@@ -161,7 +161,6 @@ class webApi:
                              'auditRemark': auditRemark,
 
                          })
-        print(auditRemark)
 
     def add_label(self, labelName, labelId, pid):
         """新增标签"""

@@ -1,10 +1,10 @@
 """幸福派相关"""
-ApiXfpUrl = 'http://192.168.10.96:8381'
+# ApiXfpUrl = 'http://192.168.10.96:8381'
 # xfp_url = 'http://192.168.10.175:9527/'
 
 # ApiXfpUrl = 'http://xfp.xfj100.com'
 #
-# ApiXfpUrl = 'http://xfpapi.ykb100.com'
+ApiXfpUrl = 'http://xfpapi.ykb100.com'
 XfpUser = '13062200301'
 # XfpPwd = 'MTIzNDU2Nzg='
 XfpPwd = '12345678'

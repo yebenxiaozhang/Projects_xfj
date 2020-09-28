@@ -320,7 +320,6 @@ class AuditTestCasc(unittest.TestCase):
             self.webApi.Audit_management(customerVisit=customerStop, customerVisitLevel=a)  # 修改配置审核
             self.appApi.GetMatchingAreaHouse()
             dome = time.strftime("%Y-%m-%d %H:%M:%S")
-            print(dome)
             self.appApi.ClientVisitAdd(projectAId=self.appText.get('houseId'),
                                        appointmentTime=dome)
             while self.appText.get('data') == '该客户已申请客户带看跟进,正在审核中!':
