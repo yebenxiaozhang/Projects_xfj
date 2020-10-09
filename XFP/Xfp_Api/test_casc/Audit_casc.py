@@ -339,7 +339,7 @@ class AuditTestCasc(unittest.TestCase):
                     self.assertEqual(1, self.appText.get('total'))
                 self.webApi.Audit_management(customerVisit=customerStop, customerVisitLevel=a)  # 修改配置审核
                 self.appApi.GetMatchingAreaHouse()
-                self.appApi.ClientVisitAdd(parentAuditId=a,projectAId=self.appText.get('houseId'),
+                self.appApi.ClientVisitAdd(projectAId=self.appText.get('houseId'),
                                            appointmentTime=dome)
             self.appApi.Task_Visit_List(appointmentTime=dome)
             self.assertEqual(self.appText.get('visiteStatus'), '3')
