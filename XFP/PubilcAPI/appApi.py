@@ -915,7 +915,7 @@ class appApi:
                              'consultantId': self.appText.get('consultantId')
                          })
 
-    def audit_List(self):
+    def follow_apply(self):
         """跟进申请"""
         self.PostRequest(url='/api/a/audit/auditList',
                          data={
@@ -926,6 +926,7 @@ class appApi:
             self.appText.set_map('auditStatueStr', globals()['r.text']['data']['records'][0]['auditStatueStr'])
             self.appText.set_map('auditStatue', globals()['r.text']['data']['records'][0]['auditStatue'])
             self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][0]['auditRemark'])
+            self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
 
     def Task_Visit_List(self, appointmentTime):
         """我的带看"""

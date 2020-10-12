@@ -14,15 +14,15 @@ from XFP.PubilcAPI.flowPath import *
 一级审核-正常流程：·····································流放公海的状态
     1、创建带看-待审核                   审核中             已取消
     2、创建带看-审核成功                 进行中             已取消
-    3、创建带看-审核失败                 已驳回             已驳回
+    3、创建带看-审核失败                 已驳回             已取消
     4、审核成功-完成带看                 已完成             已完成
     5、审核成功-提前结束带看             已取消             已取消
 
 二级审核-正常流程······································流放公海的状态
     1、创建带看-待审核          申请中                     已取消
-    2、创建带看-一级审核失败    已驳回                     已驳回
+    2、创建带看-一级审核失败    已驳回                     已取消
     3、创建带看-一级审核成功    审核中                     已取消
-    4、创建带看-二级审核失败    已驳回                     已驳回
+    4、创建带看-二级审核失败    已驳回                     已取消
     5、创建带看-二级审核成功    进行中                     已取消
     6、审核成功-完成带看        已完成                     已完成
     7、审核成功-提前结束带看    已取消                     已取消
@@ -112,7 +112,7 @@ class MyVisitTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False)  # 审核失败
         self.flowPath.visit_status(status='已驳回')
         self.flowPath.client_exile_sea()
-        self.flowPath.visit_status(status='已驳回')
+        self.flowPath.visit_status(status='已取消')
 
     def test_my_visit_07(self):
         """4、审核成功-完成带看                 已完成             已完成"""
@@ -152,7 +152,7 @@ class MyVisitTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False)  # 审核失败
         self.flowPath.visit_status(status='已驳回')
         self.flowPath.client_exile_sea()
-        self.flowPath.visit_status(status='已驳回')
+        self.flowPath.visit_status(status='已取消')
 
     def test_my_visit_11(self):
         """3、创建带看-一级审核成功    审核中                     已取消"""
@@ -174,7 +174,7 @@ class MyVisitTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appText.get('customerId'), vlue=2, isAudit=False)  # 审核
         self.flowPath.visit_status(status='已驳回')
         self.flowPath.client_exile_sea()
-        self.flowPath.visit_status(status='已驳回')
+        self.flowPath.visit_status(status='已取消')
 
     def test_my_visit_13(self):
         """5、创建带看-二级审核成功    进行中                     已取消"""

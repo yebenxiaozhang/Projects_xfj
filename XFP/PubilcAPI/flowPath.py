@@ -16,18 +16,7 @@ class flowPath:
         """客户列表--非空"""
         self.appApi.ClientList()                # 客户列表
         if self.appText.get('total') == 0:
-            self.appApi.my_clue_list()          # 线索列表
-            if self.appText.get('total') == 0:
-                self.appApi.SeaList()           # 公海列表
-                if self.appText.get('total') == 0:
-                    print('公海列表为空？')
-                    raise RuntimeError(self.appText.get('ApiXfpUrl'))
-                else:
-                    self.appApi.clue_Assigned()     # 领取线索
-                    self.appApi.my_clue_list()      # 线索列表
-                    if self.appText.get('total') == '0':
-                        print('领取线索失败？')
-                        raise RuntimeError(self.appText.get('ApiXfpUrl'))
+            self.clue_non_null()
             self.appApi.ClueInfo()
             self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                        loanSituation='这个是贷款情况')
@@ -35,6 +24,21 @@ class flowPath:
             if self.appApi.appText.get('total') == 0:
                 print('线索转客户异常？')
                 raise RuntimeError(self.appText.get('ApiXfpUrl'))
+
+    def clue_non_null(self):
+        """线索列表---非空"""
+        self.appApi.my_clue_list()  # 线索列表
+        if self.appText.get('total') == 0:
+            self.appApi.SeaList()  # 公海列表
+            if self.appText.get('total') == 0:
+                print('公海列表为空？')
+                raise RuntimeError(self.appText.get('ApiXfpUrl'))
+            else:
+                self.appApi.clue_Assigned()  # 领取线索
+                self.appApi.my_clue_list()  # 线索列表
+                if self.appText.get('total') == '0':
+                    print('领取线索失败？')
+                    raise RuntimeError(self.appText.get('ApiXfpUrl'))
 
     def add_visit(self):
         """创建带看"""
@@ -71,6 +75,11 @@ class flowPath:
         self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
         self.appApi.client_exile_sea(labelId=self.appText.get('labelId'))
 
+    def clue_exile_sea(self):
+        """线索流放公海"""
+        self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
+        self.appApi.ExileSea(labelId=self.appText.get('labelId'))
+
     def advance_over_visit(self):
         """提前结束带看"""
         self.appApi.ClientTask(taskTypeStr='带看行程')
@@ -104,6 +113,45 @@ class flowPath:
         elif status == '审核中':
             assert self.appText.get('visiteStatus') == '3', '状态异常'
             assert self.appText.get('visiteStatusStr') == '审核中', '状态异常'
+            
+    def suspend_follow(self):
+        """暂缓跟进"""
+        try:
+            self.client_list_non_null()
+            self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+            self.appApi.ClientTaskPause()
+            while self.appText.get('data') == '该客户已被暂缓!':
+                self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
+                self.appApi.ExileSea(labelId=self.appText.get('labelId'))
+                self.client_list_non_null()
+                self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+                self.appApi.ClientTaskPause()
+        except BaseException as e:
+            print("断言错误，错误原因：%s" % e)
+            raise RuntimeError(self.appText.get('ApiXfpUrl'))
+
+    def apply_status(self, status):
+        dome = self.appApi.appText.get('clueId')
+        self.appApi.follow_apply()
+        if status == '进行中':
+            assert self.appText.get('auditStatue') == '0', '状态异常'
+            assert self.appText.get('auditStatueStr') == '进行中', '状态异常'
+        elif status == '已取消':
+            assert self.appText.get('auditStatue') == '2', '状态异常'
+            assert self.appText.get('auditStatueStr') == '已取消', '状态异常'
+        elif status == '已同意':
+            assert self.appText.get('auditStatue') == '1', '状态异常'
+            assert self.appText.get('auditStatueStr') == '已同意', '状态异常'
+        elif status == '已驳回':
+            assert self.appText.get('auditStatue') == '2', '状态异常'
+            assert self.appText.get('auditStatueStr') == '已驳回', '状态异常'
+        elif status == '申请中':
+            assert self.appText.get('auditStatue') == '3', '状态异常'
+            assert self.appText.get('auditStatueStr') == '申请中', '状态异常'
+        elif status == '审核中':
+            assert self.appText.get('auditStatue') == '3', '状态异常'
+            assert self.appText.get('auditStatueStr') == '审核中', '状态异常'
+        assert self.appApi.appText.get('clueId') == dome, '跟进申请-无记录'
 
 
 
