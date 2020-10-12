@@ -270,7 +270,7 @@ class appApi:
         """线索详情"""
         self.PostRequest(url='/api/a/clue/info',
                          data={'clueId': self.appText.get('clueId')})
-        self.appText.set_map('CluePhone', globals()['r.text']['data']['cluePhone'])
+        self.appText.set_map('cluePhone', globals()['r.text']['data']['cluePhone'])
 
     def ClueSave(self, Status=1,  # 1新增 其他修改
                  cluePhone=None,
@@ -303,7 +303,6 @@ class appApi:
         if globals()['r.text']['msg'] == '成功':
             self.appText.set_map('clueId', globals()['r.text']['data']['clueId'])
             self.appText.set_map('cluePhone', cluePhone)
-            self.appText.set_map('CluePhone', cluePhone)
 
     def ClientSave(self, GFYX, ZJZZ, areaId, phoneNum=None,
                    sex='1', clueNickName='潘师傅', XSLY=None, LYBQ='表单',  # 表单，来电，IM客服
@@ -376,8 +375,8 @@ class appApi:
                              }
 
                          })
-        self.appText.set_map('CluePhone', phoneNum)
-        self.appText.set_map('ClueId', globals()['r.text']['data']['clueId'])
+        self.appText.set_map('cluePhone', phoneNum)
+        self.appText.set_map('clueId', globals()['r.text']['data']['clueId'])
         self.appText.set_map('customerId', globals()['r.text']['data']['customerId'])
 
     def ClueTaskSave(self):
@@ -388,7 +387,7 @@ class appApi:
     def ClientFollowList(self, value=0, followType=None):
         """客户跟进记录"""
         self.PostRequest(url='/api/a/customer/follow/list',
-                         data={'clueId': self.appText.get('ClueId'),
+                         data={'clueId': self.appText.get('clueId'),
                                'followType': followType,
                                'customerId': self.appText.get('customerId')
                                })
@@ -406,7 +405,7 @@ class appApi:
         """客户待办提醒"""
         self.PostRequest(url='/api/a/customer/task/list',
                          data={
-                             'clueId': self.appText.get('ClueId'),
+                             'clueId': self.appText.get('clueId'),
                              'customerId': self.appText.get('customerId')
                          })
         self.appText.set_map('total', len(globals()['r.text']['data']))
@@ -429,7 +428,7 @@ class appApi:
         """新增带看计划"""
         self.PostRequest(url='/api/a/customer/visit/add',
                          data={
-                             'clueId': self.appText.get('ClueId'),
+                             'clueId': self.appText.get('clueId'),
                              'customerId': self.appText.get('customerId'),
                              'seeingPeople': self.appText.get('consultantId'),  # 带看人
                              'appointmentTime': appointmentTime,
@@ -449,7 +448,7 @@ class appApi:
         """修改带看计划"""
         self.PostRequest(url='/api/a/customer/visit/update',
                          data={
-                             'clueId': self.appText.get('ClueId'),
+                             'clueId': self.appText.get('clueId'),
                              'isTask': True,
                              'visitId': self.appText.get('visitId'),
                              'taskId': self.appText.get('taskId'),
@@ -564,10 +563,10 @@ class appApi:
                              'customerId': self.appText.get('customerId'),
                              'clueId': self.appText.get('clueId'),
                              'labelId': labelId,
-                             'remark': remark,
                              'consultantId': self.appText.get('consultantId'),
                              'saasClueFollow': {
                                  'customerId': self.appText.get('customerId'),
+                                 'followContent': remark,
                                  'clueId': self.appText.get('clueId')
                              }
                          })
@@ -576,7 +575,7 @@ class appApi:
         """查看历史跟进"""
         self.PostRequest(url='/api/a/customer/getCustomerFollowHistoryList',
                          data={
-                             'clueId': self.appText.get('ClueId')
+                             'clueId': self.appText.get('clueId')
                          })
         self.appText.set_map('followContent', globals()['r.text']['data']['records'][value]['followContent'])
 
@@ -625,8 +624,6 @@ class appApi:
             self.appText.set_map('clueId',
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['clueId'])
             self.appText.set_map('cluePhone',
-                                 globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['cluePhone'])
-            self.appText.set_map('CluePhone',
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['cluePhone'])
         else:
             pass
@@ -796,7 +793,7 @@ class appApi:
         if globals()['r.text']['data']['total'] != 0:
             self.appText.set_map('customerId', globals()['r.text']['data']['records'][vlue]['customerId'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][vlue]['clueId'])
-            self.appText.set_map('ClueId', globals()['r.text']['data']['records'][vlue]['clueId'])
+            self.appText.set_map('clueId', globals()['r.text']['data']['records'][vlue]['clueId'])
             self.appText.set_map('taskCount', globals()['r.text']['data']['records'][vlue]['taskCount'])
 
     def ClientCallLog(self):
