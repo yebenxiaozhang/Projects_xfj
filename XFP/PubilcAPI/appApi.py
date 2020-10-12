@@ -522,7 +522,7 @@ class appApi:
                              'taskId': self.appText.get('taskId')
                          })
 
-    def ClientTaskPause(self, contactPurpose='python-申请暂停跟进'):
+    def ClientTaskPause(self, contactPurpose='python-跟进申请不通过'):
         """申请暂停跟进"""
         self.PostRequest(url='/api/a/customer/task/pause',
                          data={

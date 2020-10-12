@@ -16,12 +16,12 @@ from XFP.PubilcAPI.flowPath import *
     1、客户申请暂缓跟进-待审核       申请中                 已取消
     2、客户申请暂缓跟进-审核失败     已驳回                 已取消
     3、客户申请暂缓跟进-审核成功     已同意                 已同意
-    4、线索无效终止-待审核           申请中                 已取消
-    5、线索无效终止-审核失败         已驳回                 已取消
-    6、线索无效终止-审核成功         已同意                 已同意
-    7、客户无效终止-待审核           申请中                 已取消
-    8、客户无效终止-审核成功         已同意                 已同意
-    9、客户无效终止-审核失败         已驳回                 已驳回
+    4、线索无效终止-待审核           申请中
+    5、线索无效终止-审核失败         已驳回
+    6、线索无效终止-审核成功         已同意
+    7、客户无效终止-待审核           申请中
+    8、客户无效终止-审核成功         已同意
+    9、客户无效终止-审核失败         已驳回
     
 二级审核-正常流程······································流放公海的状态
     1、客户申请暂缓跟进-待审核              申请中            已取消
@@ -29,16 +29,16 @@ from XFP.PubilcAPI.flowPath import *
     3、客户申请暂缓跟进-一级审核成功        审核中            已取消
     4、客户申请暂缓跟进-二级审核失败        已驳回            已取消
     5、客户申请暂缓跟进-二级审核成功        已同意            已同意
-    6、线索无效终止-待审核                  申请中            已取消
-    7、线索无效终止-一级审核失败            已驳回            已取消
-    8、线索无效终止-一级审核成功            审核中            已取消
-    9、线索无效终止-二级审核失败            已驳回            已取消
-    10、线索无效终止-二级审核成功           已同意            已同意
-    11、客户无效终止-待审核                 申请中            已取消
-    12、客户无效终止-一级审核失败           已驳回            已取消
-    13、客户无效终止-一级审核成功           审核中            已取消
-    14、客户无效终止-二级审核失败           已驳回            已取消
-    15、客户无效终止-二级审核成功           已同意            已同意
+    6、线索无效终止-待审核                  申请中
+    7、线索无效终止-一级审核失败            已驳回
+    8、线索无效终止-一级审核成功            审核中
+    9、线索无效终止-二级审核失败            已驳回
+    10、线索无效终止-二级审核成功           已同意
+    11、客户无效终止-待审核                 申请中
+    12、客户无效终止-一级审核失败           已驳回
+    13、客户无效终止-一级审核成功           审核中
+    14、客户无效终止-二级审核失败           已驳回
+    15、客户无效终止-二级审核成功           已同意
            
 """
 
@@ -83,7 +83,7 @@ class FollowApplyTestCase(unittest.TestCase):
 
     def test_follow_apply_02(self):
         """2、线索无效终止        已同意"""
-        self.flowPath.client_list_non_null()
+        self.flowPath.clue_non_null()
         self.flowPath.clue_exile_sea()
         self.flowPath.apply_status(status='已同意')
 
@@ -92,6 +92,253 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.client_list_non_null()
         self.flowPath.client_exile_sea()
         self.flowPath.apply_status(status='已同意')
+
+    def test_follow_apply_04(self):
+        """1、客户申请暂缓跟进-待审核       申请中                 已取消"""
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
+        self.flowPath.suspend_follow()
+        self.flowPath.apply_status(status='申请中')
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='已取消')
+
+    def test_follow_apply_05(self):
+        """2、客户申请暂缓跟进-审核失败     已驳回                 已取消"""
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
+        self.flowPath.suspend_follow()
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
+                               isAudit=False, auditRemark=dome + 'python-跟进申请不通过',
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + 'python-跟进申请不通过', self.appApi.appText.get('auditRemark'))
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='已取消')
+
+    def test_follow_apply_06(self):
+        """3、客户申请暂缓跟进-审核成功     已同意                 已同意"""
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
+        self.flowPath.suspend_follow()
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.flowPath.apply_status(status='已同意')
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='已同意')
+
+    def test_follow_apply_07(self):
+        """4、线索无效终止-待审核           申请中"""
+        self.flowPath.clue_non_null()
+        self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
+        self.flowPath.apply_status(status='申请中')
+        """5、线索无效终止-审核失败         已驳回"""
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.test_follow_apply_07()
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(isAudit=False, auditRemark=dome + ' 线索流放审核不通过')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + ' 线索流放审核不通过', self.appApi.appText.get('auditRemark'))
+
+    def test_follow_apply_09(self):
+        """6、线索无效终止-审核成功         已同意"""
+        self.flowPath.clue_non_null()
+        self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply()
+        self.flowPath.apply_status(status='已同意')
+
+    def test_follow_apply_10(self):
+        """7、客户无效终止-待审核           申请中"""
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='申请中')
+        """8、客户无效终止-审核成功         已同意"""
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply()
+        self.flowPath.apply_status(status='已同意')
+
+    def test_follow_apply_12(self):
+        """9、客户无效终止-审核失败         已驳回"""
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
+        self.flowPath.client_exile_sea()
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(isAudit=False, auditRemark=dome + '客户无效终止审核失败')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + '客户无效终止审核失败', self.appApi.appText.get('auditRemark'))
+
+    def test_follow_apply_13(self):
+        """ 1、客户申请暂缓跟进-待审核              申请中            已取消"""
+        self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
+        self.flowPath.client_list_non_null()
+        self.flowPath.suspend_follow()
+        self.flowPath.apply_status(status='申请中')
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='已取消')
+
+    def test_follow_apply_14(self):
+        """2、客户申请暂缓跟进-一级审核失败        已驳回            已取消"""
+        self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
+        self.flowPath.client_list_non_null()
+        self.flowPath.suspend_follow()
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
+                               isAudit=False, auditRemark=dome + 'python-跟进申请不通过',
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + 'python-跟进申请不通过', self.appApi.appText.get('auditRemark'))
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='已取消')
+
+    def test_follow_apply_15(self):
+        """3、客户申请暂缓跟进-一级审核成功        审核中            已取消"""
+        self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
+        self.flowPath.client_list_non_null()
+        self.flowPath.suspend_follow()
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.flowPath.apply_status(status='审核中')
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='已取消')
+
+    def test_follow_apply_16(self):
+        """4、客户申请暂缓跟进-二级审核失败        已驳回            已取消"""
+        self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
+        self.flowPath.client_list_non_null()
+        self.flowPath.suspend_follow()
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.webApi.audit_List(auditLevel=2)
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), isAudit=False,
+                               auditRemark=dome + ' 暂申请不通过', vlue=2,
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + ' 暂申请不通过', self.appApi.appText.get('auditRemark'))
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='已取消')
+
+    def test_follow_apply_17(self):
+        """5、客户申请暂缓跟进-二级审核成功        已同意            已同意"""
+        self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
+        self.flowPath.client_list_non_null()
+        self.flowPath.suspend_follow()
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.webApi.audit_List(auditLevel=2)
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), vlue=2,
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.flowPath.apply_status(status='已同意')
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='已同意')
+
+    def test_follow_apply_18(self):
+        """6、线索无效终止-待审核                  申请中"""
+        self.flowPath.clue_non_null()
+        self.webApi.Audit_management(clueStop=True, clueStopLevel=2)
+        self.flowPath.clue_exile_sea()
+        self.flowPath.apply_status(status='申请中')
+        """7、线索无效终止-一级审核失败            已驳回"""
+        self.test_follow_apply_18()
+        self.webApi.audit_List()        # 审核列表
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.webApi.auditApply(isAudit=False, auditRemark=dome + ' 线索流放审核不通过')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + ' 线索流放审核不通过', self.appApi.appText.get('auditRemark'))
+
+    def test_follow_apply_20(self):
+        """8、线索无效终止-一级审核成功            审核中"""
+        self.flowPath.clue_non_null()
+        self.webApi.Audit_management(clueStop=True, clueStopLevel=2)
+        self.flowPath.clue_exile_sea()
+        self.flowPath.apply_status(status='申请中')
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.webApi.audit_List()        # 审核列表
+        self.webApi.auditApply()
+        self.flowPath.apply_status(status='审核中')
+        """9、线索无效终止-二级审核失败            已驳回"""
+        self.webApi.audit_List(auditLevel=2)        # 审核列表
+        self.webApi.auditApply(vlue=2, isAudit=False, auditRemark=dome + ' 线索流放审核不通过')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + ' 线索流放审核不通过', self.appApi.appText.get('auditRemark'))
+
+    def test_follow_apply_21(self):
+        """10、线索无效终止-二级审核成功           已同意"""
+        self.flowPath.clue_non_null()
+        self.webApi.Audit_management(clueStop=True, clueStopLevel=2)
+        self.flowPath.clue_exile_sea()
+        self.webApi.audit_List()        # 审核列表
+        self.webApi.auditApply()
+        self.webApi.audit_List(auditLevel=2)        # 审核列表
+        self.webApi.auditApply(vlue=2)
+        self.flowPath.apply_status(status='已同意')
+
+    def test_follow_apply_22(self):
+        """  11、客户无效终止-待审核                 申请中"""
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='申请中')
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        """12、客户无效终止-一级审核失败           已驳回"""
+        self.webApi.audit_List()        # 审核列表
+        self.webApi.auditApply(isAudit=False, auditRemark=dome + '客户无效终止审核失败')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + '客户无效终止审核失败', self.appApi.appText.get('auditRemark'))
+
+    def test_follow_apply_23(self):
+        """13、客户无效终止-一级审核成功           审核中"""
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='申请中')
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.webApi.audit_List()        # 审核列表
+        self.webApi.auditApply()
+        self.flowPath.apply_status(status='审核中')
+        """14、客户无效终止-二级审核失败           已驳回"""
+        self.webApi.audit_List(auditLevel=2)        # 审核列表
+        self.webApi.auditApply(vlue=2, isAudit=False, auditRemark=dome + '客户无效终止审核失败')
+        self.flowPath.apply_status(status='已驳回')
+        self.assertEqual(dome + '客户无效终止审核失败', self.appApi.appText.get('auditRemark'))
+
+    def test_follow_apply_24(self):
+        """15、客户无效终止-二级审核成功           已同意"""
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
+        self.flowPath.client_exile_sea()
+        self.flowPath.apply_status(status='申请中')
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.webApi.audit_List()        # 审核列表
+        self.webApi.auditApply()
+        self.flowPath.apply_status(status='审核中')
+        """14、客户无效终止-二级审核失败           已驳回"""
+        self.webApi.audit_List(auditLevel=2)        # 审核列表
+        self.webApi.auditApply(vlue=2, auditRemark=dome + '客户无效终止审核失败')
+        self.flowPath.apply_status(status='已同意')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
