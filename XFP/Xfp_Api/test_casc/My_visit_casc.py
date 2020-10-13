@@ -6,31 +6,31 @@
 """我的带看-相关"""
 from XFP.PubilcAPI.flowPath import *
 """
-无审核-正常流程：····························· 流放公海状态
-    1、创建带看          进行中                   已取消
-    2、完成带看          已完成                   已完成
-    3、提前结束带看      已取消                   已取消
-
-一级审核-正常流程：·····································流放公海的状态
-    1、创建带看-待审核                   审核中             已取消
-    2、创建带看-审核成功                 进行中             已取消
-    3、创建带看-审核失败                 已驳回             已取消
-    4、审核成功-完成带看                 已完成             已完成
-    5、审核成功-提前结束带看             已取消             已取消
-
-二级审核-正常流程······································流放公海的状态
-    1、创建带看-待审核          申请中                     已取消
-    2、创建带看-一级审核失败    已驳回                     已取消
-    3、创建带看-一级审核成功    审核中                     已取消
-    4、创建带看-二级审核失败    已驳回                     已取消
-    5、创建带看-二级审核成功    进行中                     已取消
-    6、审核成功-完成带看        已完成                     已完成
-    7、审核成功-提前结束带看    已取消                     已取消
-    
-操作事项：
-    1、审核失败的带看---不允许操作
-    2、提前结束的带看---不允许操作
-    3、审核中的带看  ---不允许操作
+无审核-正常流程：·····现状态··················· 流放公海状态
+  1、创建带看          进行中                   已取消
+  2、完成带看          已完成                   已完成
+  3、提前结束带看      已取消                   已取消
+ 
+ 一级审核-正常流程：···················现状态···············流放公海的状态
+  1、创建带看-待审核                   审核中 
+  2、创建带看-审核成功                 进行中             已取消
+  3、创建带看-审核失败                 已驳回             已取消
+  4、审核成功-完成带看                 已完成             已完成
+  5、审核成功-提前结束带看             已取消             已取消
+ 
+ 二级审核-正常流程············现状态······················流放公海的状态
+  1、创建带看-待审核          申请中 
+  2、创建带看-一级审核失败    已驳回                     已取消
+  3、创建带看-一级审核成功    审核中 
+  4、创建带看-二级审核失败    已驳回                     已取消
+  5、创建带看-二级审核成功    进行中                     已取消
+  6、审核成功-完成带看        已完成                     已完成
+  7、审核成功-提前结束带看    已取消                     已取消
+  
+ 操作事项：
+  1、审核失败的带看---不允许操作
+  2、提前结束的带看---不允许操作
+  3、审核中的带看 ---不可以完成，不可以提前结束，不可以释放公海
 """
 
 
@@ -63,6 +63,20 @@ class MyVisitTestCase(unittest.TestCase):
         cls.webApi = cls.request
         cls.webApi.Audit_management()
 
+    # def setUp(self):
+    #     pass
+
+    def tearDown(self):
+        """残留审核 失败！！！"""
+        self.webApi.audit_List()
+        while self.webApi.webText.get('total') != 0:
+            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            self.webApi.audit_List()
+        self.webApi.audit_List(auditLevel=2)
+        while self.webApi.webText.get('total') != 0:
+            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            self.webApi.audit_List()
+
     def test_my_visit_01(self):
         """1、创建带看          进行中                   已取消"""
         self.flowPath.add_visit()
@@ -87,12 +101,15 @@ class MyVisitTestCase(unittest.TestCase):
         self.flowPath.visit_status(status='已取消')
 
     def test_my_visit_04(self):
-        """1、创建带看-待审核                   审核中             已取消"""
+        """1、创建带看-待审核                   审核中"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
         self.flowPath.visit_status(status='申请中')
         self.flowPath.client_exile_sea()
+
         self.flowPath.visit_status(status='已取消')
+        self.webApi.audit_List()  # 审核列表
+        self.assertEqual(0, self.webApi.webText.get('total'))
 
     def test_my_visit_05(self):
         """2、创建带看-审核成功                 进行中             已取消"""
@@ -143,6 +160,10 @@ class MyVisitTestCase(unittest.TestCase):
         self.flowPath.visit_status(status='申请中')
         self.flowPath.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
+        self.webApi.audit_List()  # 审核列表
+        self.assertEqual(0, self.webApi.webText.get('total'))
+        self.webApi.audit_List(auditLevel=2)  # 审核列表
+        self.assertEqual(0, self.webApi.webText.get('total'))
 
     def test_my_visit_10(self):
         """2、创建带看-一级审核失败    已驳回                     已驳回"""
@@ -160,12 +181,14 @@ class MyVisitTestCase(unittest.TestCase):
         self.flowPath.add_visit()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核
-        self.flowPath.visit_status(status='审核中')
+        self.flowPath.visit_status(status='申请中')
         self.flowPath.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
+        self.webApi.audit_List(auditLevel=2)  # 审核列表
+        self.assertEqual(0, self.webApi.webText.get('total'))
 
     def test_my_visit_12(self):
-        """4、创建带看-二级审核失败    已驳回                     已驳回"""
+        """4、创建带看-二级审核失败    已驳回                     已取消"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=2)  # 修改配置审核
         self.flowPath.add_visit()
         self.webApi.audit_List()  # 审核列表

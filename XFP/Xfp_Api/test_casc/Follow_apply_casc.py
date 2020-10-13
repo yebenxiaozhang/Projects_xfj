@@ -7,39 +7,45 @@
 from XFP.PubilcAPI.flowPath import *
 
 """
-无审核-正常流程：····························· 流放公海状态
-    1、客户申请暂缓        已同意                 已同意
-    2、线索无效终止        已同意
-    3、客户无效终止        已同意
-    
-一级审核-正常流程：·····································流放公海的状态
-    1、客户申请暂缓跟进-待审核       申请中                 已取消
-    2、客户申请暂缓跟进-审核失败     已驳回                 已取消
-    3、客户申请暂缓跟进-审核成功     已同意                 已同意
-    4、线索无效终止-待审核           申请中
-    5、线索无效终止-审核失败         已驳回
-    6、线索无效终止-审核成功         已同意
-    7、客户无效终止-待审核           申请中
-    8、客户无效终止-审核成功         已同意
-    9、客户无效终止-审核失败         已驳回
-    
-二级审核-正常流程······································流放公海的状态
-    1、客户申请暂缓跟进-待审核              申请中            已取消
-    2、客户申请暂缓跟进-一级审核失败        已驳回            已取消
-    3、客户申请暂缓跟进-一级审核成功        审核中            已取消
-    4、客户申请暂缓跟进-二级审核失败        已驳回            已取消
-    5、客户申请暂缓跟进-二级审核成功        已同意            已同意
-    6、线索无效终止-待审核                  申请中
-    7、线索无效终止-一级审核失败            已驳回
-    8、线索无效终止-一级审核成功            审核中
-    9、线索无效终止-二级审核失败            已驳回
-    10、线索无效终止-二级审核成功           已同意
-    11、客户无效终止-待审核                 申请中
-    12、客户无效终止-一级审核失败           已驳回
-    13、客户无效终止-一级审核成功           审核中
-    14、客户无效终止-二级审核失败           已驳回
-    15、客户无效终止-二级审核成功           已同意
-           
+无审核-正常流程：·······现状态··············· 操作流放公海
+  1、客户申请暂缓        已同意                 已同意
+  2、线索无效终止        已同意
+  3、客户无效终止        已同意
+  
+ 一级审核-正常流程：···············现状态··················操作流放公海成功
+  1、客户申请暂缓跟进-待审核       申请中 
+  2、客户申请暂缓跟进-审核失败     已驳回                 已取消
+  3、客户申请暂缓跟进-审核成功     已同意                 已同意
+  4、线索无效终止-待审核           申请中                
+  5、线索无效终止-审核失败         已驳回
+  6、线索无效终止-审核成功         已同意
+  7、客户无效终止-待审核           申请中
+  8、客户无效终止-审核成功         已同意
+  9、客户无效终止-审核失败         已驳回
+  
+ 二级审核-正常流程························现状态·········流放公海的状态
+  1、客户申请暂缓跟进-待审核              申请中 
+  2、客户申请暂缓跟进-一级审核失败        已驳回            已取消
+  3、客户申请暂缓跟进-一级审核成功        审核中 
+  4、客户申请暂缓跟进-二级审核失败        已驳回            已取消
+  5、客户申请暂缓跟进-二级审核成功        已同意            已同意
+  6、线索无效终止-待审核                  申请中
+  7、线索无效终止-一级审核失败            已驳回
+  8、线索无效终止-一级审核成功            审核中
+  9、线索无效终止-二级审核失败            已驳回
+  10、线索无效终止-二级审核成功           已同意
+  11、客户无效终止-待审核                 申请中
+  12、客户无效终止-一级审核失败           已驳回
+  13、客户无效终止-一级审核成功           审核中
+  14、客户无效终止-二级审核失败           已驳回
+  15、客户无效终止-二级审核成功           已同意
+ 
+ 注意事项：
+  1、线索终止审核中 ---不允许转客户
+  2、客户终止跟进审核中 ---不允许创建带看，不允许录成交，不允许暂缓，不允许流放公海（无论是否开启审核，都不允许操作）
+  3、客户暂缓审核中---不允许创建带看，不允许录成交，不允许流放公海（无论是否开启审核，都不允许操作）
+  4、客户带看审核中---不允许再次录带看，不可以完成本次带看，不能提前结束带看，不允许流放公海（无论是否开启审核，都不允许操作）     
+  
 """
 
 
@@ -68,6 +74,17 @@ class FollowApplyTestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+
+    def tearDown(self):
+        """残留审核 失败！！！"""
+        self.webApi.audit_List()
+        while self.webApi.webText.get('total') != 0:
+            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            self.webApi.audit_List()
+        self.webApi.audit_List(auditLevel=2)
+        while self.webApi.webText.get('total') != 0:
+            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            self.webApi.audit_List()
 
     def test_follow_apply_01(self):
         """1、客户申请暂缓        已同意                 已同意"""
@@ -101,6 +118,8 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.apply_status(status='申请中')
         self.flowPath.client_exile_sea()
         self.flowPath.apply_status(status='已取消')
+        self.webApi.audit_List()  # 审核列表
+        self.assertEqual(0, self.webApi.webText.get('total'))
 
     def test_follow_apply_05(self):
         """2、客户申请暂缓跟进-审核失败     已驳回                 已取消"""
@@ -180,6 +199,8 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.apply_status(status='申请中')
         self.flowPath.client_exile_sea()
         self.flowPath.apply_status(status='已取消')
+        self.webApi.audit_List(auditLevel=2)  # 审核列表
+        self.assertEqual(0, self.webApi.webText.get('total'))
 
     def test_follow_apply_14(self):
         """2、客户申请暂缓跟进-一级审核失败        已驳回            已取消"""
@@ -325,39 +346,4 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.audit_List(auditLevel=2)        # 审核列表
         self.webApi.auditApply(vlue=2, auditRemark=dome + '客户无效终止审核失败')
         self.flowPath.apply_status(status='已同意')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -819,7 +819,7 @@ class appApi:
         requests.post(url=(ApiXfpUrl + '/api/b/systembase/uploadFiles'),
                       files=all_imgs)
 
-    def TransactionSave(self, transFloorage=25, Status=0,
+    def add_deal(self, transFloorage=25, Status=0,
                         transHouseBuilding='2', transHouseUnit='1-1',
                         transOwnerName='潘师傅', transRemark='python-签约', transReservedTellphone='17600000000',
                         transTotalPrice='998888.56',
@@ -849,15 +849,17 @@ class appApi:
                                'attachmentIds': attachmentIds})  # 附件
         self.appText.set_map('data', globals()['r.text']['data'])
 
-    def TransactionList(self):
+    def deal_List(self):
         """成交列表"""
         self.PostRequest(url='/api/a/transaction/list',
                          data={})
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
             self.appText.set_map('transStatus', globals()['r.text']['data']['records'][0]['transStatus'])
+            self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
+            self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][0]['auditRemark'])
 
-    def TransactionInfo(self):
+    def deal_Info(self):
         """成交详情"""
         self.PostRequest(url='/api/a/transaction/info',
                          data={'transId': self.appText.get('transId')})
