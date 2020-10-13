@@ -555,6 +555,7 @@ class appApi:
                                'remark': remark,
                                'labelName': self.appText.get('labelName'),
                                'labelId': labelId})
+        self.appText.set_map('data', globals()['r.text']['data'])
 
     def client_exile_sea(self, labelId, remark='python-客户释放公海'):
         """客户流放公海"""
@@ -570,6 +571,7 @@ class appApi:
                                  'clueId': self.appText.get('clueId')
                              }
                          })
+        self.appText.set_map('data', globals()['r.text']['data'])
 
     def LookHistoryFollow(self, value=0):
         """查看历史跟进"""
@@ -628,7 +630,6 @@ class appApi:
         else:
             pass
         self.appText.set_map('total', globals()['r.text']['data']['total'])
-
 
     def ConsultantList(self):
         """咨询师列表"""
