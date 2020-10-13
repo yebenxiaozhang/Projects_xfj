@@ -116,17 +116,9 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         self.flowPath.suspend_follow()
         self.flowPath.apply_status(status='申请中')
-        self.flowPath.client_exile_sea()
-        self.flowPath.apply_status(status='已取消')
-        self.webApi.audit_List()  # 审核列表
-        self.assertEqual(0, self.webApi.webText.get('total'))
 
-    def test_follow_apply_05(self):
         """2、客户申请暂缓跟进-审核失败     已驳回                 已取消"""
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.flowPath.client_list_non_null()
-        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
-        self.flowPath.suspend_follow()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                isAudit=False, auditRemark=dome + 'python-跟进申请不通过',
@@ -153,6 +145,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.clue_non_null()
         self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
         self.flowPath.apply_status(status='申请中')
+
         """5、线索无效终止-审核失败         已驳回"""
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.test_follow_apply_07()
@@ -175,6 +168,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
         self.flowPath.client_exile_sea()
         self.flowPath.apply_status(status='申请中')
+
         """8、客户无效终止-审核成功         已同意"""
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply()
@@ -197,16 +191,8 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.client_list_non_null()
         self.flowPath.suspend_follow()
         self.flowPath.apply_status(status='申请中')
-        self.flowPath.client_exile_sea()
-        self.flowPath.apply_status(status='已取消')
-        self.webApi.audit_List(auditLevel=2)  # 审核列表
-        self.assertEqual(0, self.webApi.webText.get('total'))
 
-    def test_follow_apply_14(self):
         """2、客户申请暂缓跟进-一级审核失败        已驳回            已取消"""
-        self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
-        self.flowPath.client_list_non_null()
-        self.flowPath.suspend_follow()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
@@ -226,14 +212,8 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.flowPath.apply_status(status='审核中')
-        self.flowPath.client_exile_sea()
-        self.flowPath.apply_status(status='已取消')
 
-    def test_follow_apply_16(self):
         """4、客户申请暂缓跟进-二级审核失败        已驳回            已取消"""
-        self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
-        self.flowPath.client_list_non_null()
-        self.flowPath.suspend_follow()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
@@ -268,6 +248,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.Audit_management(clueStop=True, clueStopLevel=2)
         self.flowPath.clue_exile_sea()
         self.flowPath.apply_status(status='申请中')
+
         """7、线索无效终止-一级审核失败            已驳回"""
         self.test_follow_apply_18()
         self.webApi.audit_List()        # 审核列表
@@ -286,6 +267,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.audit_List()        # 审核列表
         self.webApi.auditApply()
         self.flowPath.apply_status(status='审核中')
+
         """9、线索无效终止-二级审核失败            已驳回"""
         self.webApi.audit_List(auditLevel=2)        # 审核列表
         self.webApi.auditApply(vlue=2, isAudit=False, auditRemark=dome + ' 线索流放审核不通过')
@@ -310,6 +292,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.client_exile_sea()
         self.flowPath.apply_status(status='申请中')
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
+
         """12、客户无效终止-一级审核失败           已驳回"""
         self.webApi.audit_List()        # 审核列表
         self.webApi.auditApply(isAudit=False, auditRemark=dome + '客户无效终止审核失败')
@@ -326,6 +309,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.audit_List()        # 审核列表
         self.webApi.auditApply()
         self.flowPath.apply_status(status='审核中')
+
         """14、客户无效终止-二级审核失败           已驳回"""
         self.webApi.audit_List(auditLevel=2)        # 审核列表
         self.webApi.auditApply(vlue=2, isAudit=False, auditRemark=dome + '客户无效终止审核失败')
@@ -342,6 +326,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.audit_List()        # 审核列表
         self.webApi.auditApply()
         self.flowPath.apply_status(status='审核中')
+
         """14、客户无效终止-二级审核失败           已驳回"""
         self.webApi.audit_List(auditLevel=2)        # 审核列表
         self.webApi.auditApply(vlue=2, auditRemark=dome + '客户无效终止审核失败')
