@@ -64,6 +64,7 @@ class appApi:
         self.appText.set_map('XfpText', globals()['r.text'])
         self.appText.set_map('ApiXfpUrl', url)
         self.appText.set_map('msg', globals()['XfpText']['msg'])
+        self.appText.set_map('data', globals()['XfpText']['data'])
         time.sleep(0.2)
         if Status == 1:
             try:
@@ -120,12 +121,17 @@ class appApi:
                              "overtime": 0,
                              'keyWord': keyWord
                          })
-        self.appText.set_map('pages', globals()['r.text']['data']['pages'])
+        self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+        # self.appText.set_map('pages', globals()['r.text']['data']['pages'])
 
     def CluePhoneLog(self):
         """线索通话记录"""
         self.PostRequest(url='/api/a/clue/phonelog/list',
-                         data={'clueId': self.appText.get('Clue')})
+                         data={'clueId': self.appText.get('clueId')})
+        self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+        if self.appText.get('total') != 0:
+            self.appText.set_map('isFlagCallStr', globals()['r.text']['data']['records'][0]['isFlagCallStr'])   # 是否主叫
+            self.appText.set_map('consultantName', globals()['r.text']['data']['records'][0]['consultantName'])
 
     def ConsultantUpdate(self, consultantName='潘师傅(测试)'):
         """修改咨询师名称"""
@@ -744,30 +750,58 @@ class appApi:
             projectAId = 0
         self.GetLabelList(labelNo='QTKHXQ')  # 查询客户需求
         customerDemandLableIds = globals()['r.text']['data'][0]['children'][KHXQ]['labelId']
-        self.PostRequest(url='/api/a/customer/form/add',
+        self.PostRequest(url='/api/a/customer/save',
                          data={
-                             'clueId': self.appText.get('clueId'),
-                             'intentionLevelLableId': intentionLevelLableId,  # *购房意向
-                             'capitalQualificationLableId': capitalQualificationLableId,  # *资金资质
-                             'areaId': areaId,  # *区域匹配
-                             'projectAId': projectAId,  # *匹配楼盘A
-                             'phoneNum': self.appText.get('cluePhone'),
+                             'customerDemandForm': {
+                                 'clueId': self.appText.get('clueId'),
+                                 'intentionLevelLableId': intentionLevelLableId,  # *购房意向
+                                 'capitalQualificationLableId': capitalQualificationLableId,  # *资金资质
+                                 'areaId': areaId,  # *区域匹配
+                                 'projectAId': projectAId,  # *匹配楼盘A
+                                 'phoneNum': self.appText.get('cluePhone'),
 
-                             'clueNickName': callName,  # 称呼
-                             'sex': sex,  # 性别 0女 1 男
-                             'projectBId': projectBId,  # *匹配楼盘B
-                             'projectCId': projectCId,  # *匹配楼盘C
-                             'purchasePurposeLableIds': purchasePurposeLableIds,  # 购房目的，
-                             'propertyAttributeLableIds': propertyAttributeLableIds,  # 物业属性，
-                             'purchaseQualificationLableIds': purchaseQualificationLableIds,  # 购房资质
-                             'theFirstLableIds': theFirstLableIds,  # 是否首套
-                             'loanSituation': loanSituation,  # 贷款情况
+                                 'clueNickName': callName,  # 称呼
+                                 'sex': sex,  # 性别 0女 1 男
+                                 'projectBId': projectBId,  # *匹配楼盘B
+                                 'projectCId': projectCId,  # *匹配楼盘C
+                                 'purchasePurposeLableIds': purchasePurposeLableIds,  # 购房目的，
+                                 'propertyAttributeLableIds': propertyAttributeLableIds,  # 物业属性，
+                                 'purchaseQualificationLableIds': purchaseQualificationLableIds,  # 购房资质
+                                 'theFirstLableIds': theFirstLableIds,  # 是否首套
+                                 'loanSituation': loanSituation,  # 贷款情况
 
-                             'paymentRatio': paymentRatio,  # 首付比例
-                             'paymentBudget': paymentBudget,  # 首付预算
-                             'apartmentLayout': apartmentLayout,  # 户型面积
-                             'customerDemandLableIds': customerDemandLableIds  # 客户需求
+                                 'paymentRatio': paymentRatio,  # 首付比例
+                                 'paymentBudget': paymentBudget,  # 首付预算
+                                 'apartmentLayout': apartmentLayout,  # 户型面积
+                                 'customerDemandLableIds': customerDemandLableIds  # 客户需求
+
+                             },
+                             'saasClueForm': {
+                                 'clueId': self.appText.get('clueId'),
+                                 'intentionLevelLableId': intentionLevelLableId,  # *购房意向
+                                 'capitalQualificationLableId': capitalQualificationLableId,  # *资金资质
+                                 'areaId': areaId,  # *区域匹配
+                                 'projectAId': projectAId,  # *匹配楼盘A
+                                 'phoneNum': self.appText.get('cluePhone'),
+
+                                 'clueNickName': callName,  # 称呼
+                                 'sex': sex,  # 性别 0女 1 男
+                                 'projectBId': projectBId,  # *匹配楼盘B
+                                 'projectCId': projectCId,  # *匹配楼盘C
+                                 'purchasePurposeLableIds': purchasePurposeLableIds,  # 购房目的，
+                                 'propertyAttributeLableIds': propertyAttributeLableIds,  # 物业属性，
+                                 'purchaseQualificationLableIds': purchaseQualificationLableIds,  # 购房资质
+                                 'theFirstLableIds': theFirstLableIds,  # 是否首套
+                                 'loanSituation': loanSituation,  # 贷款情况
+
+                                 'paymentRatio': paymentRatio,  # 首付比例
+                                 'paymentBudget': paymentBudget,  # 首付预算
+                                 'apartmentLayout': apartmentLayout,  # 户型面积
+                                 'customerDemandLableIds': customerDemandLableIds  # 客户需求
+                             }
+
                          })
+        # self.appText.set_map('masg')
 
     def ClientFormInfo(self):
         """客户需求详情"""
@@ -992,6 +1026,40 @@ class appApi:
         self.appText.set_map('start_date', start_date)
         self.appText.set_map('end_date', end_date)
 
+    def phone_log(self, callee_num, call_time, is_own_call=1, is_me=1, talk_time=None, wait_time=None):
+        """录音上传"""
+        if is_me == 1:
+            user = XfpUser
+        else:
+            user = XfpUser1
+        r = requests.post(url='http://192.168.10.52/xfp_api/api/agent/phone_log',
+                          data={
+                              'login_phone': user,
+                              'device_no': deviceId,
+                              'is_own_call': is_own_call,   # 1呼出 0呼入
+                              'callee_num': callee_num,
+                              'saas_code': XfpsaasCode,
+                              'call_time': call_time,       # 拨打|接听时间
+                              'file_name': None,
+                              'talk_time': talk_time,       # 通话时长
+                              'wait_time': wait_time        # 等待时长
+                          })
+        r.raise_for_status()
+        # self.PostRequest(url='/api/agent/phone_log',
+        #                  data={
+        #                      'login_phone': XfpUser,
+        #                      'device_no': deviceId,
+        #                      'is_own_call': is_own_call,
+        #                      'callee_num': callee_num,
+        #                      'call_time': call_time,
+        #                      'file_name': None,
+        #                      'talk_time': None,
+        #                      'wait_time': None
+        #                  })
+
 
 if __name__ == '__main__':
     a = appApi()
+
+
+

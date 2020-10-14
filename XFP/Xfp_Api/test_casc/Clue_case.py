@@ -107,19 +107,17 @@ class ClueTestCase(unittest.TestCase):
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
         # 转化为客户后，在首页进行验证
-        self.appApi.GetUserAgenda(keyWord=self.appText.get('cluePhone'), endTime=time.strftime("%Y-%m-%d"))
-        self.assertEqual(1, self.appText.get('pages'))
 
     def test_ClueShift(self):
         """线索转移"""
         self.test_1_AddNewClue()
         self.appApi.ConsultantList()
         self.appApi.ClueChange()        # 线索转移
-        self.appApi.TodayClue(keyWord=self.appText.get('CluePhone'))         # 转移后查看自己的列表
+        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))         # 转移后查看自己的列表
         # 登陆转移后账号进行查看
         self.assertEqual(0, self.appText.get('Total'))
         self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
-        self.appApi.TodayClue(keyWord=self.appText.get('CluePhone'))
+        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
         self.assertEqual(1, self.appText.get('Total'))
 
 

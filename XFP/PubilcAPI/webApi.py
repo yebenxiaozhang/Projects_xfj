@@ -338,6 +338,26 @@ class webApi:
                              'configValue': json.dumps(configValue)
                          })
 
+    def CluePhoneLog(self):
+        """线索通话记录"""
+        self.PostRequest(url='/api/b/clue/phoneLog/list',
+                         data={'clueId': self.appText.get('clueId')})
+        self.webText.set_map('total', len(globals()['r.text']['data']['records']))
+        if self.webText.get('total') != 0:
+            self.webText.set_map('isFlagCallStr', globals()['r.text']['data']['records'][0]['isFlagCallStr'])   # 是否主叫
+            self.webText.set_map('consultantName', globals()['r.text']['data']['records'][0]['consultantName'])
+
+    def TodayClue(self, vlue=0):
+        """待首电"""
+        self.PostRequest(url='/api/b/consultant/getStatisticalConsultantTaskList',
+                         data={
+                             'consultantId': self.appText.get('consultantId')
+                         })
+        self.webText.set_map('total', len(globals()['r.text']['data']))
+        if self.webText.get('total') != 0:
+            self.webText.set_map('clueId', globals()['r.text']['data'][vlue]['clueId'])
+            self.webText.set_map('notFirstCall', globals()['r.text']['data'][vlue]['notFirstCall'])
+
 
 if __name__ == '__main__':
     a = webApi()

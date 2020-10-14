@@ -9,8 +9,10 @@ class flowPath:
         self.XfpRequest = appApi()
         self.appApi = self.XfpRequest
         # self.appApi.appText = GlobalMap()
-        self.webText = GlobalMap()
+        # self.webText = GlobalMap()
         self.flowPathText = GlobalMap()
+        self.XfpwebRequest = webApi()
+        self.webApi = self.XfpwebRequest
 
     def client_list_non_null(self):
         """客户列表--非空"""
@@ -181,7 +183,44 @@ class flowPath:
             assert self.appApi.appText.get('auditStatue') == 2, '状态异常'
         assert self.appApi.appText.get('clueId') == dome, '跟进申请-无记录'
 
+    def first_phone_non_null(self):
+        """首电不为空"""
+        self.clue_non_null()
+        self.appApi.ClueInfo()
+        self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
+        while self.appApi.appText.get('isFirst') == 1:
+            self.clue_exile_sea()
+            self.clue_non_null()
+            self.appApi.ClueInfo()
+            self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
 
+    def add_new_clue(self):
+        """新增一条线索"""
+        try:
+            self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
+            if self.appApi.appText.get('labelId') is None:
+                self.webApi.add_label(labelName='百度小程序', labelId=self.appApi.appText.get('LabelId'),
+                                      pid=self.appApi.appText.get('LabelId'))
+                self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
+            self.appApi.GetUserLabelList(userLabelType='线索标签')
+            if self.appApi.appText.get('total') == 0:
+                self.appApi.AddUserLabel()
+                self.appApi.GetUserLabelList(userLabelType='线索标签')
+            self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                                 sourceId=self.appApi.appText.get('labelId'),
+                                 keyWords=self.appApi.appText.get('labelData'))
+            # 在搜索列表进行查找
+            globals()['CluePhone'] = self.appApi.appText.get('cluePhone')
+            self.appApi.ClueList(keyWord=(self.appApi.appText.get('cluePhone')))
+            assert self.appApi.appText.get('cluePhone') == globals()['CluePhone'], '新增线索列表异常'
+            """今日上户上进行查看"""
+            self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
+            assert self.appApi.appText.get('isFirst') == 0, '新增线索是未首电'
+            time.sleep(2)
+            # self.test_4_ExileSea()
+        except BaseException as e:
+                print("错误，错误原因：%s" % e)
+                raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
 
 

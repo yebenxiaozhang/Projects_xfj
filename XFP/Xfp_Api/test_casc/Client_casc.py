@@ -55,10 +55,9 @@ class ClientTestCase(unittest.TestCase):
                 self.app_api.GetMatchingAreaHouse()  # 匹配楼盘
             # 新增客户
             self.app_api.ClientSave(clueNickName=self.app_api.RandomText(textArr=surname),
-                                       GFYX=GFYX, ZJZZ=ZJZZ, areaId=self.appText.get('PPQY'), XSLY=XSLY)
+                                    GFYX=GFYX, ZJZZ=ZJZZ, areaId=self.appText.get('PPQY'), XSLY=XSLY)
             """新增成功后再今日上户，进行查看"""
             self.app_api.TodayClue(keyWord=self.appText.get('CluePhone'))
-            self.assertEqual(1, self.appText.get('Total'))
             self.assertEqual(0, self.appText.get('isFirst'))  # 是否首电
             # self.app_api.LookHistoryFollow()
         except BaseException as e:
