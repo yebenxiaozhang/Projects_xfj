@@ -20,6 +20,12 @@ class flowPath:
         if self.appApi.appText.get('total') == 0:
             self.clue_non_null()
             self.appApi.ClueInfo()
+            # self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+            #                            loanSituation='这个是贷款情况')
+            # if self.appApi.appText.get('data') == '该线索未首电,不能转化为有效线索!':
+            self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
+                                  is_own_call=0, talk_time=12000,
+                                  call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
             self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                        loanSituation='这个是贷款情况')
             self.appApi.ClientList()  # 客户列表
@@ -136,22 +142,22 @@ class flowPath:
         dome = self.appApi.appText.get('clueId')
         self.appApi.follow_apply()
         if status == '进行中':
-            assert self.appApi.appText.get('auditStatue') == '0', '状态异常'
+            assert self.appApi.appText.get('auditStatueApp') == 0, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '进行中', '状态异常'
         elif status == '已取消':
-            assert self.appApi.appText.get('auditStatue') == '2', '状态异常'
+            assert self.appApi.appText.get('auditStatueApp') == 2, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '已取消', '状态异常'
         elif status == '已同意':
-            assert self.appApi.appText.get('auditStatue') == '1', '状态异常'
+            assert self.appApi.appText.get('auditStatueApp') == 1, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '已同意', '状态异常'
         elif status == '已驳回':
-            assert self.appApi.appText.get('auditStatue') == '2', '状态异常'
+            assert self.appApi.appText.get('auditStatueApp') == 2, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '已驳回', '状态异常'
         elif status == '申请中':
-            assert self.appApi.appText.get('auditStatue') == '3', '状态异常'
+            assert self.appApi.appText.get('auditStatueApp') == 0, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '申请中', '状态异常'
         elif status == '审核中':
-            assert self.appApi.appText.get('auditStatue') == '3', '状态异常'
+            assert self.appApi.appText.get('auditStatueApp') == 1, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '审核中', '状态异常'
         assert self.appApi.appText.get('clueId') == dome, '跟进申请-无记录'
     

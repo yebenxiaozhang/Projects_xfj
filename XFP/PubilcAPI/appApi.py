@@ -64,6 +64,7 @@ class appApi:
         self.appText.set_map('XfpText', globals()['r.text'])
         self.appText.set_map('ApiXfpUrl', url)
         self.appText.set_map('msg', globals()['XfpText']['msg'])
+        self.appText.set_map('code', globals()['XfpText']['code'])
         self.appText.set_map('data', globals()['XfpText']['data'])
         time.sleep(0.2)
         if Status == 1:
@@ -529,7 +530,7 @@ class appApi:
                              'taskId': self.appText.get('taskId')
                          })
 
-    def ClientTaskPause(self, contactPurpose='python-跟进申请不通过'):
+    def ClientTaskPause(self, contactPurpose='python-申请暂停跟进'):
         """申请暂停跟进"""
         self.PostRequest(url='/api/a/customer/task/pause',
                          data={
@@ -961,7 +962,7 @@ class appApi:
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
             self.appText.set_map('auditStatueStr', globals()['r.text']['data']['records'][0]['auditStatueStr'])
-            self.appText.set_map('auditStatue', globals()['r.text']['data']['records'][0]['auditStatue'])
+            self.appText.set_map('auditStatueApp', globals()['r.text']['data']['records'][0]['auditStatue'])
             self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][0]['auditRemark'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
 
