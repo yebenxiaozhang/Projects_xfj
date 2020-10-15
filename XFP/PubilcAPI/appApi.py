@@ -132,6 +132,7 @@ class appApi:
         if self.appText.get('total') != 0:
             self.appText.set_map('isFlagCallStr', globals()['r.text']['data']['records'][0]['isFlagCallStr'])   # 是否主叫
             self.appText.set_map('consultantName', globals()['r.text']['data']['records'][0]['consultantName'])
+            self.appText.set_map('isFirst', globals()['r.text']['data']['records'][0]['isFirst'])
 
     def ConsultantUpdate(self, consultantName='潘师傅(测试)'):
         """修改咨询师名称"""
@@ -752,6 +753,7 @@ class appApi:
         customerDemandLableIds = globals()['r.text']['data'][0]['children'][KHXQ]['labelId']
         self.PostRequest(url='/api/a/customer/save',
                          data={
+                             'consultantId': self.appText.get('consultantId'),
                              'customerDemandForm': {
                                  'clueId': self.appText.get('clueId'),
                                  'intentionLevelLableId': intentionLevelLableId,  # *购房意向
@@ -759,7 +761,7 @@ class appApi:
                                  'areaId': areaId,  # *区域匹配
                                  'projectAId': projectAId,  # *匹配楼盘A
                                  'phoneNum': self.appText.get('cluePhone'),
-
+                                 'cluePhone': self.appText.get('cluePhone'),
                                  'clueNickName': callName,  # 称呼
                                  'sex': sex,  # 性别 0女 1 男
                                  'projectBId': projectBId,  # *匹配楼盘B
@@ -769,12 +771,10 @@ class appApi:
                                  'purchaseQualificationLableIds': purchaseQualificationLableIds,  # 购房资质
                                  'theFirstLableIds': theFirstLableIds,  # 是否首套
                                  'loanSituation': loanSituation,  # 贷款情况
-
                                  'paymentRatio': paymentRatio,  # 首付比例
                                  'paymentBudget': paymentBudget,  # 首付预算
                                  'apartmentLayout': apartmentLayout,  # 户型面积
                                  'customerDemandLableIds': customerDemandLableIds  # 客户需求
-
                              },
                              'saasClueForm': {
                                  'clueId': self.appText.get('clueId'),
@@ -783,8 +783,9 @@ class appApi:
                                  'areaId': areaId,  # *区域匹配
                                  'projectAId': projectAId,  # *匹配楼盘A
                                  'phoneNum': self.appText.get('cluePhone'),
-
+                                 'cluePhone': self.appText.get('cluePhone'),
                                  'clueNickName': callName,  # 称呼
+                                 'saasCode': XfpsaasCode,
                                  'sex': sex,  # 性别 0女 1 男
                                  'projectBId': projectBId,  # *匹配楼盘B
                                  'projectCId': projectCId,  # *匹配楼盘C
@@ -793,14 +794,13 @@ class appApi:
                                  'purchaseQualificationLableIds': purchaseQualificationLableIds,  # 购房资质
                                  'theFirstLableIds': theFirstLableIds,  # 是否首套
                                  'loanSituation': loanSituation,  # 贷款情况
-
                                  'paymentRatio': paymentRatio,  # 首付比例
                                  'paymentBudget': paymentBudget,  # 首付预算
                                  'apartmentLayout': apartmentLayout,  # 户型面积
                                  'customerDemandLableIds': customerDemandLableIds  # 客户需求
                              }
-
                          })
+
         # self.appText.set_map('masg')
 
     def ClientFormInfo(self):
