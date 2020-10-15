@@ -430,6 +430,7 @@ class appApi:
             self.appText.set_map('taskRemark', globals()['r.text']['data'][vlue]['taskRemark'])
             self.appText.set_map('visitId', globals()['r.text']['data'][vlue]['visitId'])
             self.appText.set_map('taskId', globals()['r.text']['data'][vlue]['taskId'])
+            self.appText.set_map('endTime', globals()['r.text']['data'][vlue]['endTime'])
 
     def ClientVisitAdd(self, projectAId, appointmentTime=time.strftime("%Y-%m-%d ") + '22:00:00',
                        projectBId=None, projectCId=None):

@@ -339,3 +339,21 @@ class FollowApplyTestCase(unittest.TestCase):
                                vlue=2, auditRemark=dome + '客户无效终止审核失败')
         self.flowPath.apply_status(status='已同意')
 
+    # def test_follow_apply_25(self):
+    #     """暂缓失败后跟进时间 及任务待办不更新"""
+    #     self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
+    #     self.flowPath.client_list_non_null()
+    #     dome = time.strftime("%Y-%m-%d %H:%M:%S")
+    #     self.appApi.ClientTask(taskTypeStr='客户跟进')
+    #     self.flowPath.suspend_follow()
+    #     self.webApi.audit_List()  # 审核列表
+    #     self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
+    #                            endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+    #     self.webApi.audit_List(auditLevel=2)
+    #     self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), isAudit=False,
+    #                            auditRemark=dome + ' 暂申请不通过', vlue=2,
+    #                            endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+    #     self.assertEqual(0, self.appApi.appText.get('total'))
+
+
+
