@@ -1,5 +1,6 @@
 """幸福派相关"""
 # ApiXfpUrl = 'http://xfpapi.ykb100.com'
+# ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
 # XfpUser = '13062200301'
 # XfpPwd = '12345678'
 # XfpsaasCode = '000009'
@@ -8,6 +9,7 @@
 
 
 # ApiXfpUrl = 'http://xfp.xfj100.com'
+# ApiXfpUrl1 = 'http://xfp.xfj100.com'
 # XfpUser = '19859080323'
 # XfpPwd = '12345678'
 # XfpsaasCode = 'test'
@@ -16,6 +18,7 @@
 
 
 ApiXfpUrl = 'http://192.168.10.96:8381'
+ApiXfpUrl1 = 'http://192.168.10.52/xfp_api'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
 XfpsaasCode = '000009'

@@ -668,6 +668,15 @@ class appApi:
                              'consultantId': self.appText.get('consultantId2'),
                          })
 
+    def client_change(self):
+        """客户转移"""
+        self.PostRequest(url='/api/a/customer/transfer',
+                         data={
+                             'consultantId': self.appText.get('consultantId2'),
+                             'customerId': self.appText.get('customerId'),
+                             'clueId': self.appText.get('clueId')
+                         })
+
     def GetLabelList(self, labelNo, labelName=None):
         """查询标签"""
         """
@@ -859,7 +868,7 @@ class appApi:
     def add_deal(self, transFloorage=25, Status=0,
                         transHouseBuilding='2', transHouseUnit='1-1',
                         transOwnerName='潘师傅', transRemark='python-签约', transReservedTellphone='17600000000',
-                        transTotalPrice='998888.56',
+                        transTotalPrice='998888.56',isDeleted=None,
                         transYeji='88.88',
                         attachmentIds='12'):
         """成交录入"""
@@ -883,18 +892,32 @@ class appApi:
                                'transTotalPrice': transTotalPrice,  # 成交总价
                                'transType': self.appText.get('labelId'),  # 成交项
                                'transYeji': transYeji,  # 业绩
+                               'isDeleted': isDeleted,  # 是否删除
                                'attachmentIds': attachmentIds})  # 附件
         self.appText.set_map('data', globals()['r.text']['data'])
 
-    def deal_List(self):
+    def deal_List(self, transStatus=None):
         """成交列表"""
         self.PostRequest(url='/api/a/transaction/list',
                          data={})
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
-            self.appText.set_map('transStatus', globals()['r.text']['data']['records'][0]['transStatus'])
-            self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
-            self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][0]['auditRemark'])
+            if transStatus is not None:
+                dome = 0
+                while globals()['r.text']['data']['records'][dome] == transStatus:
+                    dome = dome + 1
+                    if dome == globals()['r.text']['data']['total']:
+                        print('成交列表没有已确认的成交')
+                        raise RuntimeError(self.appText.get('ApiXfpUrl'))
+            else:
+                dome = 0
+            self.appText.set_map('transStatus', globals()['r.text']['data']['records'][dome]['transStatus'])
+            self.appText.set_map('clueId', globals()['r.text']['data']['records'][dome]['clueId'])
+            self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][dome]['auditRemark'])
+            self.appText.set_map('transId', globals()['r.text']['data']['records'][dome]['transId'])
+            self.appText.set_map('customerId', globals()['r.text']['data']['records'][dome]['customerId'])
+            self.appText.set_map('houseId', globals()['r.text']['data']['records'][dome]['houseId'])
+            self.appText.set_map('labelId', globals()['r.text']['data']['records'][dome]['transType'])
 
     def deal_Info(self):
         """成交详情"""
@@ -1034,7 +1057,7 @@ class appApi:
             user = XfpUser
         else:
             user = XfpUser1
-        r = requests.post(url='http://192.168.10.52/xfp_api/api/agent/phone_log',
+        r = requests.post(url=ApiXfpUrl1 + '/api/agent/phone_log',
                           data={
                               'login_phone': user,
                               'device_no': deviceId,

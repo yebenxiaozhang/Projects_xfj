@@ -139,6 +139,7 @@ class webApi:
             self.webText.set_map('auditType', globals()['r.text']['data']['records'][0]['auditType'])
             self.webText.set_map('auditLevel', globals()['r.text']['data']['records'][0]['auditLevel'])
             self.webText.set_map('parentAuditId', globals()['r.text']['data']['records'][0]['parentAuditId'])
+            self.webText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
 
     def auditApply(self, vlue=1, auditRemark=None, isAudit=True, customerId='', endTime=''):
         """审核"""

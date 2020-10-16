@@ -171,6 +171,19 @@ class flowPath:
             assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
             self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
             self.appApi.add_deal()                  # 录入成交
+            if self.appApi.appText.get('data') == '已申请客户成交,正在审核中!':
+                self.clue_non_null()
+                self.appApi.ClueInfo()
+                self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
+                                      is_own_call=0, talk_time=12000,
+                                      call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
+                self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                           loanSituation='这个是贷款情况')
+                self.appApi.ClientList()  # 客户列表
+                self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
+                assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
+                self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
+                self.appApi.add_deal()  # 录入成交
             self.appApi.deal_List()
             assert dome != self.appApi.appText.get('total')
         except BaseException as e:
@@ -182,11 +195,11 @@ class flowPath:
         dome = self.appApi.appText.get('clueId')
         self.appApi.deal_List()
         if status == '0' or status == 0:
-            assert self.appApi.appText.get('auditStatue') == '0', '状态异常'
+            assert self.appApi.appText.get('transStatus') == 0, '状态异常'
         elif status == '1' or status == 1:
             assert self.appApi.appText.get('transStatus') == 1, '状态异常'
         elif status == '2' or status == 2:
-            assert self.appApi.appText.get('auditStatue') == 2, '状态异常'
+            assert self.appApi.appText.get('transStatus') == 2, '状态异常'
         assert self.appApi.appText.get('clueId') == dome, '跟进申请-无记录'
 
     def first_phone_non_null(self):
