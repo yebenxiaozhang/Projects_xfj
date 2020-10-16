@@ -197,5 +197,58 @@ class MyVisitTestCase(unittest.TestCase):
         self.flowPath.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
 
+    def test_my_visit_16(self):
+        """1、审核失败的带看---不允许操作"""
+        self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
+        self.flowPath.add_visit()
+        self.appApi.ClientTask(taskTypeStr='带看行程')
+        if self.appApi.appText.get('total') < 1:
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        self.appApi.visit_info()
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False)  # 审核失败
+        self.appApi.VisitFlow1()
+        self.assertEqual('该带看已无效,无法进行操作!', self.appApi.appText.get('data'))
+
+    def test_my_visit_17(self):
+        """2、提前结束的带看---不允许操作"""
+        self.webApi.Audit_management()  # 修改配置审核
+        self.flowPath.add_visit()
+        self.appApi.ClientTask(taskTypeStr='带看行程')
+        self.appApi.visit_info()
+        self.appApi.OverVisit()  # 提前结束代办
+        self.appApi.VisitFlow1()
+        self.assertEqual('该带看已无效,无法进行操作!', self.appApi.appText.get('data'))
+
+    def test_my_visit_18(self):
+        """3、审核中的带看 ---不可以完成，不可以提前结束，不可以释放公海"""
+        self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
+        self.flowPath.add_visit()
+        self.appApi.ClientTask(taskTypeStr='带看行程')
+        if self.appApi.appText.get('total') < 1:
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        self.appApi.visit_info()
+        self.appApi.VisitFlow1()
+        self.assertEqual('该客户已申请客户带看跟进审核,正在审核中!', self.appApi.appText.get('data1'))
+
+        self.appApi.visit_info()
+        self.appApi.OverVisit()  # 提前结束代办
+        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
+
+        self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
+        assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
+        self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
+        self.appApi.add_deal()  # 录入成交
+        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
+
+        self.flowPath.client_exile_sea()
+        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
+
+        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+        self.appApi.ClientTaskPause()
+        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
+
+
+
 
 

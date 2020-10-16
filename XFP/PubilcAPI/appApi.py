@@ -484,14 +484,17 @@ class appApi:
                              'beforeTakingB': beforeTakingB,
                              'beforeTakingC': beforeTakingC,
                              'beforeTakingD': beforeTakingD,
+                             'customerId': self.appText.get('customerId'),
                              'visitId': self.appText.get('visitId'),
                              'clueId': self.appText.get('clueId')
                          })
+        self.appText.set_map('data1', self.appText.get('data'))
 
         self.PostRequest(url='/api/a/customer/visit/feedback/reportVerification',
                          data={
                              'visitId': self.appText.get('visitId'),
                              'clueId': self.appText.get('clueId'),
+                             'customerId': self.appText.get('customerId'),
                              'reportVerification': 1
                          })
 
