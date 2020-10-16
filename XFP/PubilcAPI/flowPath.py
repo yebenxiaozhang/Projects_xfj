@@ -23,9 +23,15 @@ class flowPath:
             # self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
             #                            loanSituation='这个是贷款情况')
             # if self.appApi.appText.get('data') == '该线索未首电,不能转化为有效线索!':
-            self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
-                                  is_own_call=0, talk_time=12000,
-                                  call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
+            try:
+                self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
+                                      is_own_call=0, talk_time=12000,
+                                      call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
+            except:
+                self.appApi.ClueFollowList()
+                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+            else:
+                pass
             self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                        loanSituation='这个是贷款情况')
             self.appApi.ClientList()  # 客户列表

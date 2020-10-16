@@ -338,21 +338,59 @@ class FollowApplyTestCase(unittest.TestCase):
                                vlue=2)
         self.flowPath.apply_status(status='已同意')
 
-    # def test_follow_apply_25(self):
-    #     """暂缓失败后跟进时间 及任务待办不更新"""
-    #     self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
-    #     self.flowPath.client_list_non_null()
-    #     dome = time.strftime("%Y-%m-%d %H:%M:%S")
-    #     self.appApi.ClientTask(taskTypeStr='客户跟进')
-    #     self.flowPath.suspend_follow()
-    #     self.webApi.audit_List()  # 审核列表
-    #     self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
-    #                            endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
-    #     self.webApi.audit_List(auditLevel=2)
-    #     self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), isAudit=False,
-    #                            auditRemark=dome + ' 暂申请不通过', vlue=2,
-    #                            endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
-    #     self.assertEqual(0, self.appApi.appText.get('total'))
+    def test_follow_apply_25(self):
+        """1、线索终止审核中 ---不允许转客户"""
+        self.flowPath.clue_non_null()
+        self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
+        self.flowPath.clue_exile_sea()
+        self.appApi.ClueInfo()
+        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                   loanSituation='这个是贷款情况')
+        self.assertEqual('已申请线索终止,正在审核中!', self.appApi.appText.get('data'))
+
+    def test_follow_apply_26(self):
+        """2、客户终止跟进审核中 ---不允许创建带看，不允许录成交，
+        不允许暂缓，（无论是否开启审核，都不允许操作）"""
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
+        self.flowPath.client_exile_sea()
+
+        self.appApi.GetMatchingAreaHouse()
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
+                                   appointmentTime=dome)
+        self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
+
+        self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
+        assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
+        self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
+        self.appApi.add_deal()  # 录入成交
+        self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
+
+        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+        self.appApi.ClientTaskPause()
+        self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
+
+    def test_follow_apply_27(self):
+        """3、客户暂缓审核中---不允许创建带看，不允许录成交，不允许流放公海（无论是否开启审核，都不允许操作）"""
+        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
+        self.flowPath.client_list_non_null()
+        self.flowPath.suspend_follow()
+
+        self.appApi.GetMatchingAreaHouse()
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
+                                   appointmentTime=dome)
+        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
+
+        self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
+        assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
+        self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
+        self.appApi.add_deal()  # 录入成交
+        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
+
+        self.flowPath.client_exile_sea()
+        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
 
 
 
