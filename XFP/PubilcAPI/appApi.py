@@ -1073,21 +1073,25 @@ class appApi:
                               'wait_time': wait_time        # 等待时长
                           })
         r.raise_for_status()
-        # self.PostRequest(url='/api/agent/phone_log',
-        #                  data={
-        #                      'login_phone': XfpUser,
-        #                      'device_no': deviceId,
-        #                      'is_own_call': is_own_call,
-        #                      'callee_num': callee_num,
-        #                      'call_time': call_time,
-        #                      'file_name': None,
-        #                      'talk_time': None,
-        #                      'wait_time': None
-        #                  })
+
+    def getConsultantCount(self):
+        """本月概况"""
+        self.PostRequest(url='/api/a/consultant/getConsultantCount',
+                         data={
+                             'consultantId': self.appText.get('consultantId')
+                         })
+        self.appText.set_map('firstCallRatio', globals()['r.text']['data']['firstCallRatio'])   # 首电
+        self.appText.set_map('followRatio', globals()['r.text']['data']['followRatio'])         # 跟进
+        self.appText.set_map('visitRatio', globals()['r.text']['data']['visitRatio'])           # 上户
+        self.appText.set_map('dealRatio', globals()['r.text']['data']['dealRatio'])             # 带看
 
 
 if __name__ == '__main__':
     a = appApi()
+
+
+
+
 
 
 

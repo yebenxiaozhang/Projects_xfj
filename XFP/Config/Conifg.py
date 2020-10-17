@@ -7,9 +7,9 @@
 # XfpUser1 = '13062200304'
 # XfpPwd1 = '12345678'
 
-
+#
 # ApiXfpUrl = 'http://xfp.xfj100.com'
-# ApiXfpUrl1 = 'http://xfp.xfj100.com'
+# ApiXfpUrl1 = 'http://xfpweb.xfj100.com'
 # XfpUser = '19859080323'
 # XfpPwd = '12345678'
 # XfpsaasCode = 'test'
