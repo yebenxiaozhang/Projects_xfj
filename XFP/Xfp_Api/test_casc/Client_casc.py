@@ -224,33 +224,6 @@ class ClientTestCase(unittest.TestCase):
                 self.assertNotEqual(0, self.appText.get('total'))
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
-    #
-    # def test_001(self):
-    #     self.app_api.Login(userName='88888888888',
-    #                        password='12345678',
-    #                        saasCode='000000')
-    #     self.app_api.GetUserData()
-    #     a = 0
-    #     while a != 20:
-    #         self.app_api.GetLabelList(labelNo='KHYXDJ', labelName='A-现在买，紧迫性高')
-    #         # B-要买，还没确定什么时候     |   C-了解一下，还没确定买不买  |   D-不需要，随便看看
-    #         GFYX = self.appText.get('labelId')
-    #         self.app_api.GetLabelList(labelNo='ZJZZ', labelName='双资')
-    #         # 有资质无资金  |   双无   |    双资
-    #         ZJZZ = self.appText.get('labelId')
-    #         self.app_api.GetLabelList(labelNo='XSLY', labelName='百度信息流')
-    #         if self.appText.get('labelId') is None:
-    #             self.web_api.add_label(labelName='百度信息流', labelId=self.appText.get('LabelId'),
-    #                                    pid=self.appText.get('LabelId'))
-    #             self.app_api.GetLabelList(labelNo='XSLY', labelName='百度信息流')
-    #         XSLY = self.appText.get('labelId')
-    #         self.app_api.GetMatchingArea()  # 匹配区域
-    #         self.app_api.GetMatchingAreaHouse()  # 匹配楼盘
-    #         while self.appText.get('total') < 3:
-    #             self.web_api.add_house(houseName='项目' + time.strftime("%Y-%m-%d %H:%M:%S"))
-    #             self.app_api.GetMatchingAreaHouse()  # 匹配楼盘
-    #         # 新增客户
-    #         self.app_api.ClientSave(clueNickName=self.app_api.RandomText(textArr=surname),
-    #                                 GFYX=GFYX, ZJZZ=ZJZZ, areaId=self.appText.get('PPQY'), XSLY=XSLY)
-    #         a = a  + 1
+
+
 

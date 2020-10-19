@@ -75,7 +75,7 @@ class FollowApplyTestCase(unittest.TestCase):
         cls.webApi = cls.request
         cls.webApi.Audit_management()
 
-    def tearDown(self):
+    def setUp(self):
         """残留审核 失败！！！"""
         self.webApi.audit_List()
         while self.webApi.webText.get('total') != 0:
