@@ -60,14 +60,16 @@ class flowPath:
         self.appApi.GetMatchingAreaHouse()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.flowPathText.set_map('time', dome)
+        self.appApi.ClientTask(taskTypeStr='带看行程')
+        if self.appApi.appText.get('total') == 2:
+            self.advance_over_visit()
+            if self.appApi.appText.get('data') == '已申请客户带看,正在审核中!' or \
+                    self.appApi.appText.get('data') == '该客户已申请客户带看跟进审核,正在审核中!':
+                self.clue_non_null()
+                self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                           loanSituation='这个是贷款情况')
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                    appointmentTime=dome)
-        while self.appApi.appText.get('data') == '已申请客户带看,正在审核中!' or self.appApi.appText.get('data') == '该客户已申请客户带看跟进审核,正在审核中!':
-            self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
-            self.appApi.client_exile_sea(labelId=self.appApi.appText.get('labelId'))
-            self.client_list_non_null()
-            self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                       appointmentTime=dome)
 
     def accomplish_visit(self):
         """完成带看"""

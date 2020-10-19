@@ -1072,7 +1072,8 @@ class appApi:
                               'file_name': None,
                               'talk_time': talk_time,       # 通话时长
                               'wait_time': wait_time        # 等待时长
-                          })
+                          },
+                          verify=False)
         r.raise_for_status()
 
     def getConsultantCount(self):
