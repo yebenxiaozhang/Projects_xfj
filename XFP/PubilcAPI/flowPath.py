@@ -62,7 +62,7 @@ class flowPath:
         self.flowPathText.set_map('time', dome)
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                    appointmentTime=dome)
-        while self.appApi.appText.get('data') == '该客户已申请客户带看跟进,正在审核中!' or self.appApi.appText.get('data') == '该客户已申请客户带看跟进审核,正在审核中!':
+        while self.appApi.appText.get('data') == '已申请客户带看,正在审核中!' or self.appApi.appText.get('data') == '该客户已申请客户带看跟进审核,正在审核中!':
             self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
             self.appApi.client_exile_sea(labelId=self.appApi.appText.get('labelId'))
             self.client_list_non_null()

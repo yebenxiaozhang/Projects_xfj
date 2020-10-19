@@ -118,6 +118,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
         """5、在08:01:00拨打                                -首电超时"""
         self.flowPath.add_new_clue()
         self.appApi.getConsultantCount()
+        time.sleep(2)
         self.appApi.time_add(second=60)
         dome = self.appApi.appText.get('firstCallRatio')
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,

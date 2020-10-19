@@ -95,6 +95,7 @@ class FirstPhoneTestCase(unittest.TestCase):
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
+        self.assertEqual('成功', self.appApi.appText.get('msg'))
         self.appApi.CluePhoneLog()
         self.assertEqual(1, self.appText.get('total'))
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,

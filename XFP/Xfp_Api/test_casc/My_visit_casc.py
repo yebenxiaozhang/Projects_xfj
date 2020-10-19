@@ -229,7 +229,7 @@ class MyVisitTestCase(unittest.TestCase):
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
         self.appApi.VisitFlow1()
-        self.assertEqual('该客户已申请客户带看跟进审核,正在审核中!', self.appApi.appText.get('data1'))
+        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data1'))
 
         self.appApi.visit_info()
         self.appApi.OverVisit()  # 提前结束代办
