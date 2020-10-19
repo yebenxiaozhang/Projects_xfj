@@ -311,6 +311,7 @@ class appApi:
         if globals()['r.text']['msg'] == '成功':
             self.appText.set_map('clueId', globals()['r.text']['data']['clueId'])
             self.appText.set_map('cluePhone', cluePhone)
+            self.appText.set_map('createdTime', globals()['r.text']['data']['createdTime'])
 
     def ClientSave(self, GFYX, ZJZZ, areaId, phoneNum=None,
                    sex='1', clueNickName='潘师傅', XSLY=None, LYBQ='表单',  # 表单，来电，IM客服
@@ -1084,6 +1085,25 @@ class appApi:
         self.appText.set_map('followRatio', globals()['r.text']['data']['followRatio'])         # 跟进
         self.appText.set_map('visitRatio', globals()['r.text']['data']['visitRatio'])           # 上户
         self.appText.set_map('dealRatio', globals()['r.text']['data']['dealRatio'])             # 带看
+
+    def time_add(self, second):
+        if int(self.appText.get('createdTime')[-2:]) + second > 60:
+            x = int(self.appText.get('createdTime')[-2:]) + second - 60
+            y = int(self.appText.get('createdTime')[-5:-3]) + 1
+            if int(self.appText.get('createdTime')[-5:-3]) + 1 > 60:
+                y = int(self.appText.get('createdTime')[-5:-3]) + 1 - 60
+                if int(self.appText.get('createdTime')[-8:-6]) + 1 > 24:
+                    print('小时数超过24没写')
+                    raise RuntimeError(self.appText.get('ApiXfpUrl'))
+                else:
+                    print('小时数未超过24没写')
+                    raise RuntimeError(self.appText.get('ApiXfpUrl'))
+            else:
+                y = int(self.appText.get('createdTime')[-5:-3]) + 1
+        else:
+            x = int(self.appText.get('createdTime')[-2:]) + second
+
+        self.appText.set_map('time_add', self.appText.get('createdTime')[:-5] + str(y) + ':' + str(x))
 
 
 if __name__ == '__main__':

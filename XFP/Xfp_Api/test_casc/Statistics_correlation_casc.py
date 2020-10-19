@@ -13,6 +13,7 @@ from XFP.PubilcAPI.flowPath import *
     3、在08:01:00之后拨打                            -首电超时
     4、在08:00:59拨打                                -首电及时
     5、在08:01:00拨打                                -首电超时
+    6、在08:01:01拨打                                -首电超时
 """
 
 
@@ -46,21 +47,102 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
         cls.webApi.Audit_management()
 
     def test_first_phone_TimelinessRate_01(self):
-        """1、在08:00:00-08:01:00 拨打再超时之前上传录音    -首电及时
-    2、在08:00:00-08:01:00 拨打再超时之后上传录音    -首电及时
-    3、在08:01:00之后拨打                            -首电超时
-    4、在08:00:59拨打                                -首电及时
-    5、在08:01:00拨打                                -首电超时"""
+        """1、在08:00:00-08:01:00 拨打再超时之前上传录音    -首电及时"""
+        self.flowPath.add_new_clue()
+        self.appApi.getConsultantCount()
+        dome = self.appApi.appText.get('firstCallRatio')
+        try:
+            self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                                  call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
+        except:
+            self.appApi.ClueFollowList()
+            self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        self.appApi.getConsultantCount()
+        if dome < self.appApi.appText.get('firstCallRatio'):
+            pass
+        else:
+            print('在规定时间首电，不算超时')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                   loanSituation='这个是贷款情况')
+        self.assertEqual('成功', self.appApi.appText.get('msg'))
 
+    def test_first_phone_TimelinessRate_02(self):
+        """2、在08:00:00-08:01:00 拨打再超时之后上传录音    -首电及时"""
+        self.flowPath.add_new_clue()
+        self.appApi.getConsultantCount()
+        dome = self.appApi.appText.get('firstCallRatio')
+        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
+        time.sleep(60)
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=dome1)
+        self.appApi.getConsultantCount()
+        if dome < self.appApi.appText.get('firstCallRatio'):
+            pass
+        else:
+            print('2、在08:00:00-08:01:00 拨打再超时之后上传录音    -首电及时')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
+    def test_first_phone_TimelinessRate_03(self):
+        """3、在08:01:00之后拨打                            -首电超时"""
+        self.flowPath.add_new_clue()
+        self.appApi.getConsultantCount()
+        dome = self.appApi.appText.get('firstCallRatio')
+        time.sleep(60)
+        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=dome1)
+        self.appApi.getConsultantCount()
+        if dome == self.appApi.appText.get('firstCallRatio'):
+            pass
+        else:
+            print('3、在08:01:00之后拨打                            -首电超时')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
+    def test_first_phone_TimelinessRate_04(self):
+        """4、在08:00:59拨打                                -首电及时"""
+        self.flowPath.add_new_clue()
+        self.appApi.getConsultantCount()
+        dome = self.appApi.appText.get('firstCallRatio')
+        self.appApi.time_add(second=59)
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=self.appText.get('time_add'))
+        self.appApi.getConsultantCount()
+        if dome < self.appApi.appText.get('firstCallRatio'):
+            pass
+        else:
+            print('4、在08:00:59拨打                                -首电及时')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
+    def test_first_phone_TimelinessRate_05(self):
+        """5、在08:01:00拨打                                -首电超时"""
+        self.flowPath.add_new_clue()
+        self.appApi.getConsultantCount()
+        self.appApi.time_add(second=60)
+        dome = self.appApi.appText.get('firstCallRatio')
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=self.appText.get('time_add'))
+        self.appApi.getConsultantCount()
+        if dome == self.appApi.appText.get('firstCallRatio'):
+            pass
+        else:
+            print('5、在08:01:00拨打                                -首电超时')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
-
-
-
-
-
+    def test_first_phone_TimelinessRate_06(self):
+        """5、在08:01:00拨打                                -首电超时"""
+        self.flowPath.add_new_clue()
+        self.appApi.getConsultantCount()
+        self.appApi.time_add(second=61)
+        dome = self.appApi.appText.get('firstCallRatio')
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=self.appText.get('time_add'))
+        self.appApi.getConsultantCount()
+        if dome == self.appApi.appText.get('firstCallRatio'):
+            pass
+        else:
+            print('5、在08:01:00拨打                                -首电超时')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
 
 

@@ -45,7 +45,7 @@ class webApi:
             configValue = {
                     "clueCustomerConfig":
                         {
-                            "sclxTimeOut": 30,
+                            "sclxTimeOut": 1,
                             "nightLastClueTimeMinutes": 21,
                             "morningFirstClueTimeHours": 9,
                             "sclxSwitch": True,

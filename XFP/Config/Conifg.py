@@ -7,9 +7,9 @@
 # XfpUser1 = '13062200304'
 # XfpPwd1 = '12345678'
 
-#
+
 # ApiXfpUrl = 'http://xfp.xfj100.com'
-# ApiXfpUrl1 = 'http://xfpweb.xfj100.com'
+# ApiXfpUrl1 = 'https://xfpapi.xfj100.com'
 # XfpUser = '19859080323'
 # XfpPwd = '12345678'
 # XfpsaasCode = 'test'
@@ -17,7 +17,7 @@
 # XfpPwd1 = '12345678'
 
 
-ApiXfpUrl = 'http://192.168.10.96:8381'
+ApiXfpUrl = 'http://192.168.10.52:8381'
 ApiXfpUrl1 = 'http://192.168.10.52/xfp_api'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
