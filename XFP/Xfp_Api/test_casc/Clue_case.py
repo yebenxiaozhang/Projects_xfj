@@ -3,8 +3,8 @@
 # @Author  : 潘师傅
 # @File    : Client_case.py
 
-"""客户相关"""
-from XFP.PubilcAPI.webApi import *
+"""线索相关"""
+from XFP.PubilcAPI.flowPath import *
 
 
 class ClueTestCase(unittest.TestCase):
@@ -12,9 +12,16 @@ class ClueTestCase(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super(ClueTestCase, self).__init__(*args, **kwargs)
-        self.appApi = appApi()
+        self.xfp_web = webApi()
+        self.webApi = self.xfp_web
+
+        self.xfp_app = appApi()
+        self.appApi = self.xfp_app
+
+        self.flow = flowPath()
+        self.flowPath = self.flow
+
         self.appText = GlobalMap()
-        self.webApi = webApi()
         self.webText = GlobalMap()
 
     @classmethod
@@ -45,11 +52,11 @@ class ClueTestCase(unittest.TestCase):
                                  sourceId=self.appText.get('labelId'),
                                  keyWords=self.appText.get('labelData'))
             # 在搜索列表进行查找
-            globals()['CluePhone'] = self.appText.get('CluePhone')
-            self.appApi.ClueList(keyWord=(self.appText.get('CluePhone')))
-            self.assertEqual(self.appText.get('CluePhone'), globals()['CluePhone'])
+            globals()['cluePhone'] = self.appText.get('cluePhone')
+            self.appApi.ClueList(keyWord=(self.appText.get('cluePhone')))
+            self.assertEqual(self.appText.get('cluePhone'), globals()['cluePhone'])
             """今日上户上进行查看"""
-            self.appApi.TodayClue(keyWord=self.appText.get('CluePhone'))
+            self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
             self.assertEqual(1, self.appText.get('Total'))
             self.assertEqual(0, self.appText.get('isFirst'))        # 是否首电
             time.sleep(2)
@@ -79,31 +86,34 @@ class ClueTestCase(unittest.TestCase):
 
     def test_3_AlterClueMessage(self):
         """修改线索信息"""
+        self.flowPath.clue_non_null()
         self.appApi.my_clue_list()
         self.appApi.GetUserLabelList(userLabelType='线索标签')
         self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-        globals()['CluePhone'] = self.appText.get('CluePhone')
+        globals()['cluePhone'] = self.appText.get('cluePhone')
         self.appApi.ClueSave(Status=2,
                              clueNickName=self.appApi.RandomText(textArr=surname),
                              sourceId=self.appText.get('labelId'), keyWords=self.appText.get('labelData'))
         self.appApi.ClueInfo()
-        self.assertNotEqual(globals()['CluePhone'], self.appText.get('CluePhone'))
+        self.assertNotEqual(globals()['cluePhone'], self.appText.get('cluePhone'))
 
     def test_4_ExileSea(self):
         """流放公海"""
+        self.flowPath.clue_non_null()
         self.appApi.my_clue_list()
         self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
         self.appApi.ExileSea(labelId=self.appText.get('labelId'))
         # 流放公海 在首页进行验证
         self.appApi.GetUserAgenda(keyWord=self.appText.get('cluePhone'), endTime=time.strftime("%Y-%m-%d"))
-        self.assertEqual(0, self.appText.get('pages'))
         # 跟进进行验证
         self.appApi.ClueFollowList()
         self.assertEqual(self.appText.get('followContent')[:6], '线索流放公海')
 
     def test_ChangeClient(self):
         """线索转为客户"""
-        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname))
+        self.flowPath.clue_non_null()
+        self.appApi.my_clue_list()
+        self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
         # 转化为客户后，在首页进行验证
@@ -121,9 +131,3 @@ class ClueTestCase(unittest.TestCase):
         self.assertEqual(1, self.appText.get('Total'))
 
 
-    # def test_002(self):
-    #     a = 0
-    #     while a != 100:
-    #         self.appApi.my_clue_list()
-    #         self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
-    #         self.appApi.ExileSea(labelId=self.appText.get('labelId'))
