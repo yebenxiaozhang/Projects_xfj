@@ -59,6 +59,17 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
         cls.webApi = cls.request
         cls.webApi.Audit_management()
 
+    def setUp(self):
+        """残留审核 失败！！！"""
+        self.webApi.audit_List()
+        while self.webApi.webText.get('total') != 0:
+            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            self.webApi.audit_List()
+        self.webApi.audit_List(auditLevel=2)
+        while self.webApi.webText.get('total') != 0:
+            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            self.webApi.audit_List()
+
     def test_first_phone_TimelinessRate_01(self):
         """1、在08:00:00-08:01:00 拨打再超时之前上传录音    -首电及时"""
         self.flowPath.add_new_clue()
@@ -152,15 +163,79 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
                               call_time=self.appText.get('time_add'))
         self.appApi.getConsultantCount()
-        if dome == self.appApi.appText.get('firstCallRatio'):
-            pass
-        else:
+        if dome != self.appApi.appText.get('firstCallRatio'):
             print('5、在08:01:00拨打                                -首电超时')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
+    def test_client_visit_rate_01(self):
+        """1、创建带看，                 -邀约率不变"""
+        self.appApi.getConsultantCount()
+        dome = self.appApi.appText.get('visitRatio')
+        self.flowPath.add_visit()
+        self.appApi.getConsultantCount()
+        self.assertEqual(dome, self.appApi.appText.get('visitRatio'))
+        """2、提前结束带看，             -邀约率不变"""
+        self.flowPath.advance_over_visit()
+        self.appApi.getConsultantCount()
+        self.assertEqual(dome, self.appApi.appText.get('visitRatio'))
 
+    def test_client_visit_rate_02(self):
+        """3、完成带看，                 -邀约率提高"""
+        self.appApi.getConsultantCount()
+        dome = self.appApi.appText.get('visitRatio')
+        self.flowPath.add_visit()
+        self.flowPath.accomplish_visit()
+        self.appApi.getConsultantCount()
+        if self.appApi.appText.get('visitRatio') <= dome:
+            print('3、完成带看，                 -邀约率提高')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        dome = self.appApi.appText.get('visitRatio')
+        """4、完成带看后，转移客户，     -邀约率提高"""
+        self.appApi.ConsultantList()
+        self.appApi.client_change()
+        self.appApi.getConsultantCount()
+        if self.appApi.appText.get('visitRatio') != dome:
+            print('客户转移邀约率不变')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
+    def test_deal_rate_01(self):
+        """1、录入成交（需要审核）         -成交率不变"""
+        self.webApi.Audit_management(customerDeal=True, customerDealLevel=1)
+        self.appApi.getConsultantCount()
+        dome = self.appApi.appText.get('dealRatio')
+        self.flowPath.add_deal()
+        self.appApi.getConsultantCount()
+        if self.appApi.appText.get('dealRatio') != dome:
+            print('1、录入成交（需要审核）         -成交率不变')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        """2、审核成功                     -成交率提高"""
+        self.webApi.audit_List()
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'))
+        self.appApi.getConsultantCount()
+        if self.appApi.appText.get('dealRatio') <= dome:
+            print('2、审核成功                     -成交率提高')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        """4、录入成交，审核成功后转移     -成交率提高"""
+        dome = self.appApi.appText.get('dealRatio')
+        self.appApi.ConsultantList()
+        self.appApi.client_change()
+        self.appApi.getConsultantCount()
+        if self.appApi.appText.get('dealRatio') != dome:
+            print('4、录入成交，审核成功后转移     -成交率提高')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
+    def test_deal_rate_02(self):
+        """3、审核失败                     -成交率不变"""
+        self.webApi.Audit_management(customerDeal=True, customerDealLevel=1)
+        self.appApi.getConsultantCount()
+        dome = self.appApi.appText.get('dealRatio')
+        self.flowPath.add_deal()
+        self.webApi.audit_List()
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), isAudit=False)
+        self.appApi.getConsultantCount()
+        if self.appApi.appText.get('dealRatio') != dome:
+            print('3、审核失败                     -成交率不变')
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
 
 

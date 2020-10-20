@@ -38,7 +38,7 @@ class MyTestCase(unittest.TestCase):
     def test_103_alter_agent_name_long(self):
         """经纪人昵称过长"""
         self.XfkRequest.alterName(agentname=ContentLong)
-        self.assertEqual('昵称过长', self.XfkTEXT.get('Content'))
+        self.assertEqual('昵称不能超过32位', self.XfkTEXT.get('Content'))
 
     def test_104_alter_agent_name_expression(self):
         """经纪人昵称为表情"""
