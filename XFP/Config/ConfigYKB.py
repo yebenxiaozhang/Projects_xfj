@@ -1,18 +1,29 @@
-"""幸福派相关"""
-# ApiXfpUrl = 'http://192.168.10.52:8381'
-# xfp_url = 'http://192.168.10.175:9527/'
-
-# ApiXfpUrl = 'http://xfp.xfj100.com'
-#
+"""客第壹-相关"""
 ApiXfpUrl = 'http://xfpapi.ykb100.com'
+ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
 XfpUser = '13062200301'
-# XfpPwd = 'MTIzNDU2Nzg='
 XfpPwd = '12345678'
-# XfpsaasCode = '000029'
 XfpsaasCode = '000009'
-
 XfpUser1 = '13062200304'
 XfpPwd1 = '12345678'
+
+
+# ApiXfpUrl = 'http://xfp.xfj100.com'
+# ApiXfpUrl1 = 'https://xfpapi.xfj100.com'
+# XfpUser = '19859080323'
+# XfpPwd = '12345678'
+# XfpsaasCode = 'test'
+# XfpUser1 = '19859080301'
+# XfpPwd1 = '12345678'
+
+
+# ApiXfpUrl = 'http://192.168.10.96:8381'
+# ApiXfpUrl1 = 'http://192.168.10.52/xfp_api'
+# XfpUser = '13062200301'
+# XfpPwd = '12345678'
+# XfpsaasCode = '000009'
+# XfpUser1 = '13062200304'
+# XfpPwd1 = '12345678'
 
 # 设备ID
 deviceId = '864396042448297'
