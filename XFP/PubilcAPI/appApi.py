@@ -69,10 +69,12 @@ class appApi:
         time.sleep(0.2)
         if Status == 1:
             try:
-                assert "成功", globals()['r.text']['masg']
+                assert "成功", globals()['r.text']['msg']
             except BaseException as e:
                 print("断言错误，错误原因：%s" % e)
                 raise RuntimeError(self.appText.get('URL'))
+        if globals()['r.text']['code'] == 500:
+            raise RuntimeError(self.appText.get('ApiXfpUrl'))
 
     def Sign(self, userName, password='123456789'):
         """注册"""
