@@ -63,8 +63,7 @@ class flowPath:
         self.appApi.ClientTask(taskTypeStr='带看行程')
         if self.appApi.appText.get('total') == 2:
             self.advance_over_visit()
-            if self.appApi.appText.get('data') == '已申请客户带看,正在审核中!' or \
-                    self.appApi.appText.get('data') == '该客户已申请客户带看跟进审核,正在审核中!':
+            if self.appApi.appText.get('code') != 200:
                 self.clue_non_null()
                 self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                            loanSituation='这个是贷款情况')
