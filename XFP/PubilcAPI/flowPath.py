@@ -179,7 +179,7 @@ class flowPath:
             assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
             self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
             self.appApi.add_deal()                  # 录入成交
-            if self.appApi.appText.get('data') == '已申请客户成交,正在审核中!':
+            if self.appApi.appText.get('code') != 200:
                 self.clue_non_null()
                 self.appApi.ClueInfo()
                 self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),

@@ -71,7 +71,7 @@ class MyDealTestCase(unittest.TestCase):
     def test_my_deal_01(self):
         """1、录入成交          已确认                    已确认"""
         self.flowPath.add_deal()
-        self.flowPath.deal_status(status='1')
+        self.flowPath.deal_status(status=1)
 
     def test_my_deal_02(self):
         """1、录入成交-待审核          审核中"""
