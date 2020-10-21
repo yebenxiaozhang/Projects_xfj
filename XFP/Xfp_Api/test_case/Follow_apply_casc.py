@@ -392,4 +392,5 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.client_exile_sea()
         self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
 
-
+    def test_follow_apply_28(self):
+        """暂停后再次申请暂停"""
