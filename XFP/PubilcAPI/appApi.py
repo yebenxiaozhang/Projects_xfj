@@ -47,7 +47,8 @@ class appApi:
                 'current': '1'
             },
                 "saasCode": XfpsaasCode,
-                "saasCodeSys": XfpsaasCode}
+                "saasCodeSys": XfpsaasCode
+            }
             self.Merge(data1, data)
             time.sleep(0.2)
             r = requests.post(url=(ApiXfpUrl + url),
@@ -87,11 +88,11 @@ class appApi:
                          )
         self.appText.set_map('msg', globals()['XfpText']['msg'])
 
-    def Login(self, userName=XfpUser, password=XfpPwd):
+    def Login(self, userName=XfpUser, password=XfpPwd, saasCode=XfpsaasCode):
         """登录"""
         self.PostRequest(url='/api/auth/login',
                          data={"userName": userName,
-                               'saasCode': XfpsaasCode,
+                               'saasCode': saasCode,
                                # 'deviceId': deviceId,
                                "password": password},
                          header=1)
@@ -105,13 +106,14 @@ class appApi:
     def GetUserData(self):
         """获取咨询师信息"""
         self.PostRequest(url='/api/a/consultant/info',
-                         data={'deviceId': deviceId})
+                         data={'deviceId': deviceId,
+                               'saasCode': '000006'})
         if self.appText.get('msg') != '禁止访问':
             self.appText.set_map('consultantId', globals()['r.text']['data']['consultantId'])
             self.appText.set_map('consultantName', globals()['r.text']['data']['consultantName'])
             self.appText.set_map('consultantLabels', globals()['r.text']['data']['consultantLabels'])
 
-    def GetUserAgenda(self, endTime, taskType=None, keyWord=None):
+    def GetUserAgenda(self, endTime=None, taskType=None, keyWord=None, clueId=None):
         """获取用户待办"""
         self.PostRequest(url='/api/a/clue/task/list',
                          data={
@@ -119,12 +121,15 @@ class appApi:
                              "deviceId": deviceId,
                              "taskType": taskType,  # 0 超时1 线索 2 联系 3带看
                              "isCompleted": 0,
+                             'clueId': clueId,
                              "isStop": 0,
                              "endTime": endTime,
                              "overtime": 0,
                              'keyWord': keyWord
                          })
         self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+        if self.appText.get('total') != 0:
+            self.appText.set_map('endTime', globals()['r.text']['data']['records'][0]['endTime'])
         # self.appText.set_map('pages', globals()['r.text']['data']['pages'])
 
     def CluePhoneLog(self):
@@ -159,7 +164,7 @@ class appApi:
         """获取标签"""
         self.PostRequest(url='/api/label/getUserLabelList',
                          data={
-                             'userLabelType': userLabelType,
+                             'userLabelType': userLabelType
                          })
         if globals()['r.text']['data']['total'] != 0:
             self.appText.set_map('labelData', globals()['r.text']['data']['records'][value]['userLabelValue'])
@@ -171,7 +176,7 @@ class appApi:
         self.PostRequest(url='/api/label/addOrUpdateUserLabel',
                          data={
                              'userLabelValue': userLabelValue,
-                             'userLabelType': userLabelType,
+                             'userLabelType': userLabelType
                          })
 
     def UpdateUserLabel(self, userLabelValue=None, userLabelType='线索标签'):
@@ -209,9 +214,11 @@ class appApi:
         """查询线索跟进列表"""
         self.PostRequest(url='/api/a/clue/follow/list',
                          data={'clueId': self.appText.get('clueId'),
-                               'followType': followType})
+                               'followType': followType
+                               })
 
         # if globals()['r.text']['data']['total'] != 0:
+        self.appText.set_map('total', len(globals()['r.text']['data']['records']))
         self.appText.set_map('followContent',
                              globals()['r.text']['data']['records'][value]['followContent'])
         self.appText.set_map('followId', globals()['r.text']['data']['records'][value]['followId'])
@@ -232,9 +239,11 @@ class appApi:
             followType = '1'
             taskType = '1'
             self.appText.set_map('customerId', 'null')
+            taskId = 'taskId'
         else:
             followType = '3'
             taskType = '2'
+            taskId = 'taskOldId'
         self.PostRequest(url='/api/a/clue/saveFollow',
                          data={
                              'clueId': self.appText.get('clueId'),
@@ -276,7 +285,7 @@ class appApi:
                              "isStop": 0,
                              "taskEndTime": taskEndTime})
 
-    def ClueInfo(self, ):
+    def ClueInfo(self):
         """线索详情"""
         self.PostRequest(url='/api/a/clue/info',
                          data={'clueId': self.appText.get('clueId')})
@@ -390,11 +399,6 @@ class appApi:
         self.appText.set_map('clueId', globals()['r.text']['data']['clueId'])
         self.appText.set_map('customerId', globals()['r.text']['data']['customerId'])
 
-    def ClueTaskSave(self):
-        """线索待办录入"""
-        self.PostRequest(url='/api/a/clue/task/save',
-                         data={})
-
     def ClientFollowList(self, value=0, followType=None):
         """客户跟进记录"""
         self.PostRequest(url='/api/a/customer/follow/list',
@@ -435,7 +439,7 @@ class appApi:
             self.appText.set_map('taskId', globals()['r.text']['data'][vlue]['taskId'])
             self.appText.set_map('endTime', globals()['r.text']['data'][vlue]['endTime'])
 
-    def ClientVisitAdd(self, projectAId, appointmentTime=time.strftime("%Y-%m-%d ") + '22:00:00',
+    def ClientVisitAdd(self, projectAId, appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
                        projectBId=None, projectCId=None):
         """新增带看计划"""
         self.PostRequest(url='/api/a/customer/visit/add',
@@ -466,7 +470,7 @@ class appApi:
                              'taskId': self.appText.get('taskId'),
                              'customerId': self.appText.get('customerId'),
                              'seeingPeople': self.appText.get('consultantId'),  # 带看人
-                             'appointmentTime': time.strftime("%Y-%m-%d ") + '22:00:00',
+                             'appointmentTime': time.strftime("%Y-%m-%d %H:%M:%S"),
                              'projectAId': projectAId,
                              'projectBId': projectBId,
                              'projectCId': projectCId,
@@ -537,13 +541,14 @@ class appApi:
                              'taskId': self.appText.get('taskId')
                          })
 
-    def ClientTaskPause(self, contactPurpose='python-申请暂停跟进'):
+    def ClientTaskPause(self, contactPurpose='python-申请暂停跟进',
+                        endTime=time.strftime("%Y-%m-%d %H:%M:%S")):
         """申请暂停跟进"""
         self.PostRequest(url='/api/a/customer/task/pause',
                          data={
                              'clueId': self.appText.get('clueId'),
                              'labelId': self.appText.get('labelId'),
-                             'endTime': time.strftime("%Y-%m-%d ") + '22:00:00',
+                             'endTime': endTime,
                              'customerId': self.appText.get('customerId'),
                              'consultantId': self.appText.get('consultantId'),
                              'labelName': self.appText.get('labelName'),
@@ -627,13 +632,13 @@ class appApi:
                              ]
                          })
 
-    def my_clue_list(self, vlue=0):
+    def my_clue_list(self, vlue=0, myClue='Y'):
         """我的线索"""
         self.PostRequest(url='/api/a/clue/MyClueList',
                          data={
-                             'myClue': 'Y',
+                             'myClue': myClue,
                              'consultantId': self.appText.get('consultantId'),
-                             'isWork': True,
+                             'isWork': True
                          })
 
         if globals()['r.text']['data']['total'] != 0:
@@ -1107,6 +1112,18 @@ class appApi:
             x = int(self.appText.get('createdTime')[-2:]) + second
 
         self.appText.set_map('time_add', self.appText.get('createdTime')[:-5] + str(y) + ':' + str(x))
+
+    def time_difference(self):
+        """时间差"""
+        from datetime import datetime, date
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        time_1_struct = datetime.strptime(self.appText.get('endTime'), "%Y-%m-%d %H:%M:%S")
+        time_2_struct = datetime.strptime(dome, "%Y-%m-%d %H:%M:%S")
+        if dome[:10] == self.appText.get('endTime'):
+            self.appText.set_map('vlue', (time_2_struct - time_1_struct).seconds/60/60)
+        else:
+            total_seconds = (time_2_struct - time_1_struct).total_seconds()
+            self.appText.set_map('vlue', (total_seconds)/60/60)
 
 
 if __name__ == '__main__':

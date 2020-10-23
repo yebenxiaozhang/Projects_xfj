@@ -246,8 +246,107 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
             print('3、审核失败                     -成交率不变')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
+    def test_follow_rate_01(self):
+        """
+            1、线索跟进
+                - 查看线索规定时间跟进 超过6小时      跟进及时率下降
+                - 查看线索规定时间跟进 未过6小时      跟进及时率增加
+                - 无线索-新增线索      -跟进          跟进及时率增加
+        """
+        self.appApi.my_clue_list()
+        if self.appText.get('total') != 0:
+            self.appApi.getConsultantCount()
+            dome = self.appText.get('followRatio')
+            self.appApi.GetUserAgenda(clueId=self.appText.get('clueId'))
+            self.appApi.time_difference()
+            if int(self.appText.get('vlue')) > 6:
+                """查看线索规定时间跟进 超过6小时      跟进及时率下降"""
+                self.appApi.ClueFollowList()
+                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+                time.sleep(1)
+                self.appApi.getConsultantCount()
+                if int(dome) == 1:
+                    pass
+                else:
+                    if self.appText.get('followRatio') >= dome:
+                        print('查看线索规定时间跟进 超过6小时      跟进及时率下降')
+                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+            else:
+                self.appApi.ClueFollowList()
+                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+                time.sleep(1)
+                self.appApi.getConsultantCount()
+                if int(dome) == 1:
+                    pass
+                else:
+                    if self.appText.get('followRatio') <= dome:
+                        print('- 查看线索规定时间跟进 未过6小时      跟进及时率增加')
+                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        else:
+            """- 无线索-新增线索      -跟进          跟进及时率增加"""
+            self.flowPath.add_new_clue()
+            self.appApi.getConsultantCount()
+            dome = self.appText.get('followRatio')
+            self.appApi.ClueFollowList()
+            self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+            time.sleep(1)
+            self.appApi.getConsultantCount()
+            if int(dome) == 1:
+                pass
+            else:
+                if self.appText.get('followRatio') <= dome:
+                    print('- 无线索-新增线索      -跟进          跟进及时率增加')
+                    raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
-
+    def test_follow_rete_02(self):
+        """ 2、客户跟进
+                - 查看客户规定时间跟进 超过6小时      跟进及时率下降
+                - 查看客户规定时间跟进 未过6小时      跟进及时率增加
+                - 无客户-新增客户      -跟进          跟进及时率增加"""
+        self.appApi.ClientList()
+        if self.appText.get('total') != 0:
+            self.appApi.getConsultantCount()
+            dome = self.appText.get('followRatio')
+            self.appApi.ClientTask(taskTypeStr='客户跟进')
+            self.appApi.time_difference()
+            if int(self.appText.get('vlue')) >= 6:
+                """查看客户规定时间跟进 超过6小时      跟进及时率下降"""
+                self.appApi.ClientFollowList()
+                self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+                time.sleep(1)
+                self.appApi.getConsultantCount()
+                if int(dome) == 1:
+                    pass
+                else:
+                    if self.appText.get('followRatio') >= dome:
+                        print('查看客户规定时间跟进 超过6小时      跟进及时率下降')
+                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+            else:
+                self.appApi.ClientFollowList()
+                self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+                time.sleep(1)
+                self.appApi.getConsultantCount()
+                if int(dome) == 1:
+                    pass
+                else:
+                    if self.appText.get('followRatio') <= dome:
+                        print('- 查看客户规定时间跟进 未过6小时      跟进及时率增加')
+                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        else:
+            """-无客户-新增客户      -跟进          跟进及时率增加"""
+            self.flowPath.client_list_non_null()
+            self.appApi.getConsultantCount()
+            dome = self.appText.get('followRatio')
+            self.appApi.ClientFollowList()
+            self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+            time.sleep(1)
+            self.appApi.getConsultantCount()
+            if int(dome) == 1:
+                pass
+            else:
+                if self.appText.get('followRatio') < dome:
+                    print('- 无客户-新增客户      -跟进          跟进及时率增加')
+                    raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
 
 

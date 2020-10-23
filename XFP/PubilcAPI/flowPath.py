@@ -29,7 +29,7 @@ class flowPath:
                                       call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
             except:
                 self.appApi.ClueFollowList()
-                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
             else:
                 pass
             self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
@@ -45,8 +45,7 @@ class flowPath:
         if self.appApi.appText.get('total') == 0:
             self.appApi.SeaList()  # 公海列表
             if self.appApi.appText.get('total') == 0:
-                print('公海列表为空？')
-                raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+                self.add_new_clue()
             else:
                 self.appApi.clue_Assigned()  # 领取线索
                 self.appApi.my_clue_list()  # 线索列表

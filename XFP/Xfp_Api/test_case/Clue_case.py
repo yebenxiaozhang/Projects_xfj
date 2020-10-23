@@ -130,4 +130,45 @@ class ClueTestCase(unittest.TestCase):
         self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
         self.assertEqual(1, self.appText.get('Total'))
 
+    # def test_1_AddNewClue1(self):
+    #     """新增一条线索"""
+    #     self.webApi.clue_list(myClue='N', vlue=12)
+    #     self.appApi.ClueInfo()
+    #     self.appApi.ClueFollowList()
+    #     dome = self.appText.get('total')
+    #     dome1 = 1
+    #     dome2 = self.appApi.appText.get('cluePhone')
+    #     while dome != 0:
+    #         dome = dome - 1
+    #         self.appApi.Login()
+    #         time.sleep(1)
+    #         self.webApi.clue_list(myClue='N', vlue=12)
+    #         self.appApi.ClueFollowList(value=dome)
+    #         test = self.appText.get('followContent')
+    #         print(self.appText.get('followContent'))
+    #         self.appApi.Login(userName='13000000005', saasCode='000006')     # 登录咨询师B
+    #         self.appApi.GetUserData()
+    #         if dome1 == 1:
+    #             self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序', saasCode='000006')
+    #             if self.appText.get('labelId') is None:
+    #                 self.webApi.add_label(labelName='百度小程序', labelId=self.appText.get('LabelId'),
+    #                                       pid=self.appText.get('LabelId'), saasCode='000006')
+    #                 self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序', saasCode='000006')
+    #             self.appApi.GetUserLabelList(userLabelType='线索标签', saasCode='000006')
+    #             if self.appText.get('total') == 0:
+    #                 self.appApi.AddUserLabel(saasCode='000006')
+    #                 self.appApi.GetUserLabelList(userLabelType='线索标签', saasCode='000006')
+    #             self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+    #                                  sourceId=self.appText.get('labelId'),
+    #                                  keyWords=self.appText.get('labelData'),
+    #                                  cluePhone=dome2, saasCode='000006')
+    #
+    #         else:
+    #             self.appApi.my_clue_list(saasCode='000006')
+    #             self.appApi.ClueFollowList(saasCode='000006')
+    #             time.sleep(2)
+    #             self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"),
+    #                                        followContent=test,
+    #                                        taskRemark=test, saasCode='000006')
+    #         dome1 = dome1 + 1
 

@@ -359,6 +359,23 @@ class webApi:
             self.webText.set_map('clueId', globals()['r.text']['data'][vlue]['clueId'])
             self.webText.set_map('notFirstCall', globals()['r.text']['data'][vlue]['notFirstCall'])
 
+    def clue_list(self, myClue='Y', rderNo=None, vlue=0):
+        """线索列表"""
+        self.PostRequest(url='/api/b/clue/list',
+                         data={
+                             'myClue': myClue,
+                             'isWork': True,
+                             'orderNo': rderNo
+                         })
+        if globals()['r.text']['data']['total'] != 0:
+            vlue = vlue + 1
+            self.appText.set_map('clueId',
+                                 globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['clueId'])
+            self.appText.set_map('cluePhone',
+                                 globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['cluePhone'])
+        else:
+            pass
+        self.webText.set_map('total', globals()['r.text']['data']['total'])
 
 if __name__ == '__main__':
     a = webApi()
