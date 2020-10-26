@@ -92,7 +92,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.suspend_follow()
         self.appApi.ClientTask()  # 待办
         if self.appApi.appText.get('total') == 1:
-            if self.appApi.appText.get('taskTypeStr') != '带看行程':
+            if self.appApi.appText.get('taskType') != 3:
                 raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         dome = self.appApi.appText.get('clueId')
         self.appApi.follow_apply()

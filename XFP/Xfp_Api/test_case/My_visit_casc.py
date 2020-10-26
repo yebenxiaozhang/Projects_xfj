@@ -31,6 +31,7 @@ from XFP.PubilcAPI.flowPath import *
   1、审核失败的带看---不允许操作
   2、提前结束的带看---不允许操作
   3、审核中的带看 ---不可以完成，不可以提前结束，不可以释放公海
+  4、同一个客户只能存在一个带看 一个带看代办
 """
 
 
@@ -201,7 +202,7 @@ class MyVisitTestCase(unittest.TestCase):
         """1、审核失败的带看---不允许操作"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
-        self.appApi.ClientTask(taskTypeStr='带看行程')
+        self.appApi.ClientTask(taskType='3')
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
@@ -214,7 +215,7 @@ class MyVisitTestCase(unittest.TestCase):
         """2、提前结束的带看---不允许操作"""
         self.webApi.Audit_management()  # 修改配置审核
         self.flowPath.add_visit()
-        self.appApi.ClientTask(taskTypeStr='带看行程')
+        self.appApi.ClientTask(taskType='3')
         self.appApi.visit_info()
         self.appApi.OverVisit()  # 提前结束代办
         self.appApi.VisitFlow1()
@@ -224,7 +225,7 @@ class MyVisitTestCase(unittest.TestCase):
         """3、审核中的带看 ---不可以完成，不可以提前结束，不可以释放公海"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
-        self.appApi.ClientTask(taskTypeStr='带看行程')
+        self.appApi.ClientTask(taskType='3')
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
@@ -248,7 +249,12 @@ class MyVisitTestCase(unittest.TestCase):
         self.appApi.ClientTaskPause()
         self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
 
-
-
+    def test_my_visit_19(self):
+        """同一个客户只能存在一个带看 一个带看代办"""
+        self.webApi.Audit_management()
+        self.flowPath.add_visit()
+        self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
+                                   appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+        self.assertEqual(301, self.appText.get('code'))
 
 

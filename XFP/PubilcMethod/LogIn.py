@@ -1,4 +1,4 @@
-from XFP.Config.Conifg import *
+from XFP.Config.Config import *
 from XFP.PubilcMethod.WebTools import *
 
 

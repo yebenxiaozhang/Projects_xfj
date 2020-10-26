@@ -5,7 +5,7 @@
 import requests
 import json
 from XFP.GlobalMap import GlobalMap
-from XFP.Config.Conifg import *
+from XFP.Config.Config import *
 import unittest
 import time
 import random
@@ -416,7 +416,7 @@ class appApi:
         self.PostRequest(url='/api/a/customer/follow/save',
                          data={'clueId': self.appText.get('clueId')})
 
-    def ClientTask(self, taskTypeStr='带看行程'):
+    def ClientTask(self, taskType='3'):
         """客户待办提醒"""
         self.PostRequest(url='/api/a/customer/task/list',
                          data={
@@ -427,13 +427,14 @@ class appApi:
         if len(globals()['r.text']['data']) != 0:
             vlue = 0
             while vlue != self.appText.get('total'):
-                if globals()['r.text']['data'][vlue]['taskTypeStr'] == taskTypeStr:
-                    break
-                vlue = vlue + 1
-                if vlue == len(globals()['r.text']['data']):
-                    vlue = 0
-                    break
-            self.appText.set_map('taskTypeStr', globals()['r.text']['data'][vlue]['taskTypeStr'])
+                # print(vlue)
+                if self.appText.get('total') != vlue:
+                    if globals()['r.text']['data'][vlue]['taskType'] == str(taskType):
+                        break
+                    vlue = vlue + 1
+            if vlue == self.appText.get('total'):
+                vlue = vlue - 1
+            self.appText.set_map('taskType', globals()['r.text']['data'][vlue]['taskType'])
             self.appText.set_map('taskRemark', globals()['r.text']['data'][vlue]['taskRemark'])
             self.appText.set_map('visitId', globals()['r.text']['data'][vlue]['visitId'])
             self.appText.set_map('taskId', globals()['r.text']['data'][vlue]['taskId'])
@@ -658,7 +659,7 @@ class appApi:
                              'consultantId': self.appText.get('consultantId'),
                              'isShow': 0
                          })
-        if globals()['r.text']['data']['current'] != 0:
+        if len(globals()['r.text']['data']['records']) != 0:
             x = 0
             dome = globals()['r.text']['data']['records'][x]['consultantPhone']
             if dome != XfpUser1:

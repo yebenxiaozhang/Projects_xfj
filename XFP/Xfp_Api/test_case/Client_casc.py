@@ -8,7 +8,7 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class ClientTestCase(unittest.TestCase):
-    """幸福派——客户列表"""
+    """客第壹——客户列表"""
 
     def __init__(self, *args, **kwargs):
         super(ClientTestCase, self).__init__(*args, **kwargs)
@@ -66,7 +66,7 @@ class ClientTestCase(unittest.TestCase):
         """修改带看计划"""
         try:
             self.flowPath.add_visit()
-            self.appApi.ClientTask(taskTypeStr='带看行程')
+            self.appApi.ClientTask(taskType='3')
             if self.appApi.appText.get('total') < 1:
                 print('创建带看至少有一个任务')
                 raise RuntimeError(self.appText.get('ApiXfpUrl'))
@@ -80,7 +80,7 @@ class ClientTestCase(unittest.TestCase):
         """完成带看计划"""
         try:
             self.flowPath.add_visit()
-            self.appApi.ClientTask(taskTypeStr='带看行程')
+            self.appApi.ClientTask(taskType='3')
             if self.appText.get('total') < 1:
                 raise RuntimeError(self.appText.get('ApiXfpUrl'))
             self.appApi.visit_info()

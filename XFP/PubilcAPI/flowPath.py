@@ -59,7 +59,7 @@ class flowPath:
         self.appApi.GetMatchingAreaHouse()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.flowPathText.set_map('time', dome)
-        self.appApi.ClientTask(taskTypeStr='带看行程')
+        self.appApi.ClientTask(taskType='3')
         if self.appApi.appText.get('total') == 2:
             self.advance_over_visit()
             if self.appApi.appText.get('code') != 200:
@@ -72,7 +72,7 @@ class flowPath:
     def accomplish_visit(self):
         """完成带看"""
         self.visit_status(status='进行中')
-        self.appApi.ClientTask(taskTypeStr='带看行程')
+        self.appApi.ClientTask(taskType='3')
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
@@ -96,7 +96,7 @@ class flowPath:
 
     def advance_over_visit(self):
         """提前结束带看"""
-        self.appApi.ClientTask(taskTypeStr='带看行程')
+        self.appApi.ClientTask(taskType='3')
         self.appApi.visit_info()
         self.appApi.OverVisit()  # 提前结束代办
         self.appApi.ClientTask()

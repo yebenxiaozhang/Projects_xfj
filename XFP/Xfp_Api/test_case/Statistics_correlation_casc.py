@@ -204,7 +204,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
         self.appApi.client_change()
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('visitRatio') != dome:
-            print('客户转移邀约率不变')
+            print(' ')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
     def test_deal_rate_01(self):
@@ -276,7 +276,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
                 self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
                 time.sleep(1)
                 self.appApi.getConsultantCount()
-                if int(dome) == 1:
+                if dome == 1:
                     pass
                 else:
                     if self.appText.get('followRatio') <= dome:
@@ -307,7 +307,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
         if self.appText.get('total') != 0:
             self.appApi.getConsultantCount()
             dome = self.appText.get('followRatio')
-            self.appApi.ClientTask(taskTypeStr='客户跟进')
+            self.appApi.ClientTask(taskType='2')
             self.appApi.time_difference()
             if int(self.appText.get('vlue')) >= 6:
                 """查看客户规定时间跟进 超过6小时      跟进及时率下降"""
@@ -315,7 +315,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
                 self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
                 time.sleep(1)
                 self.appApi.getConsultantCount()
-                if int(dome) == 1:
+                if dome == 1:
                     pass
                 else:
                     if self.appText.get('followRatio') >= dome:
@@ -326,7 +326,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
                 self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
                 time.sleep(1)
                 self.appApi.getConsultantCount()
-                if int(dome) == 1:
+                if dome == 1:
                     pass
                 else:
                     if self.appText.get('followRatio') <= dome:
@@ -341,7 +341,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
             self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
             time.sleep(1)
             self.appApi.getConsultantCount()
-            if int(dome) == 1:
+            if dome == 1:
                 pass
             else:
                 if self.appText.get('followRatio') < dome:
