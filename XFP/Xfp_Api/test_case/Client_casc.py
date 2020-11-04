@@ -103,7 +103,7 @@ class ClientTestCase(unittest.TestCase):
             self.flowPath.advance_over_visit()
             self.appApi.ClientTask()
             self.appApi.ClientFollowList()
-            self.assertEqual('取消带看', self.appText.get('followContent'))
+            self.assertEqual('取消带看', self.appText.get('followContent')[-4:])
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appText.get('ApiXfpUrl'))

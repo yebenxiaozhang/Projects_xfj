@@ -420,7 +420,7 @@ class webApi:
         self.PostRequest(url='/api/b/goldDetail/addGoldDetailInfo',
                          data={
                                 "saasCodeSys": "000009",
-                                "goldValue": "99999999",
+                                "goldValue": "50000",
                                 "goldType": 1,
                                 "type":"add",
                                 # "saasName":"小鸡炖蘑菇",

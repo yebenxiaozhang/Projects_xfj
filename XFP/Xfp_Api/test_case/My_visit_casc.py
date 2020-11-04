@@ -120,7 +120,8 @@ class MyVisitTestCase(unittest.TestCase):
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
         self.webApi.audit_List()  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False)  # 审核失败
+        self.webApi.auditApply(customerId=self.appText.get('customerId'),
+                               isAudit=False, auditRemark=int(time.time()))  # 审核失败
         self.flowPath.visit_status(status='已驳回')
         self.flowPath.client_exile_sea()
         self.flowPath.visit_status(status='已取消')

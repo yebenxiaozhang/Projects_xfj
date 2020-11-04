@@ -113,9 +113,12 @@ class ClueTestCase(unittest.TestCase):
         """线索转为客户"""
         self.flowPath.clue_non_null()
         self.appApi.my_clue_list()
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
+        self.assertEqual(200, self.appText.get('code'))
         # 转化为客户后，在首页进行验证
 
     def test_ClueShift(self):
@@ -129,6 +132,30 @@ class ClueTestCase(unittest.TestCase):
         self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
         self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
         self.assertEqual(1, self.appText.get('Total'))
+
+    def test_clue_ChangeClient(self):
+        """未首电转客户"""
+        self.appApi.SeaList()  # 公海列表
+        self.appApi.clue_Assigned()  # 领取线索
+        self.appApi.ClueInfo()
+        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                   loanSituation='这个是贷款情况')
+        self.assertNotEqual(200, self.appText.get('code'))
+        self.assertEqual('该线索未首电，不能进行转为客户!', self.appText.get('data'))
+
+    def test_admin_clue(self):
+        """通过总部分配的线索不允许修改来源"""
+        self.appApi.Login(userName='admin', saasCode='admin')
+        self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
+        self.appApi.Login()
+        self.appApi.my_clue_list()
+        self.appApi.ClueInfo()
+        self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
+        self.appApi.ClueSave(Status=2,
+                             clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appText.get('labelId'))
+        self.assertNotEqual(200, self.appText.get('code'))
+        self.assertEqual('总部分配过来的线索,线索来源不能修改', self.appText.get('data'))
 
     # def test_1_AddNewClue1(self):
     #     """新增一条线索"""

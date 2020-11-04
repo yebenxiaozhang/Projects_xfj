@@ -148,7 +148,9 @@ class MyDealTestCase(unittest.TestCase):
         self.appApi.GetMatchingAreaHouse()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                   appointmentTime=dome)
+                                   appointmentTime=dome,
+                                   seeingConsultant=self.appApi.appText.get('consultantId'),
+                                   appointConsultant=self.appApi.appText.get('consultantId'))
         self.assertEqual('已申请客户成交,正在审核中!', self.appApi.appText.get('data'))
 
         self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')

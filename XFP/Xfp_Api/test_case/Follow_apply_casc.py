@@ -90,10 +90,8 @@ class FollowApplyTestCase(unittest.TestCase):
         """1、客户申请暂缓        已同意                 已同意"""
         self.flowPath.client_list_non_null()
         self.flowPath.suspend_follow()
-        self.appApi.ClientTask()  # 待办
-        if self.appApi.appText.get('total') == 1:
-            if self.appApi.appText.get('taskType') != 3:
-                raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        self.appApi.ClientTask(taskType=2)  # 待办
+        self.assertEqual(time.strftime("%Y-%m-%d"), self.appApi.appText.get('endTime')[:10])
         dome = self.appApi.appText.get('clueId')
         self.appApi.follow_apply()
         self.assertNotEqual(dome, self.appApi.appText.get('clueId'))
@@ -358,7 +356,9 @@ class FollowApplyTestCase(unittest.TestCase):
         self.appApi.GetMatchingAreaHouse()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                   appointmentTime=dome)
+                                   appointmentTime=dome,
+                                   seeingConsultant=self.appApi.appText.get('consultantId'),
+                                   appointConsultant=self.appApi.appText.get('consultantId'))
         self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
 
         self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
@@ -380,7 +380,9 @@ class FollowApplyTestCase(unittest.TestCase):
         self.appApi.GetMatchingAreaHouse()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                   appointmentTime=dome)
+                                   appointmentTime=dome,
+                                   seeingConsultant=self.appApi.appText.get('consultantId'),
+                                   appointConsultant=self.appApi.appText.get('consultantId'))
         self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
 
         self.appApi.GetMatchingAreaHouse()  # 匹配楼盘

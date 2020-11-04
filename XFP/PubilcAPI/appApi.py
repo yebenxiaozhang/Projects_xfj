@@ -292,7 +292,11 @@ class appApi:
         """线索详情"""
         self.PostRequest(url='/api/a/clue/info',
                          data={'clueId': self.appText.get('clueId')})
-        self.appText.set_map('cluePhone', globals()['r.text']['data']['cluePhone'])
+        if (globals()['r.text']['data']['cluePhone'])[3:4] == '*':
+            self.appText.set_map('cluePhone', '1' + str(int(time.time())))
+        else:
+            self.appText.set_map('cluePhone', globals()['r.text']['data']['cluePhone'])
+        self.appText.set_map('sourceId', globals()['r.text']['data']['sourceId'])
 
     def ClueSave(self, Status=1,  # 1新增 其他修改
                  cluePhone=None,
@@ -539,15 +543,15 @@ class appApi:
                          })
         self.appText.set_map('visitId', globals()['r.text']['data']['saasClueVisit']['visitId'])
 
-    def OverVisit(self, cancelRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 取消带看'):
-        """提前结束带看"""
-        self.PostRequest(url='/api/a/visit/cancel',
-                         data={
-                             'visitId': self.appText.get('visitId'),
-                             'cancelRemark': cancelRemark
-                         })
+    # def OverVisit(self, cancelRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 取消带看'):
+    #     """提前结束带看"""
+    #     self.PostRequest(url='/api/a/visit/cancel',
+    #                      data={
+    #                          'visitId': self.appText.get('visitId'),
+    #                          'cancelRemark': cancelRemark
+    #                      })
 
-    def visit_cancel(self, cancelRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '取消带看'):
+    def visit_cancel(self, cancelRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 取消带看'):
         """取消带看"""
         self.PostRequest(url='/api/a/visit/cancel',
                          data={
@@ -808,6 +812,7 @@ class appApi:
                                  'theFirstLableIds': theFirstLableIds,  # 是否首套
                                  'loanSituation': loanSituation,  # 贷款情况
                                  'paymentRatio': paymentRatio,  # 首付比例
+                                 'sourceId': self.appText.get('sourceId'),
                                  'paymentBudget': paymentBudget,  # 首付预算
                                  'apartmentLayout': apartmentLayout,  # 户型面积
                                  'customerDemandLableIds': customerDemandLableIds  # 客户需求
@@ -821,6 +826,7 @@ class appApi:
                                  'phoneNum': self.appText.get('cluePhone'),
                                  'cluePhone': self.appText.get('cluePhone'),
                                  'clueNickName': callName,  # 称呼
+                                 'sourceId': self.appText.get('sourceId'),
                                  'saasCode': XfpsaasCode,
                                  'sex': sex,  # 性别 0女 1 男
                                  'projectBId': projectBId,  # *匹配楼盘B

@@ -212,7 +212,6 @@ class FirstPhoneTestCase(unittest.TestCase):
         """7、线索转移后B---无首电"""
         self.appApi.Login()
         self.appApi.GetUserData()
-        dome = self.appText.get('consultantName')
         self.test_first_phone_01()
         self.appApi.ConsultantList()
         self.appApi.ClueChange()        # 线索转移

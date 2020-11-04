@@ -102,6 +102,8 @@ class flowPath:
 
     def clue_exile_sea(self):
         """线索流放公海"""
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
         self.appApi.ExileSea(labelId=self.appApi.appText.get('labelId'))
 
@@ -109,7 +111,7 @@ class flowPath:
         """取消带看"""
         self.appApi.ClientTask(taskType='3')
         self.appApi.visit_info()
-        self.appApi.OverVisit()  # 取消带看
+        self.appApi.visit_cancel()  # 取消带看
         self.appApi.ClientTask()
         if self.appApi.appText.get('total') > 1:
             print('取消带看，任务还存在')
@@ -145,9 +147,8 @@ class flowPath:
             self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
             self.appApi.ClientTaskPause()
             while self.appApi.appText.get('data') == '该客户已被暂缓!':
-                self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
-                self.appApi.ExileSea(labelId=self.appApi.appText.get('labelId'))
-                self.client_list_non_null()
+                self.appApi.ClientFollowList()
+                self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
                 self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
                 self.appApi.ClientTaskPause()
         except BaseException as e:

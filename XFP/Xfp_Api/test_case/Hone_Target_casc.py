@@ -165,7 +165,8 @@ class HomeTestCase(unittest.TestCase):
         dome = self.appText.get('Total')
         if dome < 1:
             self.flowPath.add_new_clue()
-        self.flowPath.clue_exile_sea()
+        self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
+        self.appApi.ExileSea(labelId=self.appApi.appText.get('labelId'))
         self.assertNotEqual(200, self.appText.get('code'))
         self.assertEqual('该线索未首电,不能终止跟进!', self.appText.get('data'))
 
@@ -483,6 +484,7 @@ class HomeTestCase(unittest.TestCase):
         else:
             days = 1
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+        self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
         tomorrow = (date.today() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
@@ -493,6 +495,7 @@ class HomeTestCase(unittest.TestCase):
         if vlue == 1:
             self.appApi.GetMatchingAreaHouse()
             self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
+            self.appApi.ClueInfo()
             self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                        appointmentTime=tomorrow,
                                        seeingConsultant=self.appApi.appText.get('consultantId'),
