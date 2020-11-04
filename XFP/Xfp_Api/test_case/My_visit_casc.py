@@ -9,7 +9,7 @@ from XFP.PubilcAPI.flowPath import *
 无审核-正常流程：·····现状态··················· 流放公海状态
   1、创建带看          进行中                   已取消
   2、完成带看          已完成                   已完成
-  3、提前结束带看      已取消                   已取消
+  3、取消带看          已取消                   已取消
  
  一级审核-正常流程：···················现状态···············流放公海的状态
   1、创建带看-待审核                   审核中 
@@ -30,7 +30,7 @@ from XFP.PubilcAPI.flowPath import *
  操作事项：
   1、审核失败的带看---不允许操作
   2、提前结束的带看---不允许操作
-  3、审核中的带看 ---不可以完成，不可以提前结束，不可以释放公海
+  3、审核中的带看 ---不可以完成，可以取消，不可以释放公海
   4、同一个客户只能存在一个带看 一个带看代办
 """
 
@@ -71,11 +71,13 @@ class MyVisitTestCase(unittest.TestCase):
         """残留审核 失败！！！"""
         self.webApi.audit_List()
         while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            self.webApi.auditApply(isAudit=False,
+                                   auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
             self.webApi.audit_List()
         self.webApi.audit_List(auditLevel=2)
         while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            self.webApi.auditApply(isAudit=False,
+                                   auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
             self.webApi.audit_List()
 
     def test_my_visit_01(self):
@@ -94,7 +96,7 @@ class MyVisitTestCase(unittest.TestCase):
         self.flowPath.visit_status(status='已完成')
 
     def test_my_visit_03(self):
-        """3、提前结束带看      已取消                   已取消"""
+        """3、取消带看      已取消                   已取消"""
         self.flowPath.add_visit()
         self.flowPath.advance_over_visit()
         self.flowPath.visit_status(status='已取消')
@@ -105,7 +107,7 @@ class MyVisitTestCase(unittest.TestCase):
         """1、创建带看-待审核                   审核中"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
-        self.flowPath.visit_status(status='申请中')
+        self.flowPath.visit_status(status='审核中')
         """2、创建带看-审核成功                 进行中             已取消"""
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核成功
@@ -149,7 +151,7 @@ class MyVisitTestCase(unittest.TestCase):
         """1、创建带看-待审核          申请中                     已取消"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=2)  # 修改配置审核
         self.flowPath.add_visit()
-        self.flowPath.visit_status(status='申请中')
+        self.flowPath.visit_status(status='审核中')
         """2、创建带看-一级审核失败    已驳回                     已驳回"""
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False)  # 审核失败
@@ -163,7 +165,7 @@ class MyVisitTestCase(unittest.TestCase):
         self.flowPath.add_visit()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核
-        self.flowPath.visit_status(status='申请中')
+        self.flowPath.visit_status(status='审核中')
         """4、创建带看-二级审核失败    已驳回                     已取消"""
         self.webApi.audit_List(auditLevel=2)  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'), vlue=2, isAudit=False)  # 审核
@@ -208,8 +210,11 @@ class MyVisitTestCase(unittest.TestCase):
         self.appApi.visit_info()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False)  # 审核失败
-        self.appApi.VisitFlow1()
-        self.assertEqual('该带看已无效,无法进行操作!', self.appApi.appText.get('data'))
+        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
+        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+                               receptionName=self.appApi.RandomText(textArr=surname),
+                               receptionPhone='1' + str(int(time.time())), attachmentIds='1')
+        self.assertEqual('带看计划已取消', self.appApi.appText.get('data'))
 
     def test_my_visit_17(self):
         """2、提前结束的带看---不允许操作"""
@@ -218,8 +223,11 @@ class MyVisitTestCase(unittest.TestCase):
         self.appApi.ClientTask(taskType='3')
         self.appApi.visit_info()
         self.appApi.OverVisit()  # 提前结束代办
-        self.appApi.VisitFlow1()
-        self.assertEqual('该带看已无效,无法进行操作!', self.appApi.appText.get('data'))
+        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
+        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+                               receptionName=self.appApi.RandomText(textArr=surname),
+                               receptionPhone='1' + str(int(time.time())), attachmentIds='1')
+        self.assertEqual('带看计划已取消', self.appApi.appText.get('data'))
 
     def test_my_visit_18(self):
         """3、审核中的带看 ---不可以完成，不可以提前结束，不可以释放公海"""
@@ -229,32 +237,40 @@ class MyVisitTestCase(unittest.TestCase):
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
-        self.appApi.VisitFlow1()
-        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data1'))
-
-        self.appApi.visit_info()
-        self.appApi.OverVisit()  # 提前结束代办
-        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
+        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
+        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+                               receptionName=self.appApi.RandomText(textArr=surname),
+                               receptionPhone='1' + str(int(time.time())), attachmentIds='1')
+        self.assertEqual('带看计划审核中', self.appApi.appText.get('data'))
 
         self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
         assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
         self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
         self.appApi.add_deal()  # 录入成交
-        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
+        self.assertNotEqual(200, self.appApi.appText.get('code'))
+        # self.assertEqual('带看计划审核中', self.appApi.appText.get('data'))
 
         self.flowPath.client_exile_sea()
-        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
+        self.assertNotEqual(200, self.appApi.appText.get('code'))
+        # self.assertEqual('带看计划审核中', self.appApi.appText.get('data'))
 
         self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
-        self.assertEqual('已申请客户带看,正在审核中!', self.appApi.appText.get('data'))
+        self.assertNotEqual(200, self.appApi.appText.get('code'))
+        # self.assertEqual('带看计划审核中', self.appApi.appText.get('data'))
+
+        self.appApi.visit_info()
+        self.appApi.OverVisit()  # 提前结束代办
+        self.assertEqual(200, self.appApi.appText.get('code'))
 
     def test_my_visit_19(self):
         """同一个客户只能存在一个带看 一个带看代办"""
         self.webApi.Audit_management()
         self.flowPath.add_visit()
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                   appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+                                   seeingConsultant=self.appApi.appText.get('consultantId'),
+                                   appointConsultant=self.appApi.appText.get('consultantId'))
         self.assertEqual(301, self.appText.get('code'))
+        self.assertEqual('该客户存在未完成带看', self.appApi.appText.get('data'))
 
 

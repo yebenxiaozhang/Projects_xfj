@@ -394,3 +394,16 @@ class FollowApplyTestCase(unittest.TestCase):
 
     def test_follow_apply_28(self):
         """暂停后再次申请暂停"""
+        self.flowPath.client_list_non_null()
+        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
+        self.flowPath.suspend_follow()
+        self.webApi.audit_List()  # 审核列表
+        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
+                               endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
+        self.appApi.ClientFollowList()
+        self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+        self.appApi.ClientTaskPause()
+        self.assertEqual(200, self.appApi.appText.get('code'))
+
+

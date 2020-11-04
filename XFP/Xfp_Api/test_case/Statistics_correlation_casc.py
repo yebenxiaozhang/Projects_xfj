@@ -204,7 +204,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
         self.appApi.client_change()
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('visitRatio') != dome:
-            print(' ')
+            print('4、完成带看后，转移客户，     -邀约率提高')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
     def test_deal_rate_01(self):

@@ -62,19 +62,19 @@ class ClientTestCase(unittest.TestCase):
         self.flowPath.add_visit()
         self.assertEqual(self.appApi.appText.get('code'), 200)
 
-    def test_AlterSettingTakeLook(self):
-        """修改带看计划"""
-        try:
-            self.flowPath.add_visit()
-            self.appApi.ClientTask(taskType='3')
-            if self.appApi.appText.get('total') < 1:
-                print('创建带看至少有一个任务')
-                raise RuntimeError(self.appText.get('ApiXfpUrl'))
-            self.appApi.GetMatchingAreaHouse()
-            self.appApi.UpdateVisitAdd(projectAId=self.appText.get('houseId'))
-        except BaseException as e:
-            print("断言错误，错误原因：%s" % e)
-            raise RuntimeError(self.appText.get('ApiXfpUrl'))
+    # def test_AlterSettingTakeLook(self):
+    #     """修改带看计划"""
+    #     try:
+    #         self.flowPath.add_visit()
+    #         self.appApi.ClientTask(taskType='3')
+    #         if self.appApi.appText.get('total') < 1:
+    #             print('创建带看至少有一个任务')
+    #             raise RuntimeError(self.appText.get('ApiXfpUrl'))
+    #         self.appApi.GetMatchingAreaHouse()
+    #         self.appApi.UpdateVisitAdd(projectAId=self.appText.get('houseId'))
+    #     except BaseException as e:
+    #         print("断言错误，错误原因：%s" % e)
+    #         raise RuntimeError(self.appText.get('ApiXfpUrl'))
 
     def test_CompleteSettingTakeLook(self):
         """完成带看计划"""
@@ -84,7 +84,10 @@ class ClientTestCase(unittest.TestCase):
             if self.appText.get('total') < 1:
                 raise RuntimeError(self.appText.get('ApiXfpUrl'))
             self.appApi.visit_info()
-            self.appApi.VisitFlow1()
+            self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
+            self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+                                   receptionName=self.appApi.RandomText(textArr=surname),
+                                   receptionPhone='1' + str(int(time.time())), attachmentIds='1')
             self.appApi.ClientTask()
             if self.appText.get('total') >= 2:
                 raise RuntimeError(self.appText.get('ApiXfpUrl'))
@@ -100,7 +103,7 @@ class ClientTestCase(unittest.TestCase):
             self.flowPath.advance_over_visit()
             self.appApi.ClientTask()
             self.appApi.ClientFollowList()
-            self.assertEqual('提前结束带看', self.appText.get('followContent'))
+            self.assertEqual('取消带看', self.appText.get('followContent'))
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appText.get('ApiXfpUrl'))

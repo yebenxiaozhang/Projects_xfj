@@ -66,8 +66,15 @@ class flowPath:
                 self.clue_non_null()
                 self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                            loanSituation='这个是贷款情况')
+        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
+        if self.appApi.appText.get('labelId') is None:
+            self.webApi.add_label(labelName='自驾', labelId=self.appApi.appText.get('LabelId'),
+                                  pid=self.appApi.appText.get('LabelId'))
+            self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                   appointmentTime=dome)
+                                   appointmentTime=dome,
+                                   seeingConsultant=self.appApi.appText.get('consultantId'),
+                                   appointConsultant=self.appApi.appText.get('consultantId'))
 
     def accomplish_visit(self):
         """完成带看"""
@@ -76,7 +83,11 @@ class flowPath:
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
-        self.appApi.VisitFlow1()
+
+        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+                               receptionName=self.appApi.RandomText(textArr=surname),
+                               houseId=self.appApi.appText.get('houseId'),
+                               receptionPhone='1' + str(int(time.time())))
         self.appApi.ClientTask()
         if self.appApi.appText.get('total') >= 2:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
@@ -95,16 +106,16 @@ class flowPath:
         self.appApi.ExileSea(labelId=self.appApi.appText.get('labelId'))
 
     def advance_over_visit(self):
-        """提前结束带看"""
+        """取消带看"""
         self.appApi.ClientTask(taskType='3')
         self.appApi.visit_info()
-        self.appApi.OverVisit()  # 提前结束代办
+        self.appApi.OverVisit()  # 取消带看
         self.appApi.ClientTask()
         if self.appApi.appText.get('total') > 1:
-            print('提前结束带看，任务还存在')
+            print('取消带看，任务还存在')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.ClientFollowList()
-        assert self.appApi.appText.get('followContent'), '提前结束带看'
+        assert self.appApi.appText.get('followContent'), '取消带看'
 
     def visit_status(self, status):
         """带看状态"""
@@ -121,12 +132,11 @@ class flowPath:
         elif status == '已驳回':
             assert self.appApi.appText.get('visiteStatus') == '2', '状态异常'
             assert self.appApi.appText.get('visiteStatusStr') == '已驳回', '状态异常'
-        elif status == '申请中':
-            assert self.appApi.appText.get('visiteStatus') == '3', '状态异常'
-            assert self.appApi.appText.get('visiteStatusStr') == '申请中', '状态异常'
         elif status == '审核中':
-            assert self.appApi.appText.get('visiteStatus') == '3', '状态异常'
-            assert self.appApi.appText.get('visiteStatusStr') == '审核中', '状态异常'
+            assert self.appApi.appText.get('visiteStatus') == '0', '状态异常'
+            assert self.appApi.appText.get('visiteStatusStr') == '进行中', '状态异常'
+            # assert self.appApi.appText.get('visitAuditStatus') == '1', '状态异常'
+            # assert self.appApi.appText.get('visitAuditStatusName') == '审核中', '状态异常'
             
     def suspend_follow(self):
         """暂缓跟进"""

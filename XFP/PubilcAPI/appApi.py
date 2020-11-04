@@ -32,7 +32,7 @@ class appApi:
     def Merge(self, dict1, dict2):
         return (dict2.update(dict1))
 
-    def PostRequest(self, url, data, header=None, Status=1, files=None):
+    def PostRequest(self, url, data, header=None, Status=1, files=None, saasCode=XfpsaasCode):
         """post请求"""
         if header is not None:
             r = requests.post(url=(ApiXfpUrl + url),
@@ -46,8 +46,8 @@ class appApi:
                 'size': '50',
                 'current': '1'
             },
-                "saasCode": XfpsaasCode,
-                "saasCodeSys": XfpsaasCode
+                "saasCode": saasCode,
+                "saasCodeSys": saasCode
             }
             self.Merge(data1, data)
             time.sleep(0.2)
@@ -113,7 +113,7 @@ class appApi:
             self.appText.set_map('consultantName', globals()['r.text']['data']['consultantName'])
             self.appText.set_map('consultantLabels', globals()['r.text']['data']['consultantLabels'])
 
-    def GetUserAgenda(self, endTime=None, taskType=None, keyWord=None, clueId=None):
+    def GetUserAgenda(self, endTime=None, taskType=None, keyWord=None, clueId=None, visitNo=True):
         """获取用户待办"""
         self.PostRequest(url='/api/a/clue/task/list',
                          data={
@@ -125,9 +125,10 @@ class appApi:
                              "isStop": 0,
                              "endTime": endTime,
                              "overtime": 0,
-                             'keyWord': keyWord
+                             'keyWord': keyWord,
+                             'visitNo': visitNo
                          })
-        self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+        self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
             self.appText.set_map('endTime', globals()['r.text']['data']['records'][0]['endTime'])
         # self.appText.set_map('pages', globals()['r.text']['data']['pages'])
@@ -258,13 +259,15 @@ class appApi:
                              'taskEndTime': taskEndTime
                          })
 
-    def TodayClue(self, keyWord):
+    def TodayClue(self, keyWord, isFirst=None):
         """今日线索"""
         self.PostRequest(url='/api/a/clue/list',
-                         data={'keyWord': keyWord})
+                         data={'keyWord': keyWord,
+                               'isFirst': isFirst})
         self.appText.set_map('Total', globals()['r.text']['data']['total'])
         if self.appText.get('Total') != 0:
             self.appText.set_map('isFirst', globals()['r.text']['data']['records'][0]['isFirst'])
+            self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
 
     def ResetPassword(self, userId):
         """重设密码"""
@@ -440,23 +443,34 @@ class appApi:
             self.appText.set_map('taskId', globals()['r.text']['data'][vlue]['taskId'])
             self.appText.set_map('endTime', globals()['r.text']['data'][vlue]['endTime'])
 
-    def ClientVisitAdd(self, projectAId, appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
-                       projectBId=None, projectCId=None):
+    def ClientVisitAdd(self, projectAId, appointConsultant, seeingConsultant,
+                       appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
+                       projectBId=None, projectCId=None, beforeTakingA='这个是客户情况',
+                       beforeTakingB='这个是核心诉求', beforeTakingC='这个是核心抗性',
+                       beforeTakingD='这个是应对方案', visitRemark='这个是带看备注'):
         """新增带看计划"""
-        self.PostRequest(url='/api/a/customer/visit/add',
+        self.PostRequest(url='/api/a/visit/save',
                          data={
                              'clueId': self.appText.get('clueId'),
-                             'customerId': self.appText.get('customerId'),
-                             'seeingPeople': self.appText.get('consultantId'),  # 带看人
+                             'appointConsultant': appointConsultant,    # 邀约咨询师
+                             'customerId': self.appText.get('customerId'),  # 客户ID
+                             'seeingConsultant': seeingConsultant,  # 带看人
+                             # 'consultantId': self.appText.get('consultantId'),
                              'appointmentTime': appointmentTime,
+                             'visitMode': self.appText.get('labelId'),
                              'projectAId': projectAId,
                              'projectBId': projectBId,
                              'projectCId': projectCId,
-                             "saasLocale": {
+                             'beforeTakingA': beforeTakingA,    # 客户情况
+                             'beforeTakingB': beforeTakingB,    # 核心诉求
+                             'beforeTakingC': beforeTakingC,    # 核心抗性
+                             'beforeTakingD': beforeTakingD,    # 应对方案
+                             'visitRemark': visitRemark,        # 带看备注
+                             "appointmentPlaceLocal": {
                                  "localeCoordinates": "113.587585,22.251877",
                                  "localeName": "广东省珠海市香洲区吉大街道园林花园(园林路)",
-                                 "lon": 113.587585,
-                                 "lat": 22.251877
+                                 # "lon": 113.587585,
+                                 # "lat": 22.251877
                              }
                          })
         self.appText.set_map('data', globals()['r.text']['data'])
@@ -483,37 +497,38 @@ class appApi:
                              }
                          })
 
-    def VisitFlow1(self, beforeTakingA='python-客户情况', beforeTakingB='python-核心诉求',
-                   beforeTakingC='python-核心坑性', beforeTakingD='python-应对方案'):
-        """带看前反馈 | 报备核实 | 约见签到"""
-        self.PostRequest(url='/api/a/customer/visit/feedback/addOrUpd',
-                         data={
-                             'beforeTakingA': beforeTakingA,
-                             'beforeTakingB': beforeTakingB,
-                             'beforeTakingC': beforeTakingC,
-                             'beforeTakingD': beforeTakingD,
-                             'customerId': self.appText.get('customerId'),
-                             'visitId': self.appText.get('visitId'),
-                             'clueId': self.appText.get('clueId')
-                         })
-        self.appText.set_map('data1', self.appText.get('data'))
+    def VisitFlow1(self, agencyId, attachmentIds='1031', is_QA=2,
+                   houseId=None, receptionName=None, receptionPhone=None,
+                   answer=None, title=None, visitSummary='带看总结'):
+        self.GetMatchingAreaHouse()  # 匹配楼盘
+        """完成带看"""
+        if is_QA == 1:
+            visitQaList = [{
+                                 'answer': answer,                      # 答案
+                                 # 'houseIds': houseIds,
+                                 'id': houseId,                             # 楼盘ID
+                                 'title': title                         # 标题
+                             }]
+        else:
+            visitQaList = []
 
-        self.PostRequest(url='/api/a/customer/visit/feedback/reportVerification',
+        self.PostRequest(url='/api/a/visit/complete',
                          data={
+                             'visitProjectList': [
+                                 {
+                                     'agencyId': agencyId,              # 对接平台
+                                     'attachmentIds': attachmentIds,    # 报备附件
+                                     'houseId': houseId,                # 楼盘ID
+                                     'receptionName': receptionName,    # 对接人姓名
+                                     'receptionPhone': receptionPhone   # 对接人电话
+                                 }
+                             ],
+                             # 'customerId': self.appText.get('customerId'),
                              'visitId': self.appText.get('visitId'),
-                             'clueId': self.appText.get('clueId'),
-                             'customerId': self.appText.get('customerId'),
-                             'reportVerification': 1
-                         })
-
-        self.PostRequest(url='/api/a/customer/visit/signIn',
-                         data={
-                             'saasLocale': {
-                                 "localeCoordinates": "113.58856964111328,22.2489070892334",
-                                 "localeName": "广东省珠海市香洲区吉大街道九洲大道东1104号"
-                             },
-                             'visitId': self.appText.get('visitId'),
-                             'consultantId': self.appText.get('consultantId')
+                             # 'clueId': self.appText.get('clueId'),
+                             'visitSummary': visitSummary,              # 带看总结
+                             'isComplete': 1,
+                             'visitQaList': visitQaList
                          })
 
     def visit_info(self):
@@ -524,22 +539,20 @@ class appApi:
                          })
         self.appText.set_map('visitId', globals()['r.text']['data']['saasClueVisit']['visitId'])
 
-    def OverVisit(self):
+    def OverVisit(self, cancelRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 取消带看'):
         """提前结束带看"""
-        self.PostRequest(url='/api/a/customer/visit/over',
+        self.PostRequest(url='/api/a/visit/cancel',
                          data={
                              'visitId': self.appText.get('visitId'),
-                             'taskId': self.appText.get('taskId'),
-                             'clueId': self.appText.get('clueId')
+                             'cancelRemark': cancelRemark
                          })
 
-    def DelVisit(self):
-        """删除带看"""
-        self.PostRequest(url='/api/a/customer/visit/del',
+    def visit_cancel(self, cancelRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '取消带看'):
+        """取消带看"""
+        self.PostRequest(url='/api/a/visit/cancel',
                          data={
-                             'clueId': self.appText.get('clueId'),
                              'visitId': self.appText.get('visitId'),
-                             'taskId': self.appText.get('taskId')
+                             'cancelRemark': cancelRemark
                          })
 
     def ClientTaskPause(self, contactPurpose='python-申请暂停跟进',
@@ -974,6 +987,7 @@ class appApi:
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
             self.appText.set_map('houseName', globals()['r.text']['data']['records'][0]['houseName'])
+            self.appText.set_map('title', globals()['r.text']['data']['records'][0]['title'])
 
     def CustomerStatisticalInfo(self):
         """服务统计"""
@@ -1002,24 +1016,28 @@ class appApi:
             self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][0]['auditRemark'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
 
-    def Task_Visit_List(self, appointmentTime):
+    def Task_Visit_List(self, appointmentTime=None, endTime=time.strftime("%Y-%m-%d"), visiteStatus=None):
         """我的带看"""
         self.PostRequest(url='/api/a/consultant/getTaskVisitList',
                          data={
                              'consultantId': self.appText.get('consultantId'),
                              'startTime': time.strftime("%Y-%m-%d"),
-                             'endTime': time.strftime("%Y-%m-%d")
+                             'endTime': endTime,
+                             'visiteStatus': visiteStatus,
                          })
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
             a = 0
-            while globals()['r.text']['data']['records'][a]['appointmentTime'] != appointmentTime:
-                a = a + 1
-                if a == self.appText.get('total'):
-                    break
-            self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][a]['auditRemark'])
-            self.appText.set_map('visiteStatusStr', globals()['r.text']['data']['records'][a]['visiteStatusStr'])
-            self.appText.set_map('visiteStatus', globals()['r.text']['data']['records'][a]['visiteStatus'])
+            if appointmentTime is not None:
+                while globals()['r.text']['data']['records'][a]['appointmentTime'] != appointmentTime:
+                    a = a + 1
+                    if a == self.appText.get('total'):
+                        break
+                self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][a]['auditRemark'])
+                self.appText.set_map('visiteStatusStr', globals()['r.text']['data']['records'][a]['visiteStatusStr'])
+                self.appText.set_map('visiteStatus', globals()['r.text']['data']['records'][a]['visiteStatus'])
+            # self.appText.set_map('visitAuditStatus', globals()['r.text']['data']['records'][a]['visitAuditStatus'])
+            # self.appText.set_map('visitAuditStatusName', globals()['r.text']['data']['records'][a]['visitAuditStatusName'])
 
     def my_Wealth(self):
         """我的财富值"""

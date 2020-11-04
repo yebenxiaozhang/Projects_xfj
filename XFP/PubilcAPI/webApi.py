@@ -15,11 +15,11 @@ class webApi:
         self.appText = GlobalMap()
         self.webText = GlobalMap()
 
-    def PostRequest(self, url, data):
+    def PostRequest(self, url, data, saasCode=XfpsaasCode):
         """post请求"""
         data1 = {"page": {},
-                 "saasCode": XfpsaasCode,
-                 "saasCodeSys": XfpsaasCode}
+                 "saasCode": saasCode,
+                 "saasCodeSys": saasCode}
         self.XfpRequest.Merge(data1, data)
         r = requests.post(url=(ApiXfpUrl + url),
                           data=(json.dumps(data,
@@ -140,6 +140,7 @@ class webApi:
             self.webText.set_map('auditLevel', globals()['r.text']['data']['records'][0]['auditLevel'])
             self.webText.set_map('parentAuditId', globals()['r.text']['data']['records'][0]['parentAuditId'])
             self.webText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
+            self.webText.set_map('customerId', globals()['r.text']['data']['records'][0]['customerId'])
 
     def auditApply(self, vlue=1, auditRemark=None, isAudit=True, customerId='', endTime=''):
         """审核"""
@@ -160,7 +161,6 @@ class webApi:
                              'parentAuditId': parentAuditId,
                              'endTime': endTime,
                              'auditRemark': auditRemark,
-
                          })
 
     def add_label(self, labelName, labelId, pid):
@@ -376,6 +376,58 @@ class webApi:
         else:
             pass
         self.webText.set_map('total', globals()['r.text']['data']['total'])
+
+    def consultant_list(self, vlue=0):
+        """咨询师列表"""
+        self.PostRequest(url='/api/b/consultant/list',
+                         data={
+                             'deviceNo': ''
+                         })
+        self.webText.set_map('total', len(globals()['r.text']['data']['records']))
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.webText.set_map('consultantId', globals()['r.text']['data']['records'][vlue]['consultantId'])
+
+    def add_clue_admin(self, clueNickName):
+        """总部添加线索"""
+        cluePhone = '1' + str(int(time.time()))
+
+        data = {
+                "clueAddtype": 3,
+                "clueIdList": [
+
+                ],
+                "clueNickName": clueNickName,
+                "cluePhone": cluePhone,
+                "remark": "总站添加线索",
+                "saasCodeSys": "000009",
+                "sourceId": 1910,
+                'saasCode': 'admin'
+                            }
+        r = requests.post(url=(ApiXfpUrl + '/api/b/clue/distribution'),
+                          data=(json.dumps(data,
+                                           ensure_ascii=False).encode("UTF-8")),
+                          headers={
+                              'Content-Type': 'application/json',
+                              'Authorization': 'Bearer' + ' ' + self.appText.get("user_token")
+                          },
+                          files=None)
+        r.raise_for_status()
+        globals()['r.text'] = json.loads(r.text)
+        self.webText.set_map('code', globals()['r.text']['code'])
+
+    def addGoldDetailInfo(self):
+        """幸福币充值"""
+        self.PostRequest(url='/api/b/goldDetail/addGoldDetailInfo',
+                         data={
+                                "saasCodeSys": "000009",
+                                "goldValue": "99999999",
+                                "goldType": 1,
+                                "type":"add",
+                                # "saasName":"小鸡炖蘑菇",
+                                "saasCode": "admin"
+                            },
+                         saasCode='admin')
+
 
 if __name__ == '__main__':
     a = webApi()
