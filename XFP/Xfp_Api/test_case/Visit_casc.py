@@ -178,16 +178,7 @@ class VisitTestCase(unittest.TestCase):
         """接待人姓名超过5位数"""
         self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'), receptionName=(str(surname))[1:-1])
         self.assertNotEqual(200, self.appText.get('code'))
-        """手机号码大于11位数"""
-        self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
-                               receptionName=self.appApi.RandomText(textArr=surname),
-                               receptionPhone='11' + str(int(time.time())))
-        self.assertNotEqual(200, self.appText.get('code'))
-        """手机号码低于11位数"""
-        self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
-                               receptionName=self.appApi.RandomText(textArr=surname),
-                               receptionPhone=str(int(time.time())))
-        self.assertNotEqual(200, self.appText.get('code'))
+
         """带看总结不允许超过200个字"""
         self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
                                receptionName=self.appApi.RandomText(textArr=surname),
@@ -211,7 +202,8 @@ class VisitTestCase(unittest.TestCase):
         """标题过长"""
         self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
                                receptionName=self.appApi.RandomText(textArr=surname),
-                               receptionPhone='1' + str(int(time.time())), title=(str(surname))[1:-1])
+                               receptionPhone='1' + str(int(time.time())), title=(str(surname))[1:-1],
+                               is_QA=1)
         self.assertNotEqual(200, self.appText.get('code'))
         """标题不能重复"""
         self.appApi.HouseQA()
@@ -219,12 +211,13 @@ class VisitTestCase(unittest.TestCase):
             self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
                                    receptionName=self.appApi.RandomText(textArr=surname),
                                    receptionPhone='1' + str(int(time.time())),
+                                   is_QA=1,
                                    title=self.appText.get('title'))
             self.assertNotEqual(200, self.appText.get('code'))
         """答案不能超过200个字"""
         self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
                                receptionName=self.appApi.RandomText(textArr=surname),
-                               receptionPhone='1' + str(int(time.time())),
+                               receptionPhone='1' + str(int(time.time())), is_QA=1,
                                title='楼盘问答 ' + time.strftime("%Y-%m-%d %H:%M:%S"),
                                answer=(str(surname))[1:-1])
         self.assertNotEqual(200, self.appText.get('code'))

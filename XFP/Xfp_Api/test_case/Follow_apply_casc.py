@@ -88,7 +88,11 @@ class FollowApplyTestCase(unittest.TestCase):
 
     def test_follow_apply_01(self):
         """1、客户申请暂缓        已同意                 已同意"""
-        self.flowPath.client_list_non_null()
+        self.flowPath.clue_non_null()
+        self.appApi.my_clue_list()
+        self.appApi.ClueInfo()
+        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                   loanSituation='这个是贷款情况')
         self.flowPath.suspend_follow()
         self.appApi.ClientTask(taskType=2)  # 待办
         self.assertEqual(time.strftime("%Y-%m-%d"), self.appApi.appText.get('endTime')[:10])
@@ -108,7 +112,12 @@ class FollowApplyTestCase(unittest.TestCase):
 
     def test_follow_apply_03(self):
         """3、客户无效终止        已同意"""
-        self.flowPath.client_list_non_null()
+        self.flowPath.clue_non_null()
+        self.appApi.my_clue_list()
+        self.appApi.ClueInfo()
+        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                   loanSituation='这个是贷款情况')
+        self.appApi.ClientList()
         self.flowPath.client_exile_sea()
         dome = self.appApi.appText.get('clueId')
         self.appApi.follow_apply()

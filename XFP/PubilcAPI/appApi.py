@@ -470,7 +470,7 @@ class appApi:
                              'beforeTakingC': beforeTakingC,    # 核心抗性
                              'beforeTakingD': beforeTakingD,    # 应对方案
                              'visitRemark': visitRemark,        # 带看备注
-                             "appointmentPlaceLocal": {
+                             "appointmentPlaceLocale": {
                                  "localeCoordinates": "113.587585,22.251877",
                                  "localeName": "广东省珠海市香洲区吉大街道园林花园(园林路)",
                                  # "lon": 113.587585,
@@ -522,7 +522,7 @@ class appApi:
                                  {
                                      'agencyId': agencyId,              # 对接平台
                                      'attachmentIds': attachmentIds,    # 报备附件
-                                     'houseId': houseId,                # 楼盘ID
+                                     'houseId': self.appText.get('houseId'),                # 楼盘ID
                                      'receptionName': receptionName,    # 对接人姓名
                                      'receptionPhone': receptionPhone   # 对接人电话
                                  }

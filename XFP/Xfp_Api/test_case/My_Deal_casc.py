@@ -30,7 +30,7 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class MyDealTestCase(unittest.TestCase):
-    """幸福派——我的带看"""
+    """客第壹——我的成交"""
 
     def __init__(self, *args, **kwargs):
         super(MyDealTestCase, self).__init__(*args, **kwargs)
