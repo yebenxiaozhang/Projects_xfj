@@ -20,7 +20,7 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class FirstPhoneTestCase(unittest.TestCase):
-    """客第壹——跟进申请"""
+    """客第壹——首电相关"""
 
     def __init__(self, *args, **kwargs):
         super(FirstPhoneTestCase, self).__init__(*args, **kwargs)

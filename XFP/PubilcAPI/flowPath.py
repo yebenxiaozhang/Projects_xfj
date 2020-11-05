@@ -16,6 +16,14 @@ class flowPath:
 
     def client_list_non_null(self):
         """客户列表--非空"""
+        # self.clue_non_null()
+        # self.appApi.my_clue_list()
+        # self.appApi.ClueFollowList()
+        # self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+        # self.appApi.ClueInfo()
+        # self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+        #                            loanSituation='这个是贷款情况')
+
         self.appApi.ClientList()                # 客户列表
         if self.appApi.appText.get('total') == 0:
             self.clue_non_null()
@@ -174,7 +182,7 @@ class flowPath:
             assert self.appApi.appText.get('auditStatueApp') == 0, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '申请中', '状态异常'
         elif status == '审核中':
-            assert self.appApi.appText.get('auditStatueApp') == 1, '状态异常'
+            assert self.appApi.appText.get('auditStatueApp') == 3, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '审核中', '状态异常'
         assert self.appApi.appText.get('clueId') == dome, '跟进申请-无记录'
     

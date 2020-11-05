@@ -930,7 +930,9 @@ class appApi:
     def deal_List(self, transStatus=None):
         """成交列表"""
         self.PostRequest(url='/api/a/transaction/list',
-                         data={})
+                         data={
+                             'consultantId': self.appText.get('consultantId')
+                         })
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
             if transStatus is not None:

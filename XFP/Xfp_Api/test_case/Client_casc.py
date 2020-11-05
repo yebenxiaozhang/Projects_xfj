@@ -8,7 +8,7 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class ClientTestCase(unittest.TestCase):
-    """客第壹——客户列表"""
+    """客第壹——客户"""
 
     def __init__(self, *args, **kwargs):
         super(ClientTestCase, self).__init__(*args, **kwargs)
@@ -97,7 +97,7 @@ class ClientTestCase(unittest.TestCase):
             raise RuntimeError(self.appText.get('ApiXfpUrl'))
 
     def test_advance_over_visit(self):
-        """提前结束带看代办"""
+        """取消带看"""
         try:
             self.flowPath.add_visit()
             self.flowPath.advance_over_visit()
