@@ -104,18 +104,22 @@ class HomeTestCase(unittest.TestCase):
 
     def test_await_first_phone_01(self):
         """1、平台分派              + 1"""
-        self.appApi.TodayClue(keyWord='', isFirst=0)
-        dome = self.appText.get('Total')
-        self.appApi.Login(userName='admin', saasCode='admin')
-        self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
-        if self.webText.get('code') != 200:
-            self.webApi.addGoldDetailInfo()
+        if ApiXfpUrl == 'http://xfp.xfj100.com':
+            pass
+        else:
+            self.appApi.TodayClue(keyWord='', isFirst=0)
+            dome = self.appText.get('Total')
+            self.appApi.Login(userName='admin', saasCode='admin')
+            self.appApi.GetLabelList(labelNo='XSLY', labelName='幸福派总部')
             self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
-        self.assertEqual(200, self.webText.get('code'))
-        self.appApi.Login()
-        self.appApi.TodayClue(keyWord='', isFirst=0)
-        self.assertNotEqual(dome, self.appText.get('Total'))
-        self.assertEqual(dome + 1, self.appText.get('Total'))
+            if self.webText.get('code') != 200:
+                self.webApi.addGoldDetailInfo()
+                self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
+            self.assertEqual(200, self.webText.get('code'))
+            self.appApi.Login()
+            self.appApi.TodayClue(keyWord='', isFirst=0)
+            self.assertNotEqual(dome, self.appText.get('Total'))
+            self.assertEqual(dome + 1, self.appText.get('Total'))
 
     def test_await_first_phone_02(self):
         """2、添加线索              + 1"""
@@ -184,7 +188,7 @@ class HomeTestCase(unittest.TestCase):
         except:
             self.appApi.ClueFollowList()
             self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_later(vlue=1)
+        self.follow_later()
 
     def test_await_follow_02(self):
         """3、线索转移               - 1"""

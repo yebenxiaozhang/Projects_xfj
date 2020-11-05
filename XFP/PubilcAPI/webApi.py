@@ -400,7 +400,7 @@ class webApi:
                 "cluePhone": cluePhone,
                 "remark": "总站添加线索",
                 "saasCodeSys": "000009",
-                "sourceId": 1910,
+                "sourceId": self.appText.get('labelId'),
                 'saasCode': 'admin'
                             }
         r = requests.post(url=(ApiXfpUrl + '/api/b/clue/distribution'),
@@ -422,7 +422,7 @@ class webApi:
                                 "saasCodeSys": "000009",
                                 "goldValue": "50000",
                                 "goldType": 1,
-                                "type":"add",
+                                "type": "add",
                                 # "saasName":"小鸡炖蘑菇",
                                 "saasCode": "admin"
                             },

@@ -10,10 +10,10 @@
 
 ApiXfpUrl = 'http://xfp.xfj100.com'
 ApiXfpUrl1 = 'https://xfpapi.xfj100.com'
-XfpUser = '19859080323'
+XfpUser = '13062200301'
 XfpPwd = '12345678'
 XfpsaasCode = 'test'
-XfpUser1 = '19859080301'
+XfpUser1 = '13062200304'
 XfpPwd1 = '12345678'
 
 

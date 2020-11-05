@@ -145,17 +145,21 @@ class ClueTestCase(unittest.TestCase):
 
     def test_admin_clue(self):
         """通过总部分配的线索不允许修改来源"""
-        self.appApi.Login(userName='admin', saasCode='admin')
-        self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
-        self.appApi.Login()
-        self.appApi.my_clue_list()
-        self.appApi.ClueInfo()
-        self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-        self.appApi.ClueSave(Status=2,
-                             clueNickName=self.appApi.RandomText(textArr=surname),
-                             sourceId=self.appText.get('labelId'))
-        self.assertNotEqual(200, self.appText.get('code'))
-        self.assertEqual('总部分配过来的线索,线索来源不能修改', self.appText.get('data'))
+        if ApiXfpUrl == 'http://xfp.xfj100.com':
+            pass
+        else:
+            self.appApi.Login(userName='admin', saasCode='admin')
+            self.appApi.GetLabelList(labelNo='XSLY', labelName='幸福派总部')
+            self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
+            self.appApi.Login()
+            self.appApi.my_clue_list()
+            self.appApi.ClueInfo()
+            self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
+            self.appApi.ClueSave(Status=2,
+                                 clueNickName=self.appApi.RandomText(textArr=surname),
+                                 sourceId=self.appText.get('labelId'))
+            self.assertNotEqual(200, self.appText.get('code'))
+            self.assertEqual('总部分配过来的线索,线索来源不能修改', self.appText.get('data'))
 
     # def test_1_AddNewClue1(self):
     #     """新增一条线索"""
