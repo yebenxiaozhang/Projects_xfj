@@ -30,7 +30,7 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class VisitTestCase(unittest.TestCase):
-    """幸福派——我的带看"""
+    """幸福派——带看相关"""
 
     def __init__(self, *args, **kwargs):
         super(VisitTestCase, self).__init__(*args, **kwargs)
@@ -84,6 +84,7 @@ class VisitTestCase(unittest.TestCase):
             self.flowPath.advance_over_visit()
             if self.appApi.appText.get('code') != 200:
                 self.flowPath.clue_non_null()
+                self.appApi.ClueInfo()
                 self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                            loanSituation='这个是贷款情况')
 
