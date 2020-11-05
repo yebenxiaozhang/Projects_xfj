@@ -61,7 +61,7 @@ from datetime import date, timedelta
 
 
 class HomeTestCase(unittest.TestCase):
-    """小秘——客户列表"""
+    """首页——相关指标"""
 
     def __init__(self, *args, **kwargs):
         super(HomeTestCase, self).__init__(*args, **kwargs)
@@ -534,11 +534,14 @@ class HomeTestCase(unittest.TestCase):
     def clue_front(self):
         """线索前"""
         self.flowPath.clue_non_null()
+        self.appApi.my_clue_list()
+        self.appApi.ClueFollowList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
 
     def client_front(self):
         """客户前"""
         self.flowPath.client_list_non_null()
+        self.appApi.ClientFollowList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
 
 
