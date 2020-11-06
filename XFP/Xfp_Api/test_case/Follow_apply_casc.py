@@ -106,7 +106,11 @@ class FollowApplyTestCase(unittest.TestCase):
 
     def test_follow_apply_02(self):
         """2、线索无效终止        已同意"""
-        self.flowPath.clue_non_null()
+        self.flowPath.add_new_clue()
+        self.appApi.my_clue_list()
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+        self.appApi.ClueInfo()
         self.flowPath.clue_exile_sea()
         dome = self.appApi.appText.get('clueId')
         self.appApi.follow_apply()
