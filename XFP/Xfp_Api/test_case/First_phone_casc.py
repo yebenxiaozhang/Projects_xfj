@@ -187,14 +187,14 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.flowPath.first_phone_non_null()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
-        self.assertEqual('该线索未首电,不能转化为有效线索!', self.appText.get('data'))
+        self.assertEqual('该线索未首电,不能转为客户!', self.appText.get('data'))
 
     def test_first_phone_10(self):
         """6、未首电不允许转客户--新线索转客户"""
         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname))
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
-        self.assertEqual('该线索未首电,不能转化为有效线索!', self.appText.get('data'))
+        self.assertEqual('该线索未首电,不能转为客户!', self.appText.get('data'))
 
     def test_first_phone_11(self):
         """7、线索转移后B---有首电"""
