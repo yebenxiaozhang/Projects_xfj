@@ -46,7 +46,7 @@ class webApi:
                     "clueCustomerConfig":
                         {
                             "sclxTimeOut": 1,
-                            "nightLastClueTimeMinutes": 21,
+                            "nightLastClueTimeMinutes": 23,
                             "morningFirstClueTimeHours": 9,
                             "sclxSwitch": True,
                             "clueFollowTimeHours": 48,
