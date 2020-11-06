@@ -180,6 +180,7 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.SeaList()  # 公海列表
         self.appApi.clue_Assigned()  # 领取线索
         self.follow_later(vlue=1)
+        self.appApi.ClueInfo()
         """2、新增线索（已首电）     + 1"""
         try:
             self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
@@ -188,7 +189,7 @@ class HomeTestCase(unittest.TestCase):
         except:
             self.appApi.ClueFollowList()
             self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_later()
+        self.follow_later(vlue=1)
 
     def test_await_follow_02(self):
         """3、线索转移               - 1"""
