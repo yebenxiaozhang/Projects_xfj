@@ -137,6 +137,7 @@ class ClueTestCase(unittest.TestCase):
         """未首电转客户"""
         self.appApi.SeaList()  # 公海列表
         self.appApi.clue_Assigned()  # 领取线索
+        self.appApi.my_clue_list()
         self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
