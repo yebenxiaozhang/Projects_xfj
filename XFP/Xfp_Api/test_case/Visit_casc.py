@@ -72,7 +72,7 @@ class VisitTestCase(unittest.TestCase):
             self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
             self.webApi.audit_List()
         self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
-        if self.appText.get('data') is not None:
+        if self.appText.get('data') is None:
             pass
         else:
             self.webApi.add_label(labelName='出行方式', labelId=0, pid=0)
