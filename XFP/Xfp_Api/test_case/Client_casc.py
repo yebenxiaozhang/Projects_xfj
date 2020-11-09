@@ -36,7 +36,7 @@ class ClientTestCase(unittest.TestCase):
         cls.webApi = cls.request
         cls.webApi.Audit_management()
 
-    def test_FollowSave(self):
+    def test_1_FollowSave(self):
         """客户跟进"""
         try:
             #  客户详情查看  及 列表是否有新增
