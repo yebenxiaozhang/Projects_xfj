@@ -331,7 +331,8 @@ class appApi:
                              'clueAddtypeText': clueAddtypeText,
                              'keyWords': keyWords,
                              "remark": remark,
-                             'sourceId': sourceId})  # 来源
+                             'sourceId': sourceId
+                         })  # 来源
         if globals()['r.text']['msg'] == '成功':
             self.appText.set_map('clueId', globals()['r.text']['data']['clueId'])
             self.appText.set_map('cluePhone', cluePhone)

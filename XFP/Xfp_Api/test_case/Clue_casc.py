@@ -36,19 +36,23 @@ class ClueTestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.appText = GlobalMap()
+        # 线索来源
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='百度小程序')
+        cls.appText.set_map('XSLY', cls.appText.get('labelId'))
+        # 线索标签
+        cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        if cls.appText.get('total') == 0:
+            cls.appApi.AddUserLabel()
+            cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        cls.appText.set_map('XSBQ', cls.appText.get('labelData'))
 
     def test_1_AddNewClue(self):
         """新增一条线索"""
         try:
-            self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-            if self.appText.get('labelId') is None:
-                self.webApi.add_label(labelName='百度小程序', labelId=self.appText.get('LabelId'),
-                                      pid=self.appText.get('LabelId'))
-                self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-            self.appApi.GetUserLabelList(userLabelType='线索标签')
-            if self.appText.get('total') == 0:
-                self.appApi.AddUserLabel()
-                self.appApi.GetUserLabelList(userLabelType='线索标签')
             self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
                                  sourceId=self.appText.get('labelId'),
                                  keyWords=self.appText.get('labelData'))
