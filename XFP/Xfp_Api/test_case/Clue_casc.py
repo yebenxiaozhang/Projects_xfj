@@ -49,13 +49,17 @@ class ClueTestCase(unittest.TestCase):
             cls.appApi.AddUserLabel()
             cls.appApi.GetUserLabelList(userLabelType='线索标签')
         cls.appText.set_map('XSBQ', cls.appText.get('labelData'))
+        # 终止跟进
+        cls.flowPath.get_label(labelNo='SZGJYY', labelName='终止跟进原因',
+                               newlabelName='客户已成交')
+        cls.appText.set_map('ZZGJ', cls.appText.get('labelId'))
 
     def test_1_AddNewClue(self):
         """新增一条线索"""
         try:
             self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
-                                 sourceId=self.appText.get('labelId'),
-                                 keyWords=self.appText.get('labelData'))
+                                 sourceId=self.appText.get('XSLY'),
+                                 keyWords=self.appText.get('XSBQ'))
             # 在搜索列表进行查找
             globals()['cluePhone'] = self.appText.get('cluePhone')
             self.appApi.ClueList(keyWord=(self.appText.get('cluePhone')))
@@ -93,12 +97,10 @@ class ClueTestCase(unittest.TestCase):
         """修改线索信息"""
         self.flowPath.clue_non_null()
         self.appApi.my_clue_list()
-        self.appApi.GetUserLabelList(userLabelType='线索标签')
-        self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
         globals()['cluePhone'] = self.appText.get('cluePhone')
         self.appApi.ClueSave(Status=2,
                              clueNickName=self.appApi.RandomText(textArr=surname),
-                             sourceId=self.appText.get('labelId'), keyWords=self.appText.get('labelData'))
+                             sourceId=self.appText.get('XSLY'), keyWords=self.appText.get('XSBQ'))
         self.appApi.ClueInfo()
         self.assertNotEqual(globals()['cluePhone'], self.appText.get('cluePhone'))
 
@@ -106,8 +108,7 @@ class ClueTestCase(unittest.TestCase):
         """流放公海"""
         self.flowPath.clue_non_null()
         self.appApi.my_clue_list()
-        self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
-        self.appApi.ExileSea(labelId=self.appText.get('labelId'))
+        self.appApi.ExileSea(labelId=self.appText.get('ZZGJ'))
         # 流放公海 在首页进行验证
         self.appApi.GetUserAgenda(keyWord=self.appText.get('cluePhone'), endTime=time.strftime("%Y-%m-%d"))
         # 跟进进行验证
@@ -166,80 +167,5 @@ class ClueTestCase(unittest.TestCase):
                                  sourceId=self.appText.get('labelId'))
             self.assertNotEqual(200, self.appText.get('code'))
             self.assertEqual('总部分配过来的线索,线索来源不能修改', self.appText.get('data'))
-
-    # def test_1_AddNewClue1(self):
-    #     """新增一条线索"""
-    #     self.webApi.clue_list(myClue='N', vlue=12)
-    #     self.appApi.ClueInfo()
-    #     self.appApi.ClueFollowList()
-    #     dome = self.appText.get('total')
-    #     dome1 = 1
-    #     dome2 = self.appApi.appText.get('cluePhone')
-    #     while dome != 0:
-    #         dome = dome - 1
-    #         self.appApi.Login()
-    #         time.sleep(1)
-    #         self.webApi.clue_list(myClue='N', vlue=12)
-    #         self.appApi.ClueFollowList(value=dome)
-    #         test = self.appText.get('followContent')
-    #         print(self.appText.get('followContent'))
-    #         self.appApi.Login(userName='13000000005', saasCode='000006')     # 登录咨询师B
-    #         self.appApi.GetUserData()
-    #         if dome1 == 1:
-    #             self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序', saasCode='000006')
-    #             if self.appText.get('labelId') is None:
-    #                 self.webApi.add_label(labelName='百度小程序', labelId=self.appText.get('LabelId'),
-    #                                       pid=self.appText.get('LabelId'), saasCode='000006')
-    #                 self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序', saasCode='000006')
-    #             self.appApi.GetUserLabelList(userLabelType='线索标签', saasCode='000006')
-    #             if self.appText.get('total') == 0:
-    #                 self.appApi.AddUserLabel(saasCode='000006')
-    #                 self.appApi.GetUserLabelList(userLabelType='线索标签', saasCode='000006')
-    #             self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
-    #                                  sourceId=self.appText.get('labelId'),
-    #                                  keyWords=self.appText.get('labelData'),
-    #                                  cluePhone=dome2, saasCode='000006')
-    #
-    #         else:
-    #             self.appApi.my_clue_list(saasCode='000006')
-    #             self.appApi.ClueFollowList(saasCode='000006')
-    #             time.sleep(2)
-    #             self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"),
-    #                                        followContent=test,
-    #                                        taskRemark=test, saasCode='000006')
-    #         dome1 = dome1 + 1
-    #
-    # def test_002(self):
-    #     """11"""
-    #     # self.appApi.Login(userName='13726224607', password='12345678', saasCode='000010')
-    #     self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-    #     if self.appText.get('labelId') is None:
-    #         self.webApi.add_label(labelName='百度小程序', labelId=self.appText.get('LabelId'),
-    #                               pid=self.appText.get('LabelId'))
-    #         self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-    #     self.appApi.GetUserLabelList(userLabelType='线索标签')
-    #     if self.appText.get('total') == 0:
-    #         self.appApi.AddUserLabel()
-    #         self.appApi.GetUserLabelList(userLabelType='线索标签')
-    #     dome = 0
-    #     while dome != 20:
-    #         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
-    #                              sourceId=self.appText.get('labelId'),
-    #                              keyWords=self.appText.get('labelData'))
-    #
-    #         self.appApi.my_clue_list()
-    #         self.appApi.ClueFollowList()
-    #         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-    #         self.appApi.my_clue_list()
-    #         self.appApi.ClueInfo()
-    #         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-    #                                    loanSituation='这个是贷款情况')
-    #         dome = dome + 1
-
-    # def test_003(self):
-    #     """总部新增线索并分派"""
-    #     self.appApi.Login()
-    #     self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
-
 
 
