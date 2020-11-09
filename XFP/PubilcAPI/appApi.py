@@ -113,8 +113,7 @@ class appApi:
     def GetUserData(self):
         """获取咨询师信息"""
         self.PostRequest(url='/api/a/consultant/info',
-                         data={'deviceId': deviceId,
-                               'saasCode': '000006'})
+                         data={'deviceId': deviceId})
         if self.appText.get('msg') != '禁止访问':
             self.appText.set_map('consultantId', globals()['r.text']['data']['consultantId'])
             self.appText.set_map('consultantName', globals()['r.text']['data']['consultantName'])
