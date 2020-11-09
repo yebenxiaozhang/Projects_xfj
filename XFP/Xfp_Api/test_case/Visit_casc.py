@@ -59,8 +59,13 @@ class VisitTestCase(unittest.TestCase):
         cls.webApi.Audit_management()
         cls.flow = flowPath()
         cls.flowPath = cls.flow
+        cls.appText = GlobalMap()
+        # 出行方式
         cls.flowPath.get_label(labelNo='CXFS', labelName='出行方式',
                                newlabelName='自驾')
+        cls.appText.set_map('CXFS', cls.appText.get('labelId'))
+        #
+
 
     # def setUp(self):
     #     pass
@@ -75,7 +80,6 @@ class VisitTestCase(unittest.TestCase):
         while self.webApi.webText.get('total') != 0:
             self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
             self.webApi.audit_List()
-        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
         self.flowPath.client_list_non_null()
         self.appApi.GetMatchingAreaHouse()
         globals()['dome'] = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -230,11 +234,15 @@ class VisitTestCase(unittest.TestCase):
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
-        self.appApi.GetLabelList(labelNo='DLGS')
+        self.appApi.GetLabelList(labelNo='WDFL', labelName='问答分类一')
+        WDFL = self.appText.get('labelId')
+        self.appApi.GetLabelList(labelNo='DLGS', labelName='代理公司一')
         dome = '楼盘问答 ' + time.strftime("%Y-%m-%d %H:%M:%S")
         self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
+                               houseId=self.appText.get('houseId'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                receptionPhone='1' + str(int(time.time())),
+                               questionTypeNo=WDFL,
                                attachmentIds='1', is_QA=1,
                                answer='答案 ' + time.strftime("%Y-%m-%d %H:%M:%S"),
                                title=dome)

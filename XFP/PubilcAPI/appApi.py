@@ -467,7 +467,7 @@ class appApi:
                              'seeingConsultant': seeingConsultant,  # 带看人
                              # 'consultantId': self.appText.get('consultantId'),
                              'appointmentTime': appointmentTime,
-                             'visitMode': self.appText.get('labelId'),
+                             'visitMode': self.appText.get('CXFS'),
                              'projectAId': projectAId,
                              'projectBId': projectBId,
                              'projectCId': projectCId,
@@ -507,7 +507,7 @@ class appApi:
                              }
                          })
 
-    def VisitFlow1(self, agencyId, attachmentIds='1031', is_QA=2,
+    def VisitFlow1(self, agencyId, attachmentIds='1031', is_QA=2,questionTypeNo=None,
                    houseId=None, receptionName=None, receptionPhone=None,
                    answer=None, title=None, visitSummary='带看总结'):
         self.GetMatchingAreaHouse()  # 匹配楼盘
@@ -517,6 +517,7 @@ class appApi:
                                  'answer': answer,                      # 答案
                                  # 'houseIds': houseIds,
                                  'id': houseId,                             # 楼盘ID
+                                 'questionTypeNo': questionTypeNo,          # 问答分类
                                  'title': title                         # 标题
                              }]
         else:
