@@ -125,10 +125,11 @@ class ClientTestCase(unittest.TestCase):
         """暂停跟进"""
         try:
             self.flowPath.suspend_follow()
-            self.appApi.ClientTask()       # 待办
-            if self.appText.get('total') == 1:
-                if self.appText.get('taskTypeStr') != '带看行程':
-                    raise RuntimeError(self.appText.get('ApiXfpUrl'))
+            self.appApi.ClientTask(taskType=2)       # 待办
+            self.assertEqual('2', self.appText.get('taskType'))
+            # if self.appText.get('total') == 1:
+            #     if self.appText.get('taskTypeStr') != '带看行程':
+            #         raise RuntimeError(self.appText.get('ApiXfpUrl'))
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appText.get('ApiXfpUrl'))
