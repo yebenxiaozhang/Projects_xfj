@@ -56,5 +56,11 @@ class UserTestCase(unittest.TestCase):
         self.XfpRequest.Login(userName='11111111111', password='11111111')
         self.assertEqual(self.XmfpEXT.get('data'), '用户名或密码不正确')
 
+    def test_not_consultant(self):
+        """无咨询师权限"""
+        self.XfpRequest.Login(userName='13062200302')
+        self.XfpRequest.GetUserData()
+        self.assertEqual('该用户无咨询师权限', self.XmfpEXT.get('data'))
+
 
 
