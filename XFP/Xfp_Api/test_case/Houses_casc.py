@@ -3,7 +3,7 @@
 # @Author  : 潘师傅
 # @File    : Houses_casc.py
 
-from XFP.PubilcAPI.webApi import *
+from XFP.PubilcAPI.flowPath import *
 """楼盘相关"""
 
 
@@ -18,6 +18,9 @@ class HousesTestCase(unittest.TestCase):
         self.xfp_app = appApi()
         self.app_api = self.xfp_app
 
+        self.flow = flowPath()
+        self.flowPath = self.flow
+
         self.appText = GlobalMap()
         self.webText = GlobalMap()
 
@@ -27,6 +30,14 @@ class HousesTestCase(unittest.TestCase):
         cls.do_request = appApi()
         cls.Request = cls.do_request
         cls.Request.Login()
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.flowPath.get_label(labelNo='XXFL', labelName='信息分类',
+                               newlabelName='信息分类' + time.strftime("%Y-%m-%d %H:%M:%S"))
+        cls.flowPath.get_label(labelNo='DLGS', labelName='代理公司',
+                               newlabelName='代理公司' + time.strftime("%Y-%m-%d %H:%M:%S"))
+        cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
+                               newlabelName='问答分类' + time.strftime("%Y-%m-%d %H:%M:%S"))
 
     def test_AllBuildingUpdate(self):
         """全部楼盘"""
@@ -34,12 +45,6 @@ class HousesTestCase(unittest.TestCase):
             self.app_api.AllBuildingUpdate()
             if self.appText.get('total') == 0:
                 self.app_api.GetLabelList(labelNo='XXFL', labelName='信息分类一')
-                if self.appText.get('labelId') is not None:
-                    pass        # 存在标签---不创建
-                else:
-                    self.web_api.add_label(labelName='信息分类一', labelId=self.appText.get('LabelId'),
-                                           pid=self.appText.get('LabelId'))
-                    self.app_api.GetLabelList(labelNo='XXFL', labelName='信息分类一')
                 self.web_api.house_list()
                 self.assertEqual(self.webText.get('total'), 0)
                 self.web_api.add_house(houseName='项目' + time.strftime("%Y-%m-%d"))
@@ -60,12 +65,6 @@ class HousesTestCase(unittest.TestCase):
             self.app_api.BusinessInformation()
             if self.appText.get('total') == 0:
                 self.app_api.GetLabelList(labelNo='DLGS', labelName='代理公司一')
-                if self.appText.get('labelId') is not None:
-                    pass        # 存在标签---不创建
-                else:
-                    self.web_api.add_label(labelName='代理公司一', labelId=self.appText.get('LabelId'),
-                                           pid=self.appText.get('LabelId'))
-                    self.app_api.GetLabelList(labelNo='DLGS', labelName='代理公司一')
                 self.web_api.house_list()
                 if self.webText.get('total') == 0:
                     self.web_api.add_house(houseName='项目' + time.strftime("%Y-%m-%d"))
@@ -85,12 +84,6 @@ class HousesTestCase(unittest.TestCase):
             self.app_api.Information()
             if self.appText.get('total') == 0:
                 self.app_api.GetLabelList(labelNo='XXFL', labelName='信息分类一')
-                if self.appText.get('labelId') is not None:
-                    pass        # 存在标签---不创建
-                else:
-                    self.web_api.add_label(labelName='信息分类一', labelId=self.appText.get('LabelId'),
-                                           pid=self.appText.get('LabelId'))
-                    self.app_api.GetLabelList(labelNo='XXFL', labelName='信息分类一')
                 self.web_api.house_list()
                 if self.webText.get('total') == 0:
                     self.web_api.add_house(houseName='项目' + time.strftime("%Y-%m-%d"))
@@ -111,12 +104,6 @@ class HousesTestCase(unittest.TestCase):
             self.app_api.HouseQA()
             if self.appText.get('total') == 0:
                 self.app_api.GetLabelList(labelNo='WDFL', labelName='问答分类一')
-                if self.appText.get('labelId') is not None:
-                    pass  # 存在标签---不创建
-                else:
-                    self.web_api.add_label(labelName='问答分类一', labelId=self.appText.get('LabelId'),
-                                           pid=self.appText.get('LabelId'))
-                    self.app_api.GetLabelList(labelNo='WDFL', labelName='问答分类一')
                 self.web_api.house_list()
                 if self.webText.get('total') == 0:
                     self.web_api.add_house(houseName='项目' + time.strftime("%Y-%m-%d"))

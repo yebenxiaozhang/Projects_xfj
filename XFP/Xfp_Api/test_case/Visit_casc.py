@@ -57,6 +57,10 @@ class VisitTestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.flowPath.get_label(labelNo='CXFS', labelName='出行方式',
+                               newlabelName='自驾')
 
     # def setUp(self):
     #     pass
@@ -72,15 +76,6 @@ class VisitTestCase(unittest.TestCase):
             self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
             self.webApi.audit_List()
         self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
-        if self.appText.get('data') is None:
-            pass
-        else:
-            self.webApi.add_label(labelName='出行方式', labelId=0, pid=0)
-            self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
-        if self.appText.get('labelId') is None:
-            self.webApi.add_label(labelName='自驾', labelId=self.appText.get('LabelId'),
-                                  pid=self.appText.get('LabelId'))
-            self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
         self.flowPath.client_list_non_null()
         self.appApi.GetMatchingAreaHouse()
         globals()['dome'] = time.strftime("%Y-%m-%d %H:%M:%S")

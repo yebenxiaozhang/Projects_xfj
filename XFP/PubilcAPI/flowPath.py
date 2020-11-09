@@ -265,6 +265,18 @@ class flowPath:
         except BaseException as e:
                 print("错误，错误原因：%s" % e)
                 raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+    
+    def get_label(self, labelNo, labelName, newlabelName):
+        """查询标签"""
+        self.appApi.GetLabelList(labelNo=labelNo, labelName=newlabelName)
+        if self.appApi.appText.get('data') == []:
+            self.webApi.add_label(labelName=labelName, labelId=0, pid=0)
+            self.appApi.GetLabelList(labelNo=labelNo, labelName=newlabelName)
+        if self.appApi.appText.get('labelId') is not None:
+            pass  # 存在标签---不创建
+        else:
+            self.webApi.add_label(labelName=newlabelName, labelId=self.appApi.appText.get('LabelId'),
+                                  pid=self.appApi.appText.get('LabelId'))
 
 
 

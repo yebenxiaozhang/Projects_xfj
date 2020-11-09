@@ -17,7 +17,7 @@
 # XfpPwd1 = '12345678'
 
 
-ApiXfpUrl = 'http://192.168.10.96:8381'
+ApiXfpUrl = 'http://192.168.10.114:8381'
 ApiXfpUrl1 = 'http://192.168.10.52/xfp_api'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
