@@ -82,7 +82,6 @@ class FirstPhoneTestCase(unittest.TestCase):
             a = 0
             while a != self.webText.get('total') - 1:
                 if self.webText.get('clueId') == globals()['clueId']:
-                    # print(self.webApi.appText.get('notFirstCall'))
                     if str(self.webApi.webText.get('notFirstCall')) != 'False':
                         print("已首电-但后台提示未首电")
                         raise RuntimeError(self.webText.get('ApiXfpUrl'))

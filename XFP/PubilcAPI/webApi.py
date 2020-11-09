@@ -37,6 +37,14 @@ class webApi:
         if globals()['r.text']['code'] != 200:
             raise RuntimeError(self.webText.get('ApiXfpUrl'))
 
+        if r.elapsed.total_seconds() > 5:
+            print('接口请求过慢')
+            print(self.webText.get('URL'))
+        if r.elapsed.total_seconds() > 10:
+            print('接口请求过慢大于10秒')
+            raise RuntimeError(self.webText.get('URL'))
+
+
     def Audit_management(self, suspend=False, suspendLevel=1, clueStop=False, clueStopLevel=1,
                          customerStop=False, customerStopLevel=1, customerVisit=False,
                          customerVisitLevel=1, customerDeal=False, customerDealLevel=1):
@@ -352,7 +360,9 @@ class webApi:
         """待首电"""
         self.PostRequest(url='/api/b/consultant/getStatisticalConsultantTaskList',
                          data={
-                             'consultantId': self.appText.get('consultantId')
+                             'consultantId': self.appText.get('consultantId'),
+                             'DateTime': time.strftime("%Y-%m-%d"),
+                             'isFirst': 0
                          })
         self.webText.set_map('total', len(globals()['r.text']['data']))
         if self.webText.get('total') != 0:

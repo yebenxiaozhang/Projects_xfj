@@ -77,6 +77,13 @@ class appApi:
         if globals()['r.text']['code'] == 500:
             raise RuntimeError(self.appText.get('ApiXfpUrl'))
 
+        if r.elapsed.total_seconds() > 5:
+            print('接口请求过慢')
+            print(self.appText.get('ApiXfpUrl'))
+        if r.elapsed.total_seconds() > 10:
+            print('接口请求过慢大于10秒')
+            raise RuntimeError(self.appText.get('ApiXfpUrl'))
+
     def Sign(self, userName, password='123456789'):
         """注册"""
         self.PostRequest(url='/api/auth/sign',
