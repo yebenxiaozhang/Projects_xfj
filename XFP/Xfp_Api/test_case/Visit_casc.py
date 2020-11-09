@@ -81,17 +81,17 @@ class VisitTestCase(unittest.TestCase):
             self.webApi.add_label(labelName='自驾', labelId=self.appText.get('LabelId'),
                                   pid=self.appText.get('LabelId'))
             self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
-        # self.flowPath.client_list_non_null()
-        # self.appApi.GetMatchingAreaHouse()
-        # globals()['dome'] = time.strftime("%Y-%m-%d %H:%M:%S")
-        # self.appApi.ClientTask(taskType='3')
-        # if self.appApi.appText.get('total') == 2:
-        #     self.flowPath.advance_over_visit()
-        #     if self.appApi.appText.get('code') != 200:
-        #         self.flowPath.clue_non_null()
-        #         self.appApi.ClueInfo()
-        #         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-        #                                    loanSituation='这个是贷款情况')
+        self.flowPath.client_list_non_null()
+        self.appApi.GetMatchingAreaHouse()
+        globals()['dome'] = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.ClientTask(taskType='3')
+        if self.appApi.appText.get('total') == 2:
+            self.flowPath.advance_over_visit()
+            if self.appApi.appText.get('code') != 200:
+                self.flowPath.clue_non_null()
+                self.appApi.ClueInfo()
+                self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                           loanSituation='这个是贷款情况')
 
     def test_visit_01(self):
         """3、邀约人默认是登录人也可以选其他咨询师"""
