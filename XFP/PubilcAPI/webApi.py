@@ -427,16 +427,24 @@ class webApi:
 
     def addGoldDetailInfo(self):
         """幸福币充值"""
-        self.PostRequest(url='/api/b/goldDetail/addGoldDetailInfo',
-                         data={
-                                "saasCodeSys": "000009",
-                                "goldValue": "50000",
-                                "goldType": 1,
-                                "type": "add",
-                                # "saasName":"小鸡炖蘑菇",
-                                "saasCode": "admin"
-                            },
-                         saasCode='admin')
+
+        data = {
+            "saasCodeSys": "000009",
+            "goldValue": "50000",
+            "goldType": 1,
+            "type": "add",
+            # "saasName":"小鸡炖蘑菇",
+            "saasCode": "admin"
+        }
+        r = requests.post(url=(ApiXfpUrl + '/api/b/goldDetail/addGoldDetailInfo'),
+                          data=(json.dumps(data,
+                                           ensure_ascii=False).encode("UTF-8")),
+                          headers={
+                              'Content-Type': 'application/json',
+                              'Authorization': 'Bearer' + ' ' + self.appText.get("user_token")
+                          },
+                          files=None)
+        r.raise_for_status()
 
 
 if __name__ == '__main__':
