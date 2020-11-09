@@ -218,19 +218,6 @@ class MyVisitTestCase(unittest.TestCase):
                                receptionPhone='1' + str(int(time.time())), attachmentIds='1')
         self.assertEqual('带看计划已取消', self.appApi.appText.get('data'))
 
-    # def test_my_visit_17(self):
-    #     """2、提前结束的带看---不允许操作"""
-    #     self.webApi.Audit_management()  # 修改配置审核
-    #     self.flowPath.add_visit()
-    #     self.appApi.ClientTask(taskType='3')
-    #     self.appApi.visit_info()
-    #     self.appApi.OverVisit()  # 提前结束代办
-    #     self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
-    #     self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
-    #                            receptionName=self.appApi.RandomText(textArr=surname),
-    #                            receptionPhone='1' + str(int(time.time())), attachmentIds='1')
-    #     self.assertEqual('带看计划已取消', self.appApi.appText.get('data'))
-
     def test_my_visit_18(self):
         """3、审核中的带看 ---不可以完成，不可以提前结束，不可以释放公海"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
