@@ -380,7 +380,6 @@ class HomeTestCase(unittest.TestCase):
     def test_await_follow_14(self):
         """19、客户流放公海（已暂缓 | 无需审核）     - 0"""
         self.flowPath.client_list_non_null()
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.follow_front()
         self.webApi.Audit_management()  # 修改配置审核
@@ -393,7 +392,6 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClientFollowList()
         self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.follow_front()
         self.appApi.client_exile_sea()
@@ -426,7 +424,6 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.follow_front()
         self.appApi.GetMatchingAreaHouse()
-        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                    appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
                                    seeingConsultant=self.appApi.appText.get('consultantId'),

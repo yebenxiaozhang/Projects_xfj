@@ -129,7 +129,7 @@ class ClientTestCase(unittest.TestCase):
             if self.appText.get('total') < 1:
                 raise RuntimeError(self.appText.get('ApiXfpUrl'))
             self.appApi.visit_info()
-            self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+            self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('DLGS'),
                                    receptionName=self.appApi.RandomText(textArr=surname),
                                    receptionPhone='1' + str(int(time.time())), attachmentIds='1')
             self.appApi.ClientTask()

@@ -225,18 +225,17 @@ class VisitTestCase(unittest.TestCase):
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
-        self.appApi.GetLabelList(labelNo='DLGS')
         """接待人姓名超过5位数"""
-        self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'), receptionName=(str(surname))[1:-1])
+        self.appApi.VisitFlow1(agencyId=self.appText.get('DLGS'), receptionName=(str(surname))[1:-1])
         self.assertNotEqual(200, self.appText.get('code'))
 
         """带看总结不允许超过200个字"""
-        self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
+        self.appApi.VisitFlow1(agencyId=self.appText.get('DLGS'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                receptionPhone='1' + str(int(time.time())), visitSummary=(str(surname))[1:-1])
         self.assertNotEqual(200, self.appText.get('code'))
         """报备截图最多9张"""
-        self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
+        self.appApi.VisitFlow1(agencyId=self.appText.get('DLGS'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                receptionPhone='1' + str(int(time.time())),
                                attachmentIds='1,2,3,4,5,6,7,8,9,10')
@@ -249,9 +248,8 @@ class VisitTestCase(unittest.TestCase):
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
-        self.appApi.GetLabelList(labelNo='DLGS')
         """标题过长"""
-        self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
+        self.appApi.VisitFlow1(agencyId=self.appText.get('DLGS'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                receptionPhone='1' + str(int(time.time())), title=(str(surname))[1:-1],
                                is_QA=1)
@@ -259,14 +257,14 @@ class VisitTestCase(unittest.TestCase):
         """标题不能重复"""
         self.appApi.HouseQA()
         if self.appText.get('total') != 0:
-            self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
+            self.appApi.VisitFlow1(agencyId=self.appText.get('DLGS'),
                                    receptionName=self.appApi.RandomText(textArr=surname),
                                    receptionPhone='1' + str(int(time.time())),
                                    is_QA=1,
                                    title=self.appText.get('title'))
             self.assertNotEqual(200, self.appText.get('code'))
         """答案不能超过200个字"""
-        self.appApi.VisitFlow1(agencyId=self.appText.get('labelId'),
+        self.appApi.VisitFlow1(agencyId=self.appText.get('DLGS'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                receptionPhone='1' + str(int(time.time())), is_QA=1,
                                title='楼盘问答 ' + time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -307,7 +305,6 @@ class VisitTestCase(unittest.TestCase):
         self.appApi.visit_cancel(cancelRemark=(str(surname))[1:-1])
         self.assertNotEqual(200, self.appText.get('code'))
         """正常取消"""
-
         self.appApi.visit_cancel()
         self.assertEqual(200, self.appText.get('code'))
 

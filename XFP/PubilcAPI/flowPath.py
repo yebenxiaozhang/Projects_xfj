@@ -76,7 +76,7 @@ class flowPath:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
 
-        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('DLGS'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                houseId=self.appApi.appText.get('houseId'),
                                receptionPhone='1' + str(int(time.time())))

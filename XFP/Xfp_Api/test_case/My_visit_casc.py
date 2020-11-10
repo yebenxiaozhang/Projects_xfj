@@ -270,8 +270,7 @@ class MyVisitTestCase(unittest.TestCase):
         self.appApi.visit_info()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False)  # 审核失败
-        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
-        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('DLGS'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                receptionPhone='1' + str(int(time.time())), attachmentIds='1')
         self.assertEqual('带看计划已取消', self.appApi.appText.get('data'))
@@ -284,21 +283,18 @@ class MyVisitTestCase(unittest.TestCase):
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
-        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
-        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
+        self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('DLGS'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                receptionPhone='1' + str(int(time.time())), attachmentIds='1')
         self.assertEqual('带看计划审核中', self.appApi.appText.get('data'))
 
         self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
         assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
-        self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
         self.appApi.add_deal()  # 录入成交
         self.assertNotEqual(200, self.appApi.appText.get('code'))
         self.appApi.client_exile_sea()
         self.assertNotEqual(200, self.appApi.appText.get('code'))
 
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.assertNotEqual(200, self.appApi.appText.get('code'))
 

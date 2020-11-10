@@ -212,7 +212,6 @@ class MyDealTestCase(unittest.TestCase):
                                    appointConsultant=self.appApi.appText.get('consultantId'))
         self.assertEqual('已申请客户成交,正在审核中!', self.appApi.appText.get('data'))
 
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.assertEqual('已申请客户成交,正在审核中!', self.appApi.appText.get('data'))
 
