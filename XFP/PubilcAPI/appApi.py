@@ -516,8 +516,8 @@ class appApi:
         if is_QA == 1:
             visitQaList = [{
                                  'answer': answer,                      # 答案
-                                 # 'houseIds': houseIds,
-                                 'id': houseId,                             # 楼盘ID
+                                 'houseIds': houseId,
+                                 # 'id': houseId,                             # 楼盘ID
                                  'questionTypeNo': questionTypeNo,          # 问答分类
                                  'title': title                         # 标题
                              }]
@@ -551,14 +551,6 @@ class appApi:
                          })
         self.appText.set_map('visitId', globals()['r.text']['data']['saasClueVisit']['visitId'])
 
-    # def OverVisit(self, cancelRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 取消带看'):
-    #     """提前结束带看"""
-    #     self.PostRequest(url='/api/a/visit/cancel',
-    #                      data={
-    #                          'visitId': self.appText.get('visitId'),
-    #                          'cancelRemark': cancelRemark
-    #                      })
-
     def visit_cancel(self, cancelRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 取消带看'):
         """取消带看"""
         self.PostRequest(url='/api/a/visit/cancel',
@@ -573,7 +565,7 @@ class appApi:
         self.PostRequest(url='/api/a/customer/task/pause',
                          data={
                              'clueId': self.appText.get('clueId'),
-                             'labelId': self.appText.get('labelId'),
+                             'labelId': self.appText.get('ZHGJ'),
                              'endTime': endTime,
                              'customerId': self.appText.get('customerId'),
                              'consultantId': self.appText.get('consultantId'),
@@ -594,22 +586,22 @@ class appApi:
                              'clueId': self.appText.get('clueId')
                          })
 
-    def ExileSea(self, labelId, remark='python-线索释放公海'):
+    def ExileSea(self, remark='python-线索释放公海'):
         """流放公海"""
         self.PostRequest(url='/api/a/clue/exileSea',
                          data={'clueId': self.appText.get('clueId'),
                                'remark': remark,
                                'labelName': self.appText.get('labelName'),
-                               'labelId': labelId})
+                               'labelId': self.appText.get('ZZGJ')})
         self.appText.set_map('data', globals()['r.text']['data'])
 
-    def client_exile_sea(self, labelId, remark='python-客户释放公海'):
+    def client_exile_sea(self, remark='python-客户释放公海'):
         """客户流放公海"""
         self.PostRequest(url='/api/a/customer/task/delete',
                          data={
                              'customerId': self.appText.get('customerId'),
                              'clueId': self.appText.get('clueId'),
-                             'labelId': labelId,
+                             'labelId': self.appText.get('ZZGJ'),
                              'consultantId': self.appText.get('consultantId'),
                              'saasClueFollow': {
                                  'customerId': self.appText.get('customerId'),
@@ -738,6 +730,8 @@ class appApi:
                     self.appText.set_map('labelId', globals()['r.text']['data'][0]['children'][a]['labelId'])
                     self.appText.set_map('labelName', globals()['r.text']['data'][0]['children'][a]['labelName'])
                     self.appText.set_map('labelNo', globals()['r.text']['data'][0]['children'][a]['labelNo'])
+                else:
+                    self.appText.set_map('labelId', globals()['r.text']['data'][0]['children'][0]['labelId'])
             except:
                 self.appText.set_map('labelId', None)
                 self.appText.set_map('labelName', None)
@@ -767,70 +761,46 @@ class appApi:
         self.appText.set_map('total', len(globals()['r.text']['data']))
         if len(globals()['r.text']['data']) != 0:
             self.appText.set_map('houseId', globals()['r.text']['data'][value]['value'])
+            self.appText.set_map('projectAId', globals()['r.text']['data'][value]['value'])
+            self.appText.set_map('projectBId', globals()['r.text']['data'][1]['value'])
+            self.appText.set_map('projectCId', globals()['r.text']['data'][2]['value'])
 
-    def ClientEntering(self, callName=None, sex=1, GFYX=0, ZJZZ=0, GFMD=0, WYSX=0,
-                       GFZZ=0, SFST=0, KHXQ=0, PPQY=0,
-                       PPLP=1, projectBId=0, projectCId=0, loanSituation='', paymentRatio='',
+    def ClientEntering(self, callName=None, sex=1, projectBId=0, projectCId=0,
+                       loanSituation='', paymentRatio='',
                        paymentBudget='', apartmentLayout=''):
         """录入需求"""
-        self.GetLabelList(labelNo='KHYXDJ')  # 查询购房意向loanSituation
-        intentionLevelLableId = globals()['r.text']['data'][0]['children'][GFYX]['labelId']
-        self.GetLabelList(labelNo='ZJZZ')  # 查询资金资质
-        capitalQualificationLableId = globals()['r.text']['data'][0]['children'][ZJZZ]['labelId']
-        self.GetLabelList(labelNo='GFMD')  # 查询购房目的
-        purchasePurposeLableIds = globals()['r.text']['data'][0]['children'][GFMD]['labelId']
-        self.GetLabelList(labelNo='WYSX')  # 查询物业属性
-        propertyAttributeLableIds = globals()['r.text']['data'][0]['children'][WYSX]['labelId']
-        self.GetLabelList(labelNo='GFZZ')  # 查询购房资质
-        purchaseQualificationLableIds = globals()['r.text']['data'][0]['children'][GFZZ]['labelId']
-        self.GetLabelList(labelNo='SFSTF')  # 查询是否首套
-        theFirstLableIds = globals()['r.text']['data'][0]['children'][SFST]['labelId']
-        self.GetMatchingArea()  # 查询匹配区域
-        if PPQY != '':
-            areaId = globals()['r.text']['data']['data'][0]['val'][0]['children'][0]['value']
-        else:
-            areaId = 0
-        self.GetMatchingAreaHouse()  # 匹配楼盘
-        if PPLP != '':
-            projectAId = globals()['r.text']['data'][0]['value']
-            projectBId = globals()['r.text']['data'][1]['value']
-            projectCId = globals()['r.text']['data'][2]['value']
-        else:
-            projectAId = 0
-        self.GetLabelList(labelNo='QTKHXQ')  # 查询客户需求
-        customerDemandLableIds = globals()['r.text']['data'][0]['children'][KHXQ]['labelId']
         self.PostRequest(url='/api/a/customer/save',
                          data={
                              'consultantId': self.appText.get('consultantId'),
                              'customerDemandForm': {
                                  'clueId': self.appText.get('clueId'),
-                                 'intentionLevelLableId': intentionLevelLableId,  # *购房意向
-                                 'capitalQualificationLableId': capitalQualificationLableId,  # *资金资质
-                                 'areaId': areaId,  # *区域匹配
-                                 'projectAId': projectAId,  # *匹配楼盘A
+                                 'intentionLevelLableId': self.appText.get('KHYXDJ'),  # *购房意向
+                                 'capitalQualificationLableId': self.appText.get('ZJZZ'),  # *资金资质
+                                 'areaId': self.appText.get('PPQY'),  # *区域匹配
+                                 'projectAId': self.appText.get('projectAId'),  # *匹配楼盘A
                                  'phoneNum': self.appText.get('cluePhone'),
                                  'cluePhone': self.appText.get('cluePhone'),
                                  'clueNickName': callName,  # 称呼
                                  'sex': sex,  # 性别 0女 1 男
                                  'projectBId': projectBId,  # *匹配楼盘B
                                  'projectCId': projectCId,  # *匹配楼盘C
-                                 'purchasePurposeLableIds': purchasePurposeLableIds,  # 购房目的，
-                                 'propertyAttributeLableIds': propertyAttributeLableIds,  # 物业属性，
-                                 'purchaseQualificationLableIds': purchaseQualificationLableIds,  # 购房资质
-                                 'theFirstLableIds': theFirstLableIds,  # 是否首套
+                                 'purchasePurposeLableIds': self.appText.get('GFMD'),  # 购房目的，
+                                 'propertyAttributeLableIds': self.appText.get('WYSX'),  # 物业属性，
+                                 'purchaseQualificationLableIds': self.appText.get('GFZZ'),  # 购房资质
+                                 'theFirstLableIds': self.appText.get('SFSTF'),  # 是否首套
                                  'loanSituation': loanSituation,  # 贷款情况
                                  'paymentRatio': paymentRatio,  # 首付比例
                                  'sourceId': self.appText.get('sourceId'),
                                  'paymentBudget': paymentBudget,  # 首付预算
                                  'apartmentLayout': apartmentLayout,  # 户型面积
-                                 'customerDemandLableIds': customerDemandLableIds  # 客户需求
+                                 'customerDemandLableIds': self.appText.get('QTKHXQ')  # 客户需求
                              },
                              'saasClueForm': {
                                  'clueId': self.appText.get('clueId'),
-                                 'intentionLevelLableId': intentionLevelLableId,  # *购房意向
-                                 'capitalQualificationLableId': capitalQualificationLableId,  # *资金资质
-                                 'areaId': areaId,  # *区域匹配
-                                 'projectAId': projectAId,  # *匹配楼盘A
+                                 'intentionLevelLableId': self.appText.get('KHYXDJ'),  # *购房意向
+                                 'capitalQualificationLableId': self.appText.get('ZJZZ'),  # *资金资质
+                                 'areaId': self.appText.get('PPQY'),  # *区域匹配
+                                 'projectAId': self.appText.get('projectAId'),  # *匹配楼盘A
                                  'phoneNum': self.appText.get('cluePhone'),
                                  'cluePhone': self.appText.get('cluePhone'),
                                  'clueNickName': callName,  # 称呼
@@ -839,15 +809,15 @@ class appApi:
                                  'sex': sex,  # 性别 0女 1 男
                                  'projectBId': projectBId,  # *匹配楼盘B
                                  'projectCId': projectCId,  # *匹配楼盘C
-                                 'purchasePurposeLableIds': purchasePurposeLableIds,  # 购房目的，
-                                 'propertyAttributeLableIds': propertyAttributeLableIds,  # 物业属性，
-                                 'purchaseQualificationLableIds': purchaseQualificationLableIds,  # 购房资质
-                                 'theFirstLableIds': theFirstLableIds,  # 是否首套
+                                 'purchasePurposeLableIds': self.appText.get('GFMD'),  # 购房目的，
+                                 'propertyAttributeLableIds': self.appText.get('WYSX'),  # 物业属性，
+                                 'purchaseQualificationLableIds': self.appText.get('GFZZ'),  # 购房资质
+                                 'theFirstLableIds': self.appText.get('SFSTF'),  # 是否首套
                                  'loanSituation': loanSituation,  # 贷款情况
                                  'paymentRatio': paymentRatio,  # 首付比例
                                  'paymentBudget': paymentBudget,  # 首付预算
                                  'apartmentLayout': apartmentLayout,  # 户型面积
-                                 'customerDemandLableIds': customerDemandLableIds  # 客户需求
+                                 'customerDemandLableIds': self.appText.get('QTKHXQ')  # 客户需求
                              }
                          })
 
@@ -929,7 +899,7 @@ class appApi:
                                'transRemark': transRemark,  # 备注
                                'transReservedTellphone': transReservedTellphone,  # 电话
                                'transTotalPrice': transTotalPrice,  # 成交总价
-                               'transType': self.appText.get('labelId'),  # 成交项
+                               'transType': self.appText.get('CJX'),  # 成交项
                                'transYeji': transYeji,  # 业绩
                                'isDeleted': isDeleted,  # 是否删除
                                'attachmentIds': attachmentIds})  # 附件
@@ -967,7 +937,7 @@ class appApi:
 
     def AllBuildingUpdate(self, keyWord=None):
         """全部楼盘"""
-        self.PostRequest(url='/api/a/house/getHouseList',
+        self.PostRequest(url='/api/a/house/list',
                          data={
                              'keyWord': keyWord
                          })

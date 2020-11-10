@@ -35,6 +35,65 @@ class ClientTestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.appText = GlobalMap()
+        """线索来源"""
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='百度小程序')
+        cls.appText.set_map('XSLY', cls.appText.get('labelId'))
+
+        """线索来源_幸福派总部"""
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='幸福派总部')
+        cls.appText.set_map('XSLY_admin', cls.appText.get('labelId'))
+        """线索标签"""
+        cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        if cls.appText.get('total') == 0:
+            cls.appApi.AddUserLabel()
+            cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        cls.appText.set_map('XSBQ', cls.appText.get('labelData'))
+        """终止跟进"""
+        cls.flowPath.get_label(labelNo='SZGJYY', labelName='终止跟进原因',
+                               newlabelName='客户已成交')
+        cls.appText.set_map('ZZGJ', cls.appText.get('labelId'))
+        """成交项"""
+        cls.flowPath.get_label(labelNo='CJX', labelName='成交项目',
+                               newlabelName='认购')
+        cls.appText.set_map('CJX', cls.appText.get('labelId'))
+        """出行方式"""
+        cls.flowPath.get_label(labelNo='CXFS', labelName='出行方式',
+                               newlabelName='自驾')
+        cls.appText.set_map('CXFS', cls.appText.get('labelId'))
+        """客户意向等级"""
+        cls.appApi.GetLabelList(labelNo='KHYXDJ')                       # 查询购房意向loanSituation
+        cls.appText.set_map('KHYXDJ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='ZJZZ')                         # 查询资金资质
+        cls.appText.set_map('ZJZZ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='GFMD')                         # 查询购房目的
+        cls.appText.set_map('GFMD', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='WYSX')                         # 查询物业属性
+        cls.appText.set_map('WYSX', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='GFZZ')                         # 查询购房资质
+        cls.appText.set_map('GFZZ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='SFSTF')                        # 查询是否首套
+        cls.appText.set_map('SFSTF', cls.appText.get('labelId'))
+        cls.appApi.GetMatchingArea()                                    # 查询匹配区域
+        cls.appApi.GetMatchingAreaHouse()                               # 匹配楼盘
+        cls.appApi.GetLabelList(labelNo='QTKHXQ')                       # 查询客户需求
+        cls.appText.set_map('QTKHXQ', cls.appText.get('labelId'))
+        cls.appApi.ConsultantList()                                     # 咨询师列表
+        cls.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+        cls.appText.set_map('ZHGJ', cls.appText.get('labelId'))         # 暂缓跟进
+        cls.flowPath.get_label(labelNo='XXFL', labelName='信息分类',
+                               newlabelName='信息分类一')
+        cls.appText.set_map('XXFL', cls.appText.get('labelId'))         # 信息分类
+        cls.flowPath.get_label(labelNo='DLGS', labelName='代理公司',
+                               newlabelName='代理公司一')
+        cls.appText.set_map('DLGS', cls.appText.get('labelId'))         # 代理公司
+        cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
+                               newlabelName='问答分类一')
+        cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
 
     def test_1_FollowSave(self):
         """客户跟进"""
@@ -62,20 +121,6 @@ class ClientTestCase(unittest.TestCase):
         self.flowPath.add_visit()
         self.assertEqual(self.appApi.appText.get('code'), 200)
 
-    # def test_AlterSettingTakeLook(self):
-    #     """修改带看计划"""
-    #     try:
-    #         self.flowPath.add_visit()
-    #         self.appApi.ClientTask(taskType='3')
-    #         if self.appApi.appText.get('total') < 1:
-    #             print('创建带看至少有一个任务')
-    #             raise RuntimeError(self.appText.get('ApiXfpUrl'))
-    #         self.appApi.GetMatchingAreaHouse()
-    #         self.appApi.UpdateVisitAdd(projectAId=self.appText.get('houseId'))
-    #     except BaseException as e:
-    #         print("断言错误，错误原因：%s" % e)
-    #         raise RuntimeError(self.appText.get('ApiXfpUrl'))
-
     def test_CompleteSettingTakeLook(self):
         """完成带看计划"""
         try:
@@ -84,7 +129,6 @@ class ClientTestCase(unittest.TestCase):
             if self.appText.get('total') < 1:
                 raise RuntimeError(self.appText.get('ApiXfpUrl'))
             self.appApi.visit_info()
-            self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
             self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('labelId'),
                                    receptionName=self.appApi.RandomText(textArr=surname),
                                    receptionPhone='1' + str(int(time.time())), attachmentIds='1')
@@ -127,9 +171,6 @@ class ClientTestCase(unittest.TestCase):
             self.flowPath.suspend_follow()
             self.appApi.ClientTask(taskType=2)       # 待办
             self.assertEqual('2', self.appText.get('taskType'))
-            # if self.appText.get('total') == 1:
-            #     if self.appText.get('taskTypeStr') != '带看行程':
-            #         raise RuntimeError(self.appText.get('ApiXfpUrl'))
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appText.get('ApiXfpUrl'))

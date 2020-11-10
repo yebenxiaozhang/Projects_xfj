@@ -5,7 +5,8 @@
 
 
 from XFP.PubilcAPI.appApi import *
-
+import random
+import math
 
 class webApi:
 
@@ -218,19 +219,21 @@ class webApi:
                                 "attachmentIds": attachmentIds,     # 附件ID
                                 "houseId": self.webText.get('houseId'),     # 楼盘ID
                                 "houseInfo": data,
-                                "houseInfoType": self.appText.get('labelId'),   # 标签ID
+                                "houseInfoType": self.appText.get('XXFL'),   # 标签ID
                                 "isDelete": 0,
                                 "isHaveAttachment": isHaveAttachment,
                             })
 
     def add_house(self, houseName):
         """添加新房"""
-        self.app_api.GetMatchingArea()
+        self.generate_random_gps(base_log=120.7, base_lat=30, radius=1000000)
         self.PostRequest(url='/api/b/house/save',
                          data={
                                 "areaId": self.appText.get('PPQY'),
                                 "cityId": self.appText.get('city'),
                                 "houseName": houseName,
+                                'localeCoordinates': self.webText.get('localeCoordinates'),
+                                'localeName': '经纬度转地址'+ time.strftime("%Y-%m-%d %H:%M:%S")
                             })
 
     def add_house_business_information(self,
@@ -241,7 +244,7 @@ class webApi:
         """添加楼盘商务信息"""
         self.PostRequest(url='/api/b/house/addOrUpdateHouseBusiness',
                          data={
-                                "agencyId": self.appText.get('labelId'),
+                                "agencyId": self.appText.get('DLGS'),
                                 # "endTime": "",
                                 "houseId": self.webText.get('houseId'),
                                 # "infoId": None,
@@ -410,7 +413,7 @@ class webApi:
                 "cluePhone": cluePhone,
                 "remark": "总站添加线索",
                 "saasCodeSys": "000009",
-                "sourceId": self.appText.get('labelId'),
+                "sourceId": self.appText.get('XSLY_admin'),
                 'saasCode': 'admin'
                             }
         r = requests.post(url=(ApiXfpUrl + '/api/b/clue/distribution'),
@@ -445,6 +448,23 @@ class webApi:
                           },
                           files=None)
         r.raise_for_status()
+
+    def generate_random_gps(self, base_log=None, base_lat=None, radius=None):
+        """随机经纬度"""
+        radius_in_degrees = radius / 111300
+        u = float(random.uniform(0.0, 1.0))
+        v = float(random.uniform(0.0, 1.0))
+        w = radius_in_degrees * math.sqrt(u)
+        t = 2 * math.pi * v
+        x = w * math.cos(t)
+        y = w * math.sin(t)
+        longitude = y + base_log
+        latitude = x + base_lat
+        # 这里是想保留6位小数点
+        loga = '%.6f' % longitude
+        lata = '%.6f' % latitude
+        self.webText.set_map('localeCoordinates', loga + ',' + lata)
+        return loga, lata
 
 
 if __name__ == '__main__':

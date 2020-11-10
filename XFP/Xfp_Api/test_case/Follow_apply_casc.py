@@ -74,6 +74,65 @@ class FollowApplyTestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.appText = GlobalMap()
+        """线索来源"""
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='百度小程序')
+        cls.appText.set_map('XSLY', cls.appText.get('labelId'))
+
+        """线索来源_幸福派总部"""
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='幸福派总部')
+        cls.appText.set_map('XSLY_admin', cls.appText.get('labelId'))
+        """线索标签"""
+        cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        if cls.appText.get('total') == 0:
+            cls.appApi.AddUserLabel()
+            cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        cls.appText.set_map('XSBQ', cls.appText.get('labelData'))
+        """终止跟进"""
+        cls.flowPath.get_label(labelNo='SZGJYY', labelName='终止跟进原因',
+                               newlabelName='客户已成交')
+        cls.appText.set_map('ZZGJ', cls.appText.get('labelId'))
+        """成交项"""
+        cls.flowPath.get_label(labelNo='CJX', labelName='成交项目',
+                               newlabelName='认购')
+        cls.appText.set_map('CJX', cls.appText.get('labelId'))
+        """出行方式"""
+        cls.flowPath.get_label(labelNo='CXFS', labelName='出行方式',
+                               newlabelName='自驾')
+        cls.appText.set_map('CXFS', cls.appText.get('labelId'))
+        """客户意向等级"""
+        cls.appApi.GetLabelList(labelNo='KHYXDJ')                       # 查询购房意向loanSituation
+        cls.appText.set_map('KHYXDJ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='ZJZZ')                         # 查询资金资质
+        cls.appText.set_map('ZJZZ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='GFMD')                         # 查询购房目的
+        cls.appText.set_map('GFMD', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='WYSX')                         # 查询物业属性
+        cls.appText.set_map('WYSX', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='GFZZ')                         # 查询购房资质
+        cls.appText.set_map('GFZZ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='SFSTF')                        # 查询是否首套
+        cls.appText.set_map('SFSTF', cls.appText.get('labelId'))
+        cls.appApi.GetMatchingArea()                                    # 查询匹配区域
+        cls.appApi.GetMatchingAreaHouse()                               # 匹配楼盘
+        cls.appApi.GetLabelList(labelNo='QTKHXQ')                       # 查询客户需求
+        cls.appText.set_map('QTKHXQ', cls.appText.get('labelId'))
+        cls.appApi.ConsultantList()                                     # 咨询师列表
+        cls.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+        cls.appText.set_map('ZHGJ', cls.appText.get('labelId'))         # 暂缓跟进
+        cls.flowPath.get_label(labelNo='XXFL', labelName='信息分类',
+                               newlabelName='信息分类一')
+        cls.appText.set_map('XXFL', cls.appText.get('labelId'))         # 信息分类
+        cls.flowPath.get_label(labelNo='DLGS', labelName='代理公司',
+                               newlabelName='代理公司一')
+        cls.appText.set_map('DLGS', cls.appText.get('labelId'))         # 代理公司
+        cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
+                               newlabelName='问答分类一')
+        cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
 
     def setUp(self):
         """残留审核 失败！！！"""
@@ -101,7 +160,7 @@ class FollowApplyTestCase(unittest.TestCase):
         dome = self.appApi.appText.get('clueId')
         self.appApi.follow_apply()
         self.assertNotEqual(dome, self.appApi.appText.get('clueId'))
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.assertEqual(200, self.appApi.appText.get('code'))
 
     def test_follow_apply_02(self):
@@ -126,7 +185,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
         self.appApi.ClientList()
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         dome = self.appApi.appText.get('clueId')
         self.appApi.follow_apply()
         self.assertNotEqual(dome, self.appApi.appText.get('clueId'))
@@ -149,7 +208,7 @@ class FollowApplyTestCase(unittest.TestCase):
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.flowPath.apply_status(status='已驳回')
         self.assertEqual(dome + ' python-跟进申请不通过', self.appApi.appText.get('auditRemark'))
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已驳回')
 
     def test_follow_apply_06(self):
@@ -161,7 +220,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.flowPath.apply_status(status='已同意')
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已同意')
 
     def test_follow_apply_07(self):
@@ -169,6 +228,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.clue_non_null()
         self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
         self.flowPath.clue_exile_sea()
+
         try:
             self.flowPath.apply_status(status='申请中')
         except:
@@ -194,7 +254,7 @@ class FollowApplyTestCase(unittest.TestCase):
         """7、客户无效终止-待审核           申请中"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         try:
             self.flowPath.apply_status(status='申请中')
         except:
@@ -209,7 +269,7 @@ class FollowApplyTestCase(unittest.TestCase):
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(isAudit=False, auditRemark=dome + '客户无效终止审核失败')
         self.flowPath.apply_status(status='已驳回')
@@ -233,7 +293,7 @@ class FollowApplyTestCase(unittest.TestCase):
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.flowPath.apply_status(status='已驳回')
         self.assertEqual(dome + ' python-跟进申请不通过', self.appApi.appText.get('auditRemark'))
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已驳回')
 
     def test_follow_apply_15(self):
@@ -251,16 +311,13 @@ class FollowApplyTestCase(unittest.TestCase):
 
         """4、客户申请暂缓跟进-二级审核失败        已驳回            已取消"""
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
-        # self.webApi.audit_List()  # 审核列表
-        # self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
-        #                        endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.webApi.audit_List(auditLevel=2)
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), isAudit=False,
                                auditRemark=dome + ' 暂申请不通过', vlue=2,
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.flowPath.apply_status(status='已驳回')
         self.assertEqual(dome + ' 暂申请不通过', self.appApi.appText.get('auditRemark'))
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已驳回')
 
     def test_follow_apply_17(self):
@@ -275,7 +332,7 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), vlue=2,
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.flowPath.apply_status(status='已同意')
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已同意')
 
     def test_follow_apply_18(self):
@@ -332,7 +389,7 @@ class FollowApplyTestCase(unittest.TestCase):
         """  11、客户无效终止-待审核                 申请中"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         try:
             self.flowPath.apply_status(status='申请中')
         except:
@@ -357,7 +414,7 @@ class FollowApplyTestCase(unittest.TestCase):
                                    loanSituation='这个是贷款情况')
         self.appApi.ClientList()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
 
 
         try:
@@ -384,7 +441,7 @@ class FollowApplyTestCase(unittest.TestCase):
         """15、客户无效终止-二级审核成功           已同意"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         try:
             self.flowPath.apply_status(status='申请中')
         except:
@@ -417,7 +474,7 @@ class FollowApplyTestCase(unittest.TestCase):
         不允许暂缓，（无论是否开启审核，都不允许操作）"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
 
         self.appApi.GetMatchingAreaHouse()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -429,11 +486,11 @@ class FollowApplyTestCase(unittest.TestCase):
 
         self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
         assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
-        self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
+
         self.appApi.add_deal()  # 录入成交
         self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
 
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+
         self.appApi.ClientTaskPause()
         self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
 
@@ -453,11 +510,10 @@ class FollowApplyTestCase(unittest.TestCase):
 
         self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
         assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
-        self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
         self.appApi.add_deal()  # 录入成交
         self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
 
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
 
     def test_follow_apply_28(self):
@@ -470,7 +526,6 @@ class FollowApplyTestCase(unittest.TestCase):
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.appApi.ClientFollowList()
         self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.assertEqual(200, self.appApi.appText.get('code'))
 

@@ -82,12 +82,71 @@ class HomeTestCase(unittest.TestCase):
         """登录幸福派 只执行一次
         登录幸福派 获取ID"""
         cls.do_request = appApi()
-        cls.app_api = cls.do_request
-        cls.app_api.Login()
-        cls.app_api.GetUserData()
+        cls.appApi = cls.do_request
+        cls.appApi.Login()
+        cls.appApi.GetUserData()
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.appText = GlobalMap()
+        """线索来源"""
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='百度小程序')
+        cls.appText.set_map('XSLY', cls.appText.get('labelId'))
+
+        """线索来源_幸福派总部"""
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='幸福派总部')
+        cls.appText.set_map('XSLY_admin', cls.appText.get('labelId'))
+        """线索标签"""
+        cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        if cls.appText.get('total') == 0:
+            cls.appApi.AddUserLabel()
+            cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        cls.appText.set_map('XSBQ', cls.appText.get('labelData'))
+        """终止跟进"""
+        cls.flowPath.get_label(labelNo='SZGJYY', labelName='终止跟进原因',
+                               newlabelName='客户已成交')
+        cls.appText.set_map('ZZGJ', cls.appText.get('labelId'))
+        """成交项"""
+        cls.flowPath.get_label(labelNo='CJX', labelName='成交项目',
+                               newlabelName='认购')
+        cls.appText.set_map('CJX', cls.appText.get('labelId'))
+        """出行方式"""
+        cls.flowPath.get_label(labelNo='CXFS', labelName='出行方式',
+                               newlabelName='自驾')
+        cls.appText.set_map('CXFS', cls.appText.get('labelId'))
+        """客户意向等级"""
+        cls.appApi.GetLabelList(labelNo='KHYXDJ')                       # 查询购房意向loanSituation
+        cls.appText.set_map('KHYXDJ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='ZJZZ')                         # 查询资金资质
+        cls.appText.set_map('ZJZZ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='GFMD')                         # 查询购房目的
+        cls.appText.set_map('GFMD', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='WYSX')                         # 查询物业属性
+        cls.appText.set_map('WYSX', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='GFZZ')                         # 查询购房资质
+        cls.appText.set_map('GFZZ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='SFSTF')                        # 查询是否首套
+        cls.appText.set_map('SFSTF', cls.appText.get('labelId'))
+        cls.appApi.GetMatchingArea()                                    # 查询匹配区域
+        cls.appApi.GetMatchingAreaHouse()                               # 匹配楼盘
+        cls.appApi.GetLabelList(labelNo='QTKHXQ')                       # 查询客户需求
+        cls.appText.set_map('QTKHXQ', cls.appText.get('labelId'))
+        cls.appApi.ConsultantList()                                     # 咨询师列表
+        cls.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+        cls.appText.set_map('ZHGJ', cls.appText.get('labelId'))         # 暂缓跟进
+        cls.flowPath.get_label(labelNo='XXFL', labelName='信息分类',
+                               newlabelName='信息分类一')
+        cls.appText.set_map('XXFL', cls.appText.get('labelId'))         # 信息分类
+        cls.flowPath.get_label(labelNo='DLGS', labelName='代理公司',
+                               newlabelName='代理公司一')
+        cls.appText.set_map('DLGS', cls.appText.get('labelId'))         # 代理公司
+        cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
+                               newlabelName='问答分类一')
+        cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
 
     def setUp(self):
         """残留审核 失败！！！"""
@@ -110,7 +169,6 @@ class HomeTestCase(unittest.TestCase):
             self.appApi.TodayClue(keyWord='', isFirst=0)
             dome = self.appText.get('Total')
             self.appApi.Login(userName='admin', saasCode='admin')
-            self.appApi.GetLabelList(labelNo='XSLY', labelName='幸福派总部')
             self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
             if self.webText.get('code') != 200:
                 self.webApi.addGoldDetailInfo()
@@ -125,18 +183,9 @@ class HomeTestCase(unittest.TestCase):
         """2、添加线索              + 1"""
         self.appApi.TodayClue(keyWord='', isFirst=0)
         dome = self.appText.get('Total')
-        self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-        if self.appText.get('labelId') is None:
-            self.webApi.add_label(labelName='百度小程序', labelId=self.appText.get('LabelId'),
-                                  pid=self.appText.get('LabelId'))
-            self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-        self.appApi.GetUserLabelList(userLabelType='线索标签')
-        if self.appText.get('total') == 0:
-            self.appApi.AddUserLabel()
-            self.appApi.GetUserLabelList(userLabelType='线索标签')
         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
-                             sourceId=self.appText.get('labelId'),
-                             keyWords=self.appText.get('labelData'))
+                             sourceId=self.appText.get('XSLY'),
+                             keyWords=self.appText.get('XSBQ'))
         self.appApi.TodayClue(keyWord='', isFirst=0)
         self.assertNotEqual(dome, self.appText.get('Total'))
         self.assertEqual(dome + 1, self.appText.get('Total'))
@@ -169,8 +218,7 @@ class HomeTestCase(unittest.TestCase):
         dome = self.appText.get('Total')
         if dome < 1:
             self.flowPath.add_new_clue()
-        self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
-        self.appApi.ExileSea(labelId=self.appApi.appText.get('labelId'))
+        self.appApi.ExileSea()
         self.assertNotEqual(200, self.appText.get('code'))
         self.assertEqual('该线索未首电,不能终止跟进!', self.appText.get('data'))
 
@@ -198,7 +246,6 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClueFollowList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.follow_front()
-        self.appApi.ConsultantList()
         self.appApi.ClueChange()  # 线索转移
         self.appApi.GetUserAgenda()
         self.follow_later(vlue=-1)
@@ -221,7 +268,6 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClientFollowList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
         self.follow_front()
-        self.appApi.ConsultantList()
         self.appApi.client_change()
         self.follow_later(vlue=-1)
 
@@ -232,10 +278,8 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         self.follow_front()
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.follow_later()
-        self.appApi.ConsultantList()
         self.appApi.client_change()
         self.assertNotEqual(200, self.appText.get('code'))
 
@@ -245,10 +289,8 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClientFollowList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
         self.webApi.Audit_management()  # 修改配置审核
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.follow_front()
-        self.appApi.ConsultantList()
         self.appApi.client_change()
         self.follow_later()
 
@@ -259,7 +301,6 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         self.follow_front()
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.follow_later()
         """9、客户暂缓（审核通过）   - 1"""
@@ -275,7 +316,6 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         self.follow_front()
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False,
@@ -317,7 +357,7 @@ class HomeTestCase(unittest.TestCase):
         self.client_front()
         self.webApi.Audit_management()
         self.follow_front()
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.follow_later(vlue=-1)
 
     def test_await_follow_13(self):
@@ -325,14 +365,14 @@ class HomeTestCase(unittest.TestCase):
         self.client_front()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
         self.follow_front()
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.follow_later()
         """17、客户流放公海（未申请暂缓 | 审核失败）     - 0"""
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(isAudit=False, customerId=self.appText.get('customerId'))
         self.follow_later()
         """18、客户流放公海（未申请暂缓 | 审核成功）     - 1"""
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'))
         self.follow_later(vlue=-1)
@@ -344,7 +384,7 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClientTaskPause()
         self.follow_front()
         self.webApi.Audit_management()  # 修改配置审核
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.follow_later()
 
     def test_await_follow_15(self):
@@ -356,12 +396,12 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.follow_front()
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.assertNotEqual(200, self.appText.get('code'))
         """21、客户流放公海（已暂缓 | 审核失败）     - 1"""
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(isAudit=False, customerId=self.appText.get('customerId'))
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.follow_later(vlue=-1)
 
     def test_await_follow_16(self):
@@ -370,13 +410,12 @@ class HomeTestCase(unittest.TestCase):
         self.appApi.ClientFollowList()
         self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'),
                                endTime=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.follow_front()
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.follow_later()
 
     def test_await_follow_17(self):
@@ -438,33 +477,30 @@ class HomeTestCase(unittest.TestCase):
         """4、客户转移（有带看）      - 1"""
         self.webApi.Audit_management()  # 修改配置审核
         self.visit_front()
-        self.appApi.ConsultantList()
         self.appApi.client_change()
         self.visit_later()
 
     def test_await_visit_04(self):
         """5、客户转移（无带看）      - 0"""
         self.visit_front(vlue=0)
-        self.appApi.ConsultantList()
         self.appApi.client_change()
         self.visit_later()
 
     def test_await_visit_05(self):
         """6、客户流放公海（有带看）  - 1"""
         self.visit_front()
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.visit_later()
 
     def test_await_visit_06(self):
         """7、客户流放公海（无带看）  - 0"""
         self.visit_front(vlue=0)
-        self.flowPath.client_exile_sea()
+        self.appApi.client_exile_sea()
         self.visit_later()
 
     def test_await_visit_07(self):
         """客户暂缓跟进"""
         self.visit_front(vlue=0)
-        self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
         self.appApi.ClientTaskPause()
         self.visit_later()
 
@@ -498,8 +534,6 @@ class HomeTestCase(unittest.TestCase):
         globals()['dome'] = self.appText.get('total')
         self.appApi.ClientList()  # 客户列表
         if vlue == 1:
-            self.appApi.GetMatchingAreaHouse()
-            self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
             self.appApi.ClueInfo()
             self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                        appointmentTime=tomorrow,

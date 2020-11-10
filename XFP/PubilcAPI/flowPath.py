@@ -16,21 +16,10 @@ class flowPath:
 
     def client_list_non_null(self):
         """客户列表--非空"""
-        # self.clue_non_null()
-        # self.appApi.my_clue_list()
-        # self.appApi.ClueFollowList()
-        # self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        # self.appApi.ClueInfo()
-        # self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-        #                            loanSituation='这个是贷款情况')
-
         self.appApi.ClientList()                # 客户列表
         if self.appApi.appText.get('total') == 0:
             self.clue_non_null()
             self.appApi.ClueInfo()
-            # self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-            #                            loanSituation='这个是贷款情况')
-            # if self.appApi.appText.get('data') == '该线索未首电,不能转化为有效线索!':
             try:
                 self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
                                       is_own_call=0, talk_time=12000,
@@ -74,11 +63,6 @@ class flowPath:
                 self.clue_non_null()
                 self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                            loanSituation='这个是贷款情况')
-        self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
-        if self.appApi.appText.get('labelId') is None:
-            self.webApi.add_label(labelName='自驾', labelId=self.appApi.appText.get('LabelId'),
-                                  pid=self.appApi.appText.get('LabelId'))
-            self.appApi.GetLabelList(labelNo='CXFS', labelName='自驾')
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                    appointmentTime=dome,
                                    seeingConsultant=self.appApi.appText.get('consultantId'),
@@ -102,18 +86,6 @@ class flowPath:
         self.appApi.Task_Visit_List(appointmentTime=self.flowPathText.get('time'))
         assert self.appApi.appText.get('visiteStatus'), '1'
         assert self.appApi.appText.get('visiteStatusStr'), '已完成'
-
-    def client_exile_sea(self):
-        """客户流放公海"""
-        self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
-        self.appApi.client_exile_sea(labelId=self.appApi.appText.get('labelId'))
-
-    def clue_exile_sea(self):
-        """线索流放公海"""
-        self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-        self.appApi.GetLabelList(labelNo='SZGJYY', labelName='客户已成交')
-        self.appApi.ExileSea(labelId=self.appApi.appText.get('labelId'))
 
     def advance_over_visit(self):
         """取消带看"""
@@ -145,19 +117,15 @@ class flowPath:
         elif status == '审核中':
             assert self.appApi.appText.get('visiteStatus') == '0', '状态异常'
             assert self.appApi.appText.get('visiteStatusStr') == '进行中', '状态异常'
-            # assert self.appApi.appText.get('visitAuditStatus') == '1', '状态异常'
-            # assert self.appApi.appText.get('visitAuditStatusName') == '审核中', '状态异常'
             
     def suspend_follow(self):
         """暂缓跟进"""
         try:
             self.client_list_non_null()
-            self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
             self.appApi.ClientTaskPause()
             while self.appApi.appText.get('data') == '该客户已被暂缓!':
                 self.appApi.ClientFollowList()
                 self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-                self.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
                 self.appApi.ClientTaskPause()
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
@@ -192,9 +160,6 @@ class flowPath:
             self.appApi.deal_List()
             dome = self.appApi.appText.get('total')
             self.client_list_non_null()
-            self.appApi.GetMatchingAreaHouse()             # 匹配楼盘
-            assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
-            self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
             self.appApi.add_deal()                  # 录入成交
             if self.appApi.appText.get('code') != 200:
                 self.clue_non_null()
@@ -205,9 +170,6 @@ class flowPath:
                 self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                            loanSituation='这个是贷款情况')
                 self.appApi.ClientList()  # 客户列表
-                self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
-                assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
-                self.appApi.GetLabelList(labelNo='CJX', labelName='认购')
                 self.appApi.add_deal()  # 录入成交
             self.appApi.deal_List()
             assert dome != self.appApi.appText.get('total')
@@ -233,26 +195,24 @@ class flowPath:
         self.appApi.ClueInfo()
         self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
         while self.appApi.appText.get('isFirst') == 1:
-            self.clue_exile_sea()
+            self.appApi.ExileSea()
             self.clue_non_null()
             self.appApi.ClueInfo()
             self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
 
+    def clue_exile_sea(self):
+        """线索流放公海"""
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+
+        self.appApi.ExileSea()
+
     def add_new_clue(self):
         """新增一条线索"""
         try:
-            self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-            if self.appApi.appText.get('labelId') is None:
-                self.webApi.add_label(labelName='百度小程序', labelId=self.appApi.appText.get('LabelId'),
-                                      pid=self.appApi.appText.get('LabelId'))
-                self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
-            self.appApi.GetUserLabelList(userLabelType='线索标签')
-            if self.appApi.appText.get('total') == 0:
-                self.appApi.AddUserLabel()
-                self.appApi.GetUserLabelList(userLabelType='线索标签')
             self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
-                                 sourceId=self.appApi.appText.get('labelId'),
-                                 keyWords=self.appApi.appText.get('labelData'))
+                                 sourceId=self.appApi.appText.get('XSLY'),
+                                 keyWords=self.appApi.appText.get('XSBQ'))
             # 在搜索列表进行查找
             globals()['CluePhone'] = self.appApi.appText.get('cluePhone')
             self.appApi.ClueList(keyWord=(self.appApi.appText.get('cluePhone')))
@@ -261,7 +221,6 @@ class flowPath:
             self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
             assert self.appApi.appText.get('isFirst') == 0, '新增线索是未首电'
             time.sleep(2)
-            # self.test_4_ExileSea()
         except BaseException as e:
                 print("错误，错误原因：%s" % e)
                 raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
