@@ -137,16 +137,25 @@ class FirstPhoneTestCase(unittest.TestCase):
         # 后台查看是否已首电
         globals()['clueId'] = self.appText.get('clueId')
         self.webApi.TodayClue()
+        globals()['r.text'] = json.loads(self.webText.get('r.text'))
         if self.webText.get('total') != 0:
             a = 0
             while a != self.webText.get('total') - 1:
-                if self.webText.get('clueId') == globals()['clueId']:
-                    if str(self.webApi.webText.get('notFirstCall')) != 'False':
+                if globals()['r.text']['data'][a]['clueId'] == globals()['clueId']:
+                    if str(globals()['r.text']['data'][a]['notFirstCall']) != 'False':
                         print("已首电-但后台提示未首电")
                         raise RuntimeError(self.webText.get('ApiXfpUrl'))
                 a = a + 1
-                time.sleep(1)
-                self.webApi.TodayClue(vlue=a)
+
+        """7、线索转移后B---无首电"""
+        self.appApi.ClueChange()        # 线索转移
+        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))         # 转移后查看自己的列表
+        # 登陆转移后账号进行查看
+        self.assertEqual(0, self.appText.get('Total'))
+        self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
+        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
+        self.assertEqual(1, self.appText.get('isFirst'))
+        self.appApi.Login()
 
     def test_first_phone_02(self):
         """5、线索转客户要将通话也一并转移"""
@@ -265,18 +274,7 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
         self.assertEqual(0, self.appText.get('isFirst'))
 
-    def test_first_phone_12(self):
-        """7、线索转移后B---无首电"""
-        self.appApi.Login()
-        self.appApi.GetUserData()
-        self.test_first_phone_01()
-        self.appApi.ClueChange()        # 线索转移
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))         # 转移后查看自己的列表
-        # 登陆转移后账号进行查看
-        self.assertEqual(0, self.appText.get('Total'))
-        self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(1, self.appText.get('isFirst'))
+
 
 
 

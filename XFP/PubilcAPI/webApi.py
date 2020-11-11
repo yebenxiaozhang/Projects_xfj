@@ -359,7 +359,7 @@ class webApi:
             self.webText.set_map('isFlagCallStr', globals()['r.text']['data']['records'][0]['isFlagCallStr'])   # 是否主叫
             self.webText.set_map('consultantName', globals()['r.text']['data']['records'][0]['consultantName'])
 
-    def TodayClue(self, vlue=0):
+    def TodayClue(self):
         """待首电"""
         self.PostRequest(url='/api/b/consultant/getStatisticalConsultantTaskList',
                          data={
@@ -369,8 +369,7 @@ class webApi:
                          })
         self.webText.set_map('total', len(globals()['r.text']['data']))
         if self.webText.get('total') != 0:
-            self.webText.set_map('clueId', globals()['r.text']['data'][vlue]['clueId'])
-            self.webText.set_map('notFirstCall', globals()['r.text']['data'][vlue]['notFirstCall'])
+            self.webText.set_map('r.text', globals()['r.text'])
 
     def clue_list(self, myClue='Y', rderNo=None, vlue=0):
         """线索列表"""
