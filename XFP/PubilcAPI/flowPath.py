@@ -193,12 +193,14 @@ class flowPath:
         """首电不为空"""
         self.clue_non_null()
         self.appApi.ClueInfo()
-        self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
-        while self.appApi.appText.get('isFirst') == 1:
+        self.appApi.TodayClue(isFirst=1)
+        globals()['r.text'] = json.loads(json.dumps(self.appApi.appText.get('records')))
+        while globals()['r.text'][0]['isFirst'] == '1':
             self.appApi.ExileSea()
             self.clue_non_null()
-            self.appApi.ClueInfo()
-            self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
+            self.appApi.TodayClue()
+            globals()['r.text'] = json.loads(json.dumps(self.appApi.appText.get('records')))
+        self.appApi.ClueInfo()
 
     def clue_exile_sea(self):
         """线索流放公海"""
@@ -218,9 +220,14 @@ class flowPath:
             self.appApi.ClueList(keyWord=(self.appApi.appText.get('cluePhone')))
             assert self.appApi.appText.get('cluePhone') == globals()['CluePhone'], '新增线索列表异常'
             """今日上户上进行查看"""
-            self.appApi.TodayClue(keyWord=self.appApi.appText.get('cluePhone'))
-            assert self.appApi.appText.get('isFirst') == 0, '新增线索是未首电'
-            time.sleep(2)
+            self.appApi.TodayClue()
+            dome1 = 0
+            globals()['r.text'] = json.loads(json.dumps(self.appApi.appText.get('records')))
+            while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appApi.appText.get('cluePhone'):
+                # print(dome1)
+                dome1 = dome1 + 1
+            assert globals()['r.text'][dome1]['isFirst'] == '0', '新增线索是未首电'
+            time.sleep(1)
         except BaseException as e:
                 print("错误，错误原因：%s" % e)
                 raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))

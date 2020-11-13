@@ -107,9 +107,8 @@ class ClueTestCase(unittest.TestCase):
             self.appApi.ClueList(keyWord=(self.appText.get('cluePhone')))
             self.assertEqual(self.appText.get('cluePhone'), globals()['cluePhone'])
             """今日上户上进行查看"""
-            self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-            self.assertEqual(1, self.appText.get('Total'))
-            self.assertEqual(0, self.appText.get('isFirst'))        # 是否首电
+            self.appApi.TodayClue()
+            self.assertEqual('0', self.appText.get('isFirst'))        # 是否首电
             time.sleep(2)
             # self.test_4_ExileSea()
         except BaseException as e:
@@ -126,14 +125,10 @@ class ClueTestCase(unittest.TestCase):
         try:
             self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
             """查看今日上户是否已首电"""
-            self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-            # self.assertEqual(1, self.appText.get('isFirst'))
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
             self.appApi.ClueFollowList(value=1)
             self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
-            self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-            # self.assertEqual(1, self.appText.get('isFirst'))
 
     def test_3_AlterClueMessage(self):
         """修改线索信息"""
@@ -152,7 +147,7 @@ class ClueTestCase(unittest.TestCase):
         self.appApi.my_clue_list()
         self.appApi.ExileSea()
         # 流放公海 在首页进行验证
-        self.appApi.GetUserAgenda(keyWord=self.appText.get('cluePhone'), endTime=time.strftime("%Y-%m-%d"))
+        self.appApi.GetUserAgenda(keyWord=self.appText.get('cluePhone'))
         # 跟进进行验证
         self.appApi.ClueFollowList()
         self.assertEqual(self.appText.get('followContent')[:6], '线索流放公海')
@@ -172,13 +167,21 @@ class ClueTestCase(unittest.TestCase):
     def test_ClueShift(self):
         """线索转移"""
         self.test_1_AddNewClue()
-        self.appApi.ClueChange()        # 线索转移
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))         # 转移后查看自己的列表
-        # 登陆转移后账号进行查看
-        self.assertEqual(0, self.appText.get('Total'))
         self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(1, self.appText.get('Total'))
+        self.appApi.GetUserData()
+        self.appApi.my_clue_list()         # 转移后查看自己的列表
+        dome1 = self.appText.get('total')
+        self.appApi.Login()
+        self.appApi.GetUserData()
+        self.appApi.my_clue_list()         # 转移后查看自己的列表
+        dome = self.appText.get('total')
+        self.appApi.ClueChange()        # 线索转移
+        self.appApi.my_clue_list()         # 转移后查看自己的列表
+        self.assertEqual(dome-1, self.appText.get('total'))
+        # 登陆转移后账号进行查看
+        self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
+        self.appApi.my_clue_list()
+        self.assertEqual(dome1 + 1, self.appText.get('total'))
 
     def test_clue_ChangeClient(self):
         """未首电转客户"""
@@ -208,3 +211,31 @@ class ClueTestCase(unittest.TestCase):
             self.assertEqual('总部分配过来的线索,线索来源不能修改', self.appText.get('data'))
 
 
+    # def test_002(self):
+    #     """11"""
+    #     # self.appApi.Login(userName='13726224607', password='12345678', saasCode='000010')
+    #     # self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
+    #     # if self.appText.get('labelId') is None:
+    #     #     self.webApi.add_label(labelName='百度小程序', labelId=self.appText.get('LabelId'),
+    #     #                           pid=self.appText.get('LabelId'))
+    #     #     self.appApi.GetLabelList(labelNo='XSLY', labelName='百度小程序')
+    #     # self.appApi.GetUserLabelList(userLabelType='线索标签')
+    #     # if self.appText.get('total') == 0:
+    #     #     self.appApi.AddUserLabel()
+    #     #     self.appApi.GetUserLabelList(userLabelType='线索标签')
+    #     dome = 0
+    #     while dome != 10:
+    #         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+    #                              sourceId=self.appText.get('labelId'),
+    #                              keyWords=self.appText.get('labelData'))
+    #
+    #         # self.appApi.my_clue_list()
+    #         # self.appApi.ClueFollowList()
+    #         # self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+    #         # self.appApi.my_clue_list()
+    #         # self.appApi.ClueInfo()
+    #         # self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+    #         #                            loanSituation='这个是贷款情况')
+    #         # self.appApi.ClientList()
+    #         # self.flowPath.add_visit()
+    #         # dome = dome + 1

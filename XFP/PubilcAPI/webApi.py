@@ -404,7 +404,7 @@ class webApi:
         cluePhone = '1' + str(int(time.time()))
 
         data = {
-                "clueAddtype": 3,
+                "clueAddtype": 2,
                 "clueIdList": [
 
                 ],
@@ -426,12 +426,12 @@ class webApi:
         r.raise_for_status()
         globals()['r.text'] = json.loads(r.text)
         self.webText.set_map('code', globals()['r.text']['code'])
+        self.webText.set_map('cluePhone', cluePhone)
 
     def addGoldDetailInfo(self):
         """幸福币充值"""
-
         data = {
-            "saasCodeSys": "000009",
+            "saasCodeSys": XfpsaasCode,
             "goldValue": "50000",
             "goldType": 1,
             "type": "add",
@@ -464,6 +464,48 @@ class webApi:
         lata = '%.6f' % latitude
         self.webText.set_map('localeCoordinates', loga + ',' + lata)
         return loga, lata
+
+    def consultant_allocition(self, isAppoint=1):
+        """咨询师是否分配线索"""
+        self.PostRequest(url='/api/b/consultant/save',
+                         data={
+                             'consultantId': self.appText.get('consultantId'),
+                             'isAppoint': isAppoint
+                         })
+
+    def clue_await_allocition(self, keyWord=None):
+        """线索待分配"""
+        self.PostRequest(url='/api/b/clue/subWaitAllocatedClueList',
+                         data={
+                             'keyWord': keyWord
+
+                         })
+        self.webText.set_map('total', globals()['r.text']['data']['total'])
+        if self.webText.get('total') != 0:
+            self.webText.set_map('createdTime', globals()['r.text']['data']['records'][0]['createdTime'])
+            self.webText.set_map('receptionTime', globals()['r.text']['data']['records'][0]['receptionTime'])
+            self.webText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
+
+    def clue_appoint(self):
+        """线索指派"""
+        self.PostRequest(url='/api/b/clue/appoint',
+                         data={
+                                "title": "线索指派",
+                                "show": "zhipai",
+                                "clueId": self.webText.get('clueId'),
+                                "isWork": True,
+                                # "sourceId": null,
+                                # "remark": null,
+                                "clueIdList": [
+                                    self.webText.get('clueId')
+                                ],
+                                "consultantId": self.appText.get('consultantId'),
+                                "page": {
+
+                                },
+                                "saasCode": XfpsaasCode
+                            }
+                                                     )
 
 
 if __name__ == '__main__':

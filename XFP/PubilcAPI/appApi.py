@@ -114,29 +114,41 @@ class appApi:
         """获取咨询师信息"""
         self.PostRequest(url='/api/a/consultant/info',
                          data={'deviceId': deviceId})
-        if self.appText.get('msg') != '禁止访问':
+        if self.appText.get('code') == 200:
             self.appText.set_map('consultantId', globals()['r.text']['data']['consultantId'])
             self.appText.set_map('consultantName', globals()['r.text']['data']['consultantName'])
             self.appText.set_map('consultantLabels', globals()['r.text']['data']['consultantLabels'])
+        # else:
+        #     pass
 
-    def GetUserAgenda(self, endTime=None, taskType=None, keyWord=None, clueId=None, visitNo=True):
+    def GetUserAgenda(self, taskType=None, keyWord=None, clueId=None, visitNo=True, tesk=1):
         """获取用户待办"""
-        self.PostRequest(url='/api/a/clue/task/list',
+        self.PostRequest(url='/api/a/consultant/getConsultantWorkSchedule',
                          data={
                              'consultantId': self.appText.get('consultantId'),
                              "deviceId": deviceId,
                              "taskType": taskType,  # 0 超时1 线索 2 联系 3带看
                              "isCompleted": 0,
                              'clueId': clueId,
+                             'consultantIds': [self.appText.get('consultantId')],
+                             'day': 7,
                              "isStop": 0,
-                             "endTime": endTime,
+                             "endTime": time.strftime("%Y-%m-%d"),
+                             'isWorkSchedule': True,
                              "overtime": 0,
                              'keyWord': keyWord,
                              'visitNo': visitNo
                          })
-        self.appText.set_map('total', globals()['r.text']['data']['total'])
-        if self.appText.get('total') != 0:
-            self.appText.set_map('endTime', globals()['r.text']['data']['records'][0]['endTime'])
+        self.appText.set_map('dome', globals()['r.text']['data'][0])
+        dome = json.loads(self.appText.get('dome'))
+        if tesk == 1:
+            self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['taskVos']))
+            if self.appText.get('total') != 0:
+                self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['endTime'])
+        else:
+            self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['visitVos']))
+            if self.appText.get('total') != 0:
+                self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['visitVos'][0]['endTime'])
         # self.appText.set_map('pages', globals()['r.text']['data']['pages'])
 
     def CluePhoneLog(self):
@@ -223,13 +235,12 @@ class appApi:
                          data={'clueId': self.appText.get('clueId'),
                                'followType': followType
                                })
-
-        # if globals()['r.text']['data']['total'] != 0:
-        self.appText.set_map('total', len(globals()['r.text']['data']['records']))
-        self.appText.set_map('followContent',
-                             globals()['r.text']['data']['records'][value]['followContent'])
-        self.appText.set_map('followId', globals()['r.text']['data']['records'][value]['followId'])
-        self.appText.set_map('taskId', globals()['r.text']['data']['records'][value]['taskId'])
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+            self.appText.set_map('followContent',
+                                 globals()['r.text']['data']['records'][value]['followContent'])
+            self.appText.set_map('followId', globals()['r.text']['data']['records'][value]['followId'])
+            self.appText.set_map('taskId', globals()['r.text']['data']['records'][value]['taskId'])
 
     def ClueList(self, keyWord=''):
         """查询线索列表"""
@@ -265,15 +276,17 @@ class appApi:
                              'taskEndTime': taskEndTime
                          })
 
-    def TodayClue(self, keyWord, isFirst=None):
+    def TodayClue(self, isFirst=0):
         """今日线索"""
-        self.PostRequest(url='/api/a/clue/list',
-                         data={'keyWord': keyWord,
+        self.PostRequest(url='/api/a/consultant/firstCallList',
+                         data={
+                               'consultantId': self.appText.get('consultantId'),
                                'isFirst': isFirst})
-        self.appText.set_map('Total', globals()['r.text']['data']['total'])
+        self.appText.set_map('Total', len(globals()['r.text']['data']['records']))
         if self.appText.get('Total') != 0:
-            self.appText.set_map('isFirst', globals()['r.text']['data']['records'][0]['isFirst'])
-            self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
+            self.appText.set_map('records', globals()['r.text']['data']['records'])
+            # self.appText.set_map('isFirst', globals()['r.text']['data']['records'][0]['isFirst'])
+            # self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
 
     def ResetPassword(self, userId):
         """重设密码"""
@@ -303,6 +316,9 @@ class appApi:
         else:
             self.appText.set_map('cluePhone', globals()['r.text']['data']['cluePhone'])
         self.appText.set_map('sourceId', globals()['r.text']['data']['sourceId'])
+        self.appText.set_map('receptionTime', globals()['r.text']['data']['receptionTime'])
+        self.appText.set_map('createdTime', globals()['r.text']['data']['createdTime'])
+        self.appText.set_map('isFirst', globals()['r.text']['data']['isFirst'])
 
     def ClueSave(self, Status=1,  # 1新增 其他修改
                  cluePhone=None,
@@ -650,13 +666,14 @@ class appApi:
                              ]
                          })
 
-    def my_clue_list(self, vlue=0, myClue='Y'):
+    def my_clue_list(self, vlue=0, myClue='Y', keyWord=None):
         """我的线索"""
         self.PostRequest(url='/api/a/clue/MyClueList',
                          data={
                              'myClue': myClue,
                              'consultantId': self.appText.get('consultantId'),
-                             'isWork': True
+                             'isWork': True,
+                             'keyWord': keyWord,
                          })
 
         if globals()['r.text']['data']['total'] != 0:

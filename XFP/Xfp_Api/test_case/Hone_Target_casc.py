@@ -166,7 +166,7 @@ class HomeTestCase(unittest.TestCase):
         if ApiXfpUrl == 'http://xfp.xfj100.com':
             pass
         else:
-            self.appApi.TodayClue(keyWord='', isFirst=0)
+            self.appApi.TodayClue(isFirst=0)
             dome = self.appText.get('Total')
             self.appApi.Login(userName='admin', saasCode='admin')
             self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
@@ -175,46 +175,46 @@ class HomeTestCase(unittest.TestCase):
                 self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
             self.assertEqual(200, self.webText.get('code'))
             self.appApi.Login()
-            self.appApi.TodayClue(keyWord='', isFirst=0)
+            self.appApi.TodayClue(isFirst=0)
             self.assertNotEqual(dome, self.appText.get('Total'))
             self.assertEqual(dome + 1, self.appText.get('Total'))
 
     def test_await_first_phone_02(self):
         """2、添加线索              + 1"""
-        self.appApi.TodayClue(keyWord='', isFirst=0)
+        self.appApi.TodayClue(isFirst=0)
         dome = self.appText.get('Total')
         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
                              sourceId=self.appText.get('XSLY'),
                              keyWords=self.appText.get('XSBQ'))
-        self.appApi.TodayClue(keyWord='', isFirst=0)
+        self.appApi.TodayClue(isFirst=0)
         self.assertNotEqual(dome, self.appText.get('Total'))
         self.assertEqual(dome + 1, self.appText.get('Total'))
 
     def test_await_first_phone_03(self):
         """3、领取线索              + 1"""
-        self.appApi.TodayClue(keyWord='', isFirst=0)
+        self.appApi.TodayClue(isFirst=0)
         dome = self.appText.get('Total')
         self.appApi.SeaList()  # 公海列表
         self.appApi.clue_Assigned()  # 领取线索
-        self.appApi.TodayClue(keyWord='', isFirst=0)
+        self.appApi.TodayClue(isFirst=0)
         self.assertNotEqual(dome, self.appText.get('Total'))
         self.assertEqual(dome + 1, self.appText.get('Total'))
 
     def test_await_first_phone_04(self):
         """4、线索转移（未首电）    - 1"""
-        self.appApi.TodayClue(keyWord='', isFirst=0)
+        self.appApi.TodayClue(isFirst=0)
         dome = self.appText.get('Total')
         if dome < 1:
             self.flowPath.add_new_clue()
         self.appApi.ConsultantList()
         self.appApi.ClueChange()  # 线索转移
-        self.appApi.TodayClue(keyWord='', isFirst=0)
+        self.appApi.TodayClue(isFirst=0)
         self.assertNotEqual(dome, self.appText.get('Total'))
         self.assertEqual(dome - 1, self.appText.get('Total'))
 
     def test_await_first_phone_05(self):
         """5、线索流放公海（未首电）   - 不支持该操作"""
-        self.appApi.TodayClue(keyWord='', isFirst=0)
+        self.appApi.TodayClue(isFirst=0)
         dome = self.appText.get('Total')
         if dome < 1:
             self.flowPath.add_new_clue()
@@ -237,7 +237,7 @@ class HomeTestCase(unittest.TestCase):
         except:
             self.appApi.ClueFollowList()
             self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_later(vlue=1)
+        self.follow_later(0)
 
     def test_await_follow_02(self):
         """3、线索转移               - 1"""
@@ -552,12 +552,12 @@ class HomeTestCase(unittest.TestCase):
 
     def follow_front(self):
         """跟进前"""
-        self.appApi.GetUserAgenda(endTime=time.strftime("%Y-%m-%d"))
+        self.appApi.GetUserAgenda()
         globals()['dome'] = self.appText.get('total')
 
     def follow_later(self, vlue=0):
         """跟进后"""
-        self.appApi.GetUserAgenda(endTime=time.strftime("%Y-%m-%d"))
+        self.appApi.GetUserAgenda()
         if vlue == 0:
             self.assertEqual(globals()['dome'], self.appText.get('total'))
         else:

@@ -1,25 +1,22 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2020/3/21 11:08
-# @Author  : 潘师傅
-# @File    : Client_casc.py
-
-"""客户相关"""
+"""后台-线索分配"""
 from XFP.PubilcAPI.flowPath import *
+"""
+    1、幸福币不足，分配失败
+    2、无咨询师接受分配，会在待分配列表
+    3、上户时间：分站分配时间
+"""
 
 
-class ClientTestCase(unittest.TestCase):
-    """客第壹——客户"""
+class TestCase(unittest.TestCase):
+    """客第壹——线索分配"""
 
     def __init__(self, *args, **kwargs):
-        super(ClientTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 
         self.xfp_app = appApi()
         self.appApi = self.xfp_app
-
-        self.flow = flowPath()
-        self.flowPath = self.flow
 
         self.appText = GlobalMap()
         self.webText = GlobalMap()
@@ -27,7 +24,7 @@ class ClientTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """登录幸福派 只执行一次
-        登录经纪人 获取ID"""
+        登录幸福派 获取ID"""
         cls.do_request = appApi()
         cls.appApi = cls.do_request
         cls.appApi.Login()
@@ -95,85 +92,31 @@ class ClientTestCase(unittest.TestCase):
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
 
-    def test_1_FollowSave(self):
-        """客户跟进"""
-        try:
-            #  客户详情查看  及 列表是否有新增
-            self.flowPath.client_list_non_null()
-            self.appApi.ClientFollowList()
-            self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-            self.appApi.ClientFollowList()
-            try:
-                self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
-            except BaseException as e:
-                print("断言错误，错误原因：%s" % e)
-                self.appApi.ClientFollowList(value=1)
-                self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
-        except BaseException as e:
-            print("断言错误，错误原因：%s" % e)
-            raise RuntimeError(self.appText.get('ApiXfpUrl'))
-
-    def test_SettingTakeLook(self):
-        """设定带看计划"""
-        self.flowPath.add_visit()
-        self.assertEqual(self.appApi.appText.get('code'), 200)
-
-    def test_CompleteSettingTakeLook(self):
-        """完成带看计划"""
-        try:
-            self.flowPath.add_visit()
-            self.appApi.ClientTask(taskType='3')
-            if self.appText.get('total') < 1:
-                raise RuntimeError(self.appText.get('ApiXfpUrl'))
-            self.appApi.visit_info()
-            self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('DLGS'),
-                                   receptionName=self.appApi.RandomText(textArr=surname),
-                                   receptionPhone='1' + str(int(time.time())), attachmentIds='1')
-            self.appApi.ClientTask()
-            if self.appText.get('total') >= 2:
-                raise RuntimeError(self.appText.get('ApiXfpUrl'))
-
-        except BaseException as e:
-            print("断言错误，错误原因：%s" % e)
-            raise RuntimeError(self.appText.get('ApiXfpUrl'))
-
-    def test_advance_over_visit(self):
-        """取消带看"""
-        try:
-            self.flowPath.add_visit()
-            self.flowPath.advance_over_visit()
-            self.appApi.ClientTask()
-            self.appApi.ClientFollowList()
-            self.assertEqual('取消带看', self.appText.get('followContent')[-4:])
-        except BaseException as e:
-            print("断言错误，错误原因：%s" % e)
-            raise RuntimeError(self.appText.get('ApiXfpUrl'))
-
-    def test_AddAgreement(self):
-        """录入成交"""
-        try:
-            self.appApi.deal_List()
+    def test_all_allocation_1(self):
+        """2、无咨询师接受分配，会在待分配列表"""
+        if ApiXfpUrl == 'http://xfp.xfj100.com':
+            pass
+        else:
+            self.webApi.consultant_allocition(isAppoint=0)
+            self.appApi.my_clue_list()
             dome = self.appText.get('total')
-            self.flowPath.client_list_non_null()
-            self.flowPath.add_deal()
-            self.appApi.deal_List()
+            self.appApi.Login(userName='admin', saasCode='admin')
+            self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
+            self.appApi.Login()
+            self.webApi.clue_await_allocition(keyWord=self.webText.get('cluePhone'))
+            self.assertEqual(1, self.webText.get('total'))
+            self.assertNotEqual(self.webText.get('receptionTime'), self.webText.get('createdTime'))
+            """3、上户时间：分站分配时间"""
+            self.webApi.clue_appoint()
+            self.webApi.clue_await_allocition(keyWord=self.webText.get('cluePhone'))
+            self.assertEqual(0, self.webText.get('total'))
+            self.appApi.my_clue_list()
             self.assertNotEqual(dome, self.appText.get('total'))
-        except BaseException as e:
-            print("断言错误，错误原因：%s" % e)
-            raise RuntimeError(self.appText.get('ApiXfpUrl'))
-
-    def test_SuspendFollow(self):
-        """暂停跟进"""
-        try:
-            self.flowPath.suspend_follow()
-            self.appApi.ClientTask(taskType=2)       # 待办
-            self.assertEqual('2', self.appText.get('taskType'))
-        except BaseException as e:
-            print("断言错误，错误原因：%s" % e)
-            raise RuntimeError(self.appText.get('ApiXfpUrl'))
-
-
-
+            self.appApi.ClueInfo()
+            self.assertNotEqual(self.webText.get('receptionTime'), self.webText.get('createdTime'))
+            self.assertNotEqual(self.appText.get('receptionTime'), self.appText.get('createdTime'))
+            self.assertEqual(self.webText.get('createdTime'), self.appText.get('createdTime'))
+            self.webApi.consultant_allocition(isAppoint=1)
 
 
 

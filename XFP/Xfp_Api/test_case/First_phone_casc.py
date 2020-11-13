@@ -128,11 +128,16 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.assertEqual(webdome + 1, self.webText.get('total'))
         self.assertEqual('呼出', self.webText.get('isFlagCallStr'))
         self.assertEqual(webdome1, self.webText.get('consultantName'))
+        dome = self.appText.get('clueId')
         # 检查首页 待首电状态
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(1, self.appText.get('isFirst'))
+        self.appApi.TodayClue(isFirst=1)
+        dome1 = 0
+        globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
+        while globals()['r.text'][dome1]['clueId'] != dome:
+            dome1 = dome1 + 1
+        self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
         # 检查待跟进状态
-        self.appApi.GetUserAgenda(endTime=time.strftime("%Y-%m-%d"), keyWord=self.appText.get('cluePhone'))
+        self.appApi.GetUserAgenda(keyWord=self.appText.get('cluePhone'))
         self.assertNotEqual(0, self.appText.get('total'))
         # 后台查看是否已首电
         globals()['clueId'] = self.appText.get('clueId')
@@ -149,12 +154,16 @@ class FirstPhoneTestCase(unittest.TestCase):
 
         """7、线索转移后B---无首电"""
         self.appApi.ClueChange()        # 线索转移
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))         # 转移后查看自己的列表
+        self.appApi.my_clue_list(keyWord=self.appText.get('cluePhone'))
         # 登陆转移后账号进行查看
-        self.assertEqual(0, self.appText.get('Total'))
+        self.assertEqual(0, self.appText.get('total'))
         self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(1, self.appText.get('isFirst'))
+        self.appApi.TodayClue(isFirst=1)
+        dome1 = 0
+        globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
+        while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appText.get('cluePhone'):
+            dome1 = dome1 + 1
+        self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
         self.appApi.Login()
 
     def test_first_phone_02(self):
@@ -179,14 +188,23 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.flowPath.first_phone_non_null()
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), is_own_call=0, talk_time=12000,
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(1, self.appText.get('isFirst'))
+
+        self.appApi.TodayClue(isFirst=1)
+        dome1 = 0
+        globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
+        while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appText.get('cluePhone'):
+            dome1 = dome1 + 1
+        self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
         self.flowPath.first_phone_non_null()
         # 呼出
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(1, self.appText.get('isFirst'))
+        self.appApi.TodayClue(isFirst=1)
+        dome1 = 0
+        globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
+        while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
+            dome1 = dome1 + 1
+        self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
 
     def test_first_phone_04(self):
         """呼入-计入在通话记录"""
@@ -234,16 +252,24 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.flowPath.first_phone_non_null()
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), wait_time=1200,
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(1, self.appText.get('isFirst'))
+        self.appApi.TodayClue(isFirst=1)
+        dome1 = 0
+        globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
+        while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appText.get('cluePhone'):
+            dome1 = dome1 + 1
+        self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
 
     def test_first_phone_08(self):
         """4、他人打该线索"""
         self.flowPath.first_phone_non_null()
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), wait_time=1200, is_me=2,
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(1, self.appText.get('isFirst'))
+        self.appApi.TodayClue(isFirst=1)
+        dome1 = 0
+        globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
+        while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appText.get('cluePhone'):
+            dome1 = dome1 + 1
+        self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=1200, is_me=2,
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.appApi.CluePhoneLog()
@@ -266,13 +292,18 @@ class FirstPhoneTestCase(unittest.TestCase):
     def test_first_phone_11(self):
         """7、线索转移后B---有首电"""
         self.flowPath.first_phone_non_null()
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), wait_time=1200, is_me=2,
+                              call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.appApi.ClueChange()        # 线索转移
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))         # 转移后查看自己的列表
+        self.appApi.my_clue_list(keyWord=self.appText.get('cluePhone'))
         # 登陆转移后账号进行查看
-        self.assertEqual(0, self.appText.get('Total'))
+        self.assertEqual(0, self.appText.get('total'))
+        self.appApi.ClueInfo()
         self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
-        self.appApi.TodayClue(keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(0, self.appText.get('isFirst'))
+        self.appApi.GetUserData()
+        self.appApi.my_clue_list(keyWord=self.appText.get('cluePhone'))
+        self.appApi.CluePhoneLog()
+        self.assertEqual(1, self.appText.get('total'))
 
 
 
