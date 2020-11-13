@@ -108,8 +108,12 @@ class ClueTestCase(unittest.TestCase):
             self.assertEqual(self.appText.get('cluePhone'), globals()['cluePhone'])
             """今日上户上进行查看"""
             self.appApi.TodayClue()
-            self.assertEqual('0', self.appText.get('isFirst'))        # 是否首电
-            time.sleep(2)
+            dome1 = 0
+            globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
+            while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
+                dome1 = dome1 + 1
+            self.assertEqual('0', globals()['r.text'][dome1]['isFirst'])
+            time.sleep(1)
             # self.test_4_ExileSea()
         except BaseException as e:
                 print("错误，错误原因：%s" % e)

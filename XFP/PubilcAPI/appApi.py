@@ -527,7 +527,7 @@ class appApi:
     def VisitFlow1(self, agencyId, attachmentIds='1031', is_QA=2,questionTypeNo=None,
                    houseId=None, receptionName=None, receptionPhone=None,
                    answer=None, title=None, visitSummary='带看总结'):
-        self.GetMatchingAreaHouse()  # 匹配楼盘
+        # self.GetMatchingAreaHouse()  # 匹配楼盘
         """完成带看"""
         if is_QA == 1:
             visitQaList = [{
@@ -1037,7 +1037,8 @@ class appApi:
                     if a == self.appText.get('total'):
                         break
                 self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][a]['auditRemark'])
-                self.appText.set_map('visiteStatusStr', globals()['r.text']['data']['records'][a]['visiteStatusStr'])
+                self.appText.set_map('visitAuditStatusName', globals()['r.text']['data']['records'][a]['visitAuditStatusName'])
+                self.appText.set_map('visitAuditStatus', globals()['r.text']['data']['records'][a]['visitAuditStatus'])
                 self.appText.set_map('visiteStatus', globals()['r.text']['data']['records'][a]['visiteStatus'])
             # self.appText.set_map('visitAuditStatus', globals()['r.text']['data']['records'][a]['visitAuditStatus'])
             # self.appText.set_map('visitAuditStatusName', globals()['r.text']['data']['records'][a]['visitAuditStatusName'])

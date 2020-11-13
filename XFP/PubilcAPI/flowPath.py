@@ -53,7 +53,7 @@ class flowPath:
     def add_visit(self):
         """创建带看"""
         self.client_list_non_null()
-        self.appApi.GetMatchingAreaHouse()
+        # self.appApi.GetMatchingAreaHouse()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.flowPathText.set_map('time', dome)
         self.appApi.ClientTask(taskType='3')
@@ -70,7 +70,7 @@ class flowPath:
 
     def accomplish_visit(self):
         """完成带看"""
-        self.visit_status(status='进行中')
+        # self.visit_status(status='无需审核')
         self.appApi.ClientTask(taskType='3')
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
@@ -103,21 +103,33 @@ class flowPath:
         """带看状态"""
         self.appApi.Task_Visit_List(appointmentTime=self.flowPathText.get('time'))
         if status == '进行中':
-            assert self.appApi.appText.get('visiteStatus') == '0', '状态异常'
-            assert self.appApi.appText.get('visiteStatusStr') == '进行中', '状态异常'
+            assert self.appApi.appText.get('visitAuditStatus') == '0', '状态异常'
+            assert self.appApi.appText.get('visitAuditStatusName') == '进行中', '状态异常'
         elif status == '已取消':
             assert self.appApi.appText.get('visiteStatus') == '2', '状态异常'
-            assert self.appApi.appText.get('visiteStatusStr') == '已取消', '状态异常'
         elif status == '已完成':
             assert self.appApi.appText.get('visiteStatus') == '1', '状态异常'
-            assert self.appApi.appText.get('visiteStatusStr') == '已完成', '状态异常'
         elif status == '已驳回':
+            assert self.appApi.appText.get('visitAuditStatus') == '3', '状态异常'
+            assert self.appApi.appText.get('visitAuditStatusName') == '已驳回', '状态异常'
             assert self.appApi.appText.get('visiteStatus') == '2', '状态异常'
-            assert self.appApi.appText.get('visiteStatusStr') == '已驳回', '状态异常'
         elif status == '审核中':
+            assert self.appApi.appText.get('visitAuditStatus') == '0', '状态异常'
+            assert self.appApi.appText.get('visitAuditStatusName') == '进行中', '状态异常'
+        elif status == '无需审核':
+            assert self.appApi.appText.get('visitAuditStatus') == '6', '状态异常'
+            assert self.appApi.appText.get('visitAuditStatusName') == '无需审核', '状态异常'
+        elif status == '队长审核中':
+            assert self.appApi.appText.get('visitAuditStatus') == '1', '状态异常'
+            assert self.appApi.appText.get('visitAuditStatusName') == '队长审核中', '状态异常'
+        elif status == '已同意':
+            assert self.appApi.appText.get('visitAuditStatus') == '2', '状态异常'
+            assert self.appApi.appText.get('visitAuditStatusName') == '已同意', '状态异常'
+        elif status == '总监审核中':
+            assert self.appApi.appText.get('visitAuditStatus') == '1', '状态异常'
+            assert self.appApi.appText.get('visitAuditStatusName') == '总监审核中', '状态异常'
             assert self.appApi.appText.get('visiteStatus') == '0', '状态异常'
-            assert self.appApi.appText.get('visiteStatusStr') == '进行中', '状态异常'
-            
+
     def suspend_follow(self):
         """暂缓跟进"""
         try:

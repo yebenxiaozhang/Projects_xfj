@@ -206,7 +206,7 @@ class HomeTestCase(unittest.TestCase):
         dome = self.appText.get('Total')
         if dome < 1:
             self.flowPath.add_new_clue()
-        self.appApi.ConsultantList()
+        self.appText.set_map('clueId', (json.loads(json.dumps(self.appText.get('records'))))[0]['clueId'])
         self.appApi.ClueChange()  # 线索转移
         self.appApi.TodayClue(isFirst=0)
         self.assertNotEqual(dome, self.appText.get('Total'))
@@ -218,15 +218,16 @@ class HomeTestCase(unittest.TestCase):
         dome = self.appText.get('Total')
         if dome < 1:
             self.flowPath.add_new_clue()
+        self.appText.set_map('clueId', (json.loads(json.dumps(self.appText.get('records'))))[0]['clueId'])
         self.appApi.ExileSea()
         self.assertNotEqual(200, self.appText.get('code'))
         self.assertEqual('该线索未首电,不能终止跟进!', self.appText.get('data'))
 
     def test_await_follow_01(self):
         """1、新增线索（未首电）     + 1"""
-        self.follow_front()
-        self.appApi.SeaList()  # 公海列表
-        self.appApi.clue_Assigned()  # 领取线索
+        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appText.get('XSLY'),
+                             keyWords=self.appText.get('XSBQ'))
         self.follow_later(vlue=1)
         self.appApi.ClueInfo()
         """2、新增线索（已首电）     + 1"""

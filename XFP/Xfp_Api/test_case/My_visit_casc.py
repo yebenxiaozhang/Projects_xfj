@@ -141,7 +141,7 @@ class MyVisitTestCase(unittest.TestCase):
     def test_my_visit_01(self):
         """1、创建带看          进行中                   已取消"""
         self.flowPath.add_visit()
-        self.flowPath.visit_status(status='进行中')
+        self.flowPath.visit_status(status='无需审核')
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
 
@@ -165,11 +165,11 @@ class MyVisitTestCase(unittest.TestCase):
         """1、创建带看-待审核                   审核中"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
-        self.flowPath.visit_status(status='审核中')
+        self.flowPath.visit_status(status='队长审核中')
         """2、创建带看-审核成功                 进行中             已取消"""
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核成功
-        self.flowPath.visit_status(status='进行中')
+        self.flowPath.visit_status(status='已同意')
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
 
@@ -210,7 +210,7 @@ class MyVisitTestCase(unittest.TestCase):
         """1、创建带看-待审核          申请中                     已取消"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=2)  # 修改配置审核
         self.flowPath.add_visit()
-        self.flowPath.visit_status(status='审核中')
+        self.flowPath.visit_status(status='队长审核中')
         """2、创建带看-一级审核失败    已驳回                     已驳回"""
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False,
@@ -225,7 +225,7 @@ class MyVisitTestCase(unittest.TestCase):
         self.flowPath.add_visit()
         self.webApi.audit_List()  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核
-        self.flowPath.visit_status(status='审核中')
+        self.flowPath.visit_status(status='总监审核中')
         """4、创建带看-二级审核失败    已驳回                     已取消"""
         self.webApi.audit_List(auditLevel=2)  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'), vlue=2, isAudit=False)  # 审核
@@ -241,7 +241,7 @@ class MyVisitTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核
         self.webApi.audit_List(auditLevel=2)  # 审核列表
         self.webApi.auditApply(customerId=self.appText.get('customerId'), vlue=2)  # 审核
-        self.flowPath.visit_status(status='进行中')
+        self.flowPath.visit_status(status='已同意')
         self.flowPath.accomplish_visit()
         self.flowPath.visit_status(status='已完成')
         self.appApi.client_exile_sea()
@@ -288,8 +288,6 @@ class MyVisitTestCase(unittest.TestCase):
                                receptionPhone='1' + str(int(time.time())), attachmentIds='1')
         self.assertEqual('带看计划审核中', self.appApi.appText.get('data'))
 
-        self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
-        assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
         self.appApi.add_deal()  # 录入成交
         self.assertNotEqual(200, self.appApi.appText.get('code'))
         self.appApi.client_exile_sea()

@@ -161,7 +161,7 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.appApi.TodayClue(isFirst=1)
         dome1 = 0
         globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
-        while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appText.get('cluePhone'):
+        while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
             dome1 = dome1 + 1
         self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
         self.appApi.Login()
