@@ -225,10 +225,11 @@ class HomeTestCase(unittest.TestCase):
 
     def test_await_follow_01(self):
         """1、新增线索（未首电）     + 1"""
+        self.follow_front()
         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
                              sourceId=self.appText.get('XSLY'),
                              keyWords=self.appText.get('XSBQ'))
-        self.follow_later(vlue=1)
+        self.follow_later(0)
         self.appApi.ClueInfo()
         """2、新增线索（已首电）     + 1"""
         try:
@@ -238,7 +239,7 @@ class HomeTestCase(unittest.TestCase):
         except:
             self.appApi.ClueFollowList()
             self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_later(0)
+        self.follow_later(vlue=1)
 
     def test_await_follow_02(self):
         """3、线索转移               - 1"""
