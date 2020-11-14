@@ -203,15 +203,21 @@ class flowPath:
 
     def first_phone_non_null(self):
         """首电不为空"""
-        self.clue_non_null()
-        self.appApi.ClueInfo()
-        self.appApi.TodayClue(isFirst=1)
+        self.appApi.TodayClue(isFirst=0)
+        if self.appApi.appText.get('Total') < 1:
+            self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                                 sourceId=self.appApi.appText.get('XSLY'),
+                                 keyWords=self.appApi.appText.get('XSBQ'))
+            self.appApi.TodayClue(isFirst=0)
         globals()['r.text'] = json.loads(json.dumps(self.appApi.appText.get('records')))
         while globals()['r.text'][0]['isFirst'] == '1':
+            print('创建线索后首电 isFirst != 0')
+            self.appApi.appText.set_map('clueId', globals()['r.text'][0]['clueId'])
             self.appApi.ExileSea()
             self.clue_non_null()
-            self.appApi.TodayClue()
+            self.appApi.TodayClue(isFirst=None)
             globals()['r.text'] = json.loads(json.dumps(self.appApi.appText.get('records')))
+        self.appApi.appText.set_map('clueId', globals()['r.text'][0]['clueId'])
         self.appApi.ClueInfo()
 
     def clue_exile_sea(self):

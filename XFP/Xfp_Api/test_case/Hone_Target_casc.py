@@ -539,6 +539,12 @@ class HomeTestCase(unittest.TestCase):
                                        seeingConsultant=self.appApi.appText.get('consultantId'),
                                        appointConsultant=self.appApi.appText.get('consultantId'))
 
+    def test_hone_wealth(self):
+        """首页财富值对比"""
+        self.appApi.hone_wealth()
+        self.assertEqual(self.appText.get('monthWealth'), self.appText.get('lastMonthWealth') +
+                         self.appText.get('lastMonthWealthDifference'))
+
     def visit_later(self, vlue=0):
         """带看后"""
         tomorrow = (date.today() + timedelta(days=7)).strftime("%Y-%m-%d")

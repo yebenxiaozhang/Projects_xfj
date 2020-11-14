@@ -250,7 +250,8 @@ class appApi:
                                "isStop": 0,
                                "overtime": 0})
 
-    def ClueFollowSave(self, taskEndTime, followType='线索', followContent='python-线索/客户跟进，本次沟通记录',
+    def ClueFollowSave(self, taskEndTime, followType='线索',
+                       followContent='python-线索/客户跟进，本次沟通记录',
                        taskRemark='python-线索/客户跟进，下次沟通记录'):
         """线索/客户跟进录入"""
         if followType == '线索':
@@ -285,8 +286,6 @@ class appApi:
         self.appText.set_map('Total', len(globals()['r.text']['data']['records']))
         if self.appText.get('Total') != 0:
             self.appText.set_map('records', globals()['r.text']['data']['records'])
-            # self.appText.set_map('isFirst', globals()['r.text']['data']['records'][0]['isFirst'])
-            # self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
 
     def ResetPassword(self, userId):
         """重设密码"""
@@ -1147,6 +1146,25 @@ class appApi:
         else:
             total_seconds = (time_2_struct - time_1_struct).total_seconds()
             self.appText.set_map('vlue', (total_seconds)/60/60)
+
+    def hone_wealth(self):
+        """首页财富值"""
+        today = datetime.date.today()
+        oneday = datetime.timedelta(days=1)
+        yesterday = today - oneday
+        self.PostRequest(url='/api/a/consultant/getWealthDetailCount',
+                         data={
+                                "consultantId": self.appText.get('consultantId'),
+                                "consultantIds": [
+                                    self.appText.get('consultantId')
+                                ],
+                                "startTime": str(yesterday),
+                                "endTime": time.strftime("%Y-%m-%d")
+                            })
+        self.appText.set_map('lastMonthWealth', globals()['r.text']['data']['lastMonthWealth'])
+        self.appText.set_map('lastMonthWealthDifference',
+                             globals()['r.text']['data']['lastMonthWealthDifference'])
+        self.appText.set_map('monthWealth', globals()['r.text']['data']['monthWealth'])
 
 
 if __name__ == '__main__':

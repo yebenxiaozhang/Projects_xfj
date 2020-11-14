@@ -92,6 +92,7 @@ class Config_labelTestCase(unittest.TestCase):
         cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
+        cls.webApi.consultant_allocition(isAppoint=1)
 
     def test_config_01(self):
         """项目大于3个"""

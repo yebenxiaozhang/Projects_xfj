@@ -62,5 +62,3 @@ class UserTestCase(unittest.TestCase):
         self.XfpRequest.GetUserData()
         self.assertEqual('登录账号无咨询师权限，请使用咨询师账号登录!', self.XmfpEXT.get('data'))
 
-
-

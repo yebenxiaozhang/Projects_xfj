@@ -128,12 +128,11 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.assertEqual(webdome + 1, self.webText.get('total'))
         self.assertEqual('呼出', self.webText.get('isFlagCallStr'))
         self.assertEqual(webdome1, self.webText.get('consultantName'))
-        dome = self.appText.get('clueId')
         # 检查首页 待首电状态
         self.appApi.TodayClue(isFirst=1)
         dome1 = 0
         globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
-        while globals()['r.text'][dome1]['clueId'] != dome:
+        while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
             dome1 = dome1 + 1
         self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
         # 检查待跟进状态
@@ -192,7 +191,7 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.appApi.TodayClue(isFirst=1)
         dome1 = 0
         globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
-        while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appText.get('cluePhone'):
+        while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
             dome1 = dome1 + 1
         self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
         self.flowPath.first_phone_non_null()
@@ -255,7 +254,7 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.appApi.TodayClue(isFirst=1)
         dome1 = 0
         globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
-        while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appText.get('cluePhone'):
+        while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
             dome1 = dome1 + 1
         self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
 
@@ -267,7 +266,7 @@ class FirstPhoneTestCase(unittest.TestCase):
         self.appApi.TodayClue(isFirst=1)
         dome1 = 0
         globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
-        while globals()['r.text'][dome1]['clueNoHiddenPhone'] != self.appText.get('cluePhone'):
+        while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
             dome1 = dome1 + 1
         self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=1200, is_me=2,
