@@ -77,6 +77,7 @@ class ResultsTheChangeTestCace(unittest.TestCase):
             raise RuntimeError(self.XmTEXT.get('xmurl'))
 
     def test_RandomUserPriceAdjustment(self):
+        # self.FlowPath.ResultsTheChange()
         """随机账户 ---调价及调佣"""
         AGENTUSER = [AgentUser1, AgentUser3, AgentUser5, AgentUser7, AgentUser9]
         dome = self.XmRequest.RandomText(AGENTUSER)

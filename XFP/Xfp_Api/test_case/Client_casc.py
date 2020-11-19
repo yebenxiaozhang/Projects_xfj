@@ -172,7 +172,15 @@ class ClientTestCase(unittest.TestCase):
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appText.get('ApiXfpUrl'))
 
-
+    def test_client_change(self):
+        """客户转移"""
+        self.flowPath.client_list_non_null()
+        self.appApi.client_change()
+        self.appApi.Login(userName=XfpUser1)
+        self.appApi.GetUserData()
+        self.appApi.ClientList()
+        self.appApi.ClientFollowList()
+        self.assertEqual('客户转移', self.appText.get('followContent')[:4])
 
 
 

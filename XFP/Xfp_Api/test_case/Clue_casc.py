@@ -186,6 +186,8 @@ class ClueTestCase(unittest.TestCase):
         self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
         self.appApi.my_clue_list()
         self.assertEqual(dome1 + 1, self.appText.get('total'))
+        self.appApi.ClueFollowList()
+        self.assertEqual('线索转移', self.appText.get('followContent')[:4])
 
     def test_clue_ChangeClient(self):
         """未首电转客户"""

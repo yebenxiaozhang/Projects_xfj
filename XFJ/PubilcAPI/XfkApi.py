@@ -376,7 +376,7 @@ class XfkApi:
                                #           self.XfkTEXT.get('sellerXJJAmount'), 2),
                                'applyId': globals()['applyId']})
 
-    def NewsList(self):
+    def NewsList(self): 
         """消息列表"""
         r = self.do_request.to_request(method="post",
                                        url=ApiNewsUrl,
