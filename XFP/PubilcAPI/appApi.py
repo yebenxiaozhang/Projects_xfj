@@ -1005,11 +1005,12 @@ class appApi:
                              'consultantId': self.appText.get('consultantId')
                          })
 
-    def follow_apply(self, vlue=0):
+    def follow_apply(self, vlue=0, keyWord=None):
         """跟进申请"""
         self.PostRequest(url='/api/a/audit/auditList',
                          data={
-                             'consultantId': self.appText.get('consultantId')
+                             'consultantId': self.appText.get('consultantId'),
+                             'keyWord': keyWord,
                          })
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:

@@ -254,7 +254,7 @@ class TestCase(unittest.TestCase):
                 self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
                 time.sleep(1)
                 self.appApi.getConsultantCount()
-                if int(dome) == 1:
+                if float(dome) == 1:
                     pass
                 else:
                     if self.appText.get('followRatio') >= dome:
@@ -265,7 +265,7 @@ class TestCase(unittest.TestCase):
                 self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
                 time.sleep(1)
                 self.appApi.getConsultantCount()
-                if dome == 1:
+                if float(dome) == 1:
                     pass
                 else:
                     if self.appText.get('followRatio') <= dome:
@@ -280,7 +280,7 @@ class TestCase(unittest.TestCase):
             self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
             time.sleep(1)
             self.appApi.getConsultantCount()
-            if int(dome) == 1:
+            if float(dome) == 1:
                 pass
             else:
                 if self.appText.get('followRatio') <= dome:

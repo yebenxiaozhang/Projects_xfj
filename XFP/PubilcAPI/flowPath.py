@@ -146,9 +146,9 @@ class flowPath:
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
-    def apply_status(self, status, vlue=0):
+    def apply_status(self, status, vlue=0, keyWord=None):
         dome = self.appApi.appText.get('clueId')
-        self.appApi.follow_apply(vlue=vlue)
+        self.appApi.follow_apply(vlue=vlue, keyWord=keyWord)
         if status == '进行中':
             assert self.appApi.appText.get('auditStatueApp') == 0, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '进行中', '状态异常'

@@ -3,7 +3,7 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class TestCase(unittest.TestCase):
-    """幸福派——带看相关"""
+    """幸福派——财富值"""
 
     def __init__(self, *args, **kwargs):
         super(TestCase, self).__init__(*args, **kwargs)
@@ -82,35 +82,35 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
         cls.webApi.consultant_allocition(isAppoint=1)
 
-    def test_config_01(self):
-        """项目大于3个"""
-        self.appApi.AllBuildingUpdate()
-        while self.appText.get('total') < 3:
-            dome = time.strftime("%Y-%m-%d %H:%M:%S")
-            self.webApi.add_house(houseName=dome)
-            self.appApi.AllBuildingUpdate()
-
-    def test_config_02(self):
-        """资料信息"""
-        self.appApi.Information()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
-            self.appApi.Information()
-
-    def test_config_03(self):
-        """商务信息"""
-        self.appApi.BusinessInformation()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_business_information()
-            self.appApi.BusinessInformation()
-
-    def test_config_04(self):
-        """楼盘问答"""
-        self.appApi.HouseQA()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_questions()
-            self.appApi.HouseQA()
-
+    # def test_config_01(self):
+    #     """项目大于3个"""
+    #     self.appApi.AllBuildingUpdate()
+    #     while self.appText.get('total') < 3:
+    #         dome = time.strftime("%Y-%m-%d %H:%M:%S")
+    #         self.webApi.add_house(houseName=dome)
+    #         self.appApi.AllBuildingUpdate()
+    #
+    # def test_config_02(self):
+    #     """资料信息"""
+    #     self.appApi.Information()
+    #     while self.appText.get('total') < 1:
+    #         self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
+    #         self.appApi.Information()
+    #
+    # def test_config_03(self):
+    #     """商务信息"""
+    #     self.appApi.BusinessInformation()
+    #     while self.appText.get('total') < 1:
+    #         self.webApi.add_house_business_information()
+    #         self.appApi.BusinessInformation()
+    #
+    # def test_config_04(self):
+    #     """楼盘问答"""
+    #     self.appApi.HouseQA()
+    #     while self.appText.get('total') < 1:
+    #         self.webApi.add_house_questions()
+    #         self.appApi.HouseQA()
+    #
 
 
 
