@@ -411,7 +411,7 @@ class webApi:
                 "clueNickName": clueNickName,
                 "cluePhone": cluePhone,
                 "remark": "总站添加线索",
-                "saasCodeSys": "000009",
+                "saasCodeSys": XfpsaasCode,
                 "sourceId": self.appText.get('XSLY_admin'),
                 'saasCode': 'admin'
                             }

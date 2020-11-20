@@ -22,6 +22,7 @@ ApiXfpUrl1 = 'http://192.168.10.52/xfp_api'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
 XfpsaasCode = '000009'
+# XfpsaasCode = '000012'
 XfpUser1 = '13062200304'
 XfpPwd1 = '12345678'
 

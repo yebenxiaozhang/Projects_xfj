@@ -175,7 +175,10 @@ class TestCase(unittest.TestCase):
         self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))        # 审核列表
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.webApi.auditApply(isAudit=False, auditRemark=dome + ' 线索流放审核不通过')
-        self.flowPath.apply_status(status='已驳回', vlue=1, keyWord=self.appText.get('cluePhone'))
+        try:
+            self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
+        except:
+            self.flowPath.apply_status(status='已驳回', vlue=1, keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + ' 线索流放审核不通过', self.appApi.appText.get('auditRemark'))
 
     def test_follow_apply_05(self):
