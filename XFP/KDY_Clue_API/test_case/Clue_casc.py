@@ -8,11 +8,11 @@ from XFP.PubilcAPI.flowPath import *
 # 通过总部分配的线索不允许修改来源
 
 
-class ClueTestCase(unittest.TestCase):
+class TestCase(unittest.TestCase):
     """幸福派APP——线索"""
 
     def __init__(self, *args, **kwargs):
-        super(ClueTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 

@@ -60,11 +60,11 @@ from datetime import date, timedelta
 """
 
 
-class HomeTestCase(unittest.TestCase):
+class TestCase(unittest.TestCase):
     """首页——相关指标"""
 
     def __init__(self, *args, **kwargs):
-        super(HomeTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 

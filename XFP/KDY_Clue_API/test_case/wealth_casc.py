@@ -1,14 +1,9 @@
-"""后台-线索分配"""
+"""财富值-相关"""
 from XFP.PubilcAPI.flowPath import *
-"""
-    1、幸福币不足，分配失败
-    2、无咨询师接受分配，会在待分配列表
-    3、上户时间：分站分配时间
-"""
 
 
 class TestCase(unittest.TestCase):
-    """客第壹——线索分配"""
+    """幸福派——带看相关"""
 
     def __init__(self, *args, **kwargs):
         super(TestCase, self).__init__(*args, **kwargs)
@@ -17,6 +12,9 @@ class TestCase(unittest.TestCase):
 
         self.xfp_app = appApi()
         self.appApi = self.xfp_app
+
+        self.flow = flowPath()
+        self.flowPath = self.flow
 
         self.appText = GlobalMap()
         self.webText = GlobalMap()
@@ -54,14 +52,6 @@ class TestCase(unittest.TestCase):
         cls.flowPath.get_label(labelNo='SZGJYY', labelName='终止跟进原因',
                                newlabelName='客户已成交')
         cls.appText.set_map('ZZGJ', cls.appText.get('labelId'))
-        """成交项"""
-        cls.flowPath.get_label(labelNo='CJX', labelName='成交项目',
-                               newlabelName='认购')
-        cls.appText.set_map('CJX', cls.appText.get('labelId'))
-        """出行方式"""
-        cls.flowPath.get_label(labelNo='CXFS', labelName='出行方式',
-                               newlabelName='自驾')
-        cls.appText.set_map('CXFS', cls.appText.get('labelId'))
         """客户意向等级"""
         cls.appApi.GetLabelList(labelNo='KHYXDJ')                       # 查询购房意向loanSituation
         cls.appText.set_map('KHYXDJ', cls.appText.get('labelId'))
@@ -80,8 +70,7 @@ class TestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='QTKHXQ')                       # 查询客户需求
         cls.appText.set_map('QTKHXQ', cls.appText.get('labelId'))
         cls.appApi.ConsultantList()                                     # 咨询师列表
-        cls.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
-        cls.appText.set_map('ZHGJ', cls.appText.get('labelId'))         # 暂缓跟进
+
         cls.flowPath.get_label(labelNo='XXFL', labelName='信息分类',
                                newlabelName='信息分类一')
         cls.appText.set_map('XXFL', cls.appText.get('labelId'))         # 信息分类
@@ -91,32 +80,37 @@ class TestCase(unittest.TestCase):
         cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
+        cls.webApi.consultant_allocition(isAppoint=1)
 
-    def test_all_allocation_1(self):
-        """2、无咨询师接受分配，会在待分配列表"""
-        if ApiXfpUrl == 'http://xfp.xfj100.com':
-            pass
-        else:
-            self.webApi.consultant_allocition(isAppoint=0)
-            self.appApi.my_clue_list()
-            dome = self.appText.get('total')
-            self.appApi.Login(userName='admin', saasCode='admin')
-            self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
-            self.appApi.Login()
-            self.webApi.clue_await_allocition(keyWord=self.webText.get('cluePhone'))
-            self.assertEqual(1, self.webText.get('total'))
-            self.assertNotEqual(self.webText.get('receptionTime'), self.webText.get('createdTime'))
-            """3、上户时间：分站分配时间"""
-            self.webApi.clue_appoint()
-            self.webApi.clue_await_allocition(keyWord=self.webText.get('cluePhone'))
-            self.assertEqual(0, self.webText.get('total'))
-            self.appApi.my_clue_list()
-            self.assertNotEqual(dome, self.appText.get('total'))
-            self.appApi.ClueInfo()
-            self.assertNotEqual(self.webText.get('receptionTime'), self.webText.get('createdTime'))
-            self.assertNotEqual(self.appText.get('receptionTime'), self.appText.get('createdTime'))
-            self.assertEqual(self.webText.get('createdTime'), self.appText.get('createdTime'))
-            self.webApi.consultant_allocition(isAppoint=1)
+    def test_config_01(self):
+        """项目大于3个"""
+        self.appApi.AllBuildingUpdate()
+        while self.appText.get('total') < 3:
+            dome = time.strftime("%Y-%m-%d %H:%M:%S")
+            self.webApi.add_house(houseName=dome)
+            self.appApi.AllBuildingUpdate()
+
+    def test_config_02(self):
+        """资料信息"""
+        self.appApi.Information()
+        while self.appText.get('total') < 1:
+            self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
+            self.appApi.Information()
+
+    def test_config_03(self):
+        """商务信息"""
+        self.appApi.BusinessInformation()
+        while self.appText.get('total') < 1:
+            self.webApi.add_house_business_information()
+            self.appApi.BusinessInformation()
+
+    def test_config_04(self):
+        """楼盘问答"""
+        self.appApi.HouseQA()
+        while self.appText.get('total') < 1:
+            self.webApi.add_house_questions()
+            self.appApi.HouseQA()
+
 
 
 
