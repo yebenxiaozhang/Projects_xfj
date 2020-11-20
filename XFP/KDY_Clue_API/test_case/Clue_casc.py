@@ -95,7 +95,10 @@ class TestCase(unittest.TestCase):
         self.appApi.my_clue_list(keyWord=dome2)
         self.assertEqual(1, self.appText.get('total'))
         self.appApi.ClueFollowList()
-        self.assertEqual('线索转移', self.appText.get('followContent')[:4])
+        if '线索转移' != self.appText.get('followContent')[:4]:
+            print(self.appText.get('followContent'))
+            print(self.appText.get('cluePhone'))
+            raise RuntimeError('线索转移没有跟进日志，或者跟进日志错误')
 
     def test_clue_ChangeClient(self):
         """未首电转客户"""
