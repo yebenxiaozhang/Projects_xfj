@@ -3,7 +3,6 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class TestCase(unittest.TestCase):
-    """幸福派——带看相关"""
 
     def __init__(self, *args, **kwargs):
         super(TestCase, self).__init__(*args, **kwargs)
