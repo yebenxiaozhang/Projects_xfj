@@ -399,7 +399,7 @@ class FollowApplyTestCase(unittest.TestCase):
         """12、客户无效终止-一级审核失败           已驳回"""
         self.webApi.audit_List()        # 审核列表
         self.webApi.auditApply(isAudit=False, auditRemark=dome + '客户无效终止审核失败')
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', vlue=1)
         self.assertEqual(dome + '客户无效终止审核失败', self.appApi.appText.get('auditRemark'))
 
     def test_follow_apply_23(self):

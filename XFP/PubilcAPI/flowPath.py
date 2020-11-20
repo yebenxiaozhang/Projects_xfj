@@ -43,12 +43,15 @@ class flowPath:
             self.appApi.SeaList()  # 公海列表
             if self.appApi.appText.get('total') == 0:
                 self.add_new_clue()
+                self.appApi.my_clue_list()  # 线索列表
+                if self.appApi.appText.get('total') == '0':
+                    print('新增线索失败？')
             else:
                 self.appApi.clue_Assigned()  # 领取线索
                 self.appApi.my_clue_list()  # 线索列表
                 if self.appApi.appText.get('total') == '0':
                     print('领取线索失败？')
-                    raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        self.appApi.ClueInfo()
 
     def add_visit(self):
         """创建带看"""
@@ -143,9 +146,9 @@ class flowPath:
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
-    def apply_status(self, status):
+    def apply_status(self, status, vlue=0):
         dome = self.appApi.appText.get('clueId')
-        self.appApi.follow_apply()
+        self.appApi.follow_apply(vlue=vlue)
         if status == '进行中':
             assert self.appApi.appText.get('auditStatueApp') == 0, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '进行中', '状态异常'
@@ -224,7 +227,7 @@ class flowPath:
         """线索流放公海"""
         self.appApi.ClueFollowList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-
+        time.sleep(1)
         self.appApi.ExileSea()
 
     def add_new_clue(self):

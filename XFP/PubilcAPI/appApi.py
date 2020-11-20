@@ -1005,7 +1005,7 @@ class appApi:
                              'consultantId': self.appText.get('consultantId')
                          })
 
-    def follow_apply(self):
+    def follow_apply(self, vlue=0):
         """跟进申请"""
         self.PostRequest(url='/api/a/audit/auditList',
                          data={
@@ -1013,10 +1013,10 @@ class appApi:
                          })
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
-            self.appText.set_map('auditStatueStr', globals()['r.text']['data']['records'][0]['auditStatueStr'])
-            self.appText.set_map('auditStatueApp', globals()['r.text']['data']['records'][0]['auditStatue'])
-            self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][0]['auditRemark'])
-            self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
+            self.appText.set_map('auditStatueStr', globals()['r.text']['data']['records'][vlue]['auditStatueStr'])
+            self.appText.set_map('auditStatueApp', globals()['r.text']['data']['records'][vlue]['auditStatue'])
+            self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][vlue]['auditRemark'])
+            self.appText.set_map('clueId', globals()['r.text']['data']['records'][vlue]['clueId'])
 
     def Task_Visit_List(self, appointmentTime=None, endTime=time.strftime("%Y-%m-%d"), visiteStatus=None):
         """我的带看"""
