@@ -95,7 +95,7 @@ class ClientTestCase(unittest.TestCase):
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
 
-    def test_1_FollowSave(self):
+    def test_FollowSave(self):
         """客户跟进"""
         try:
             #  客户详情查看  及 列表是否有新增
