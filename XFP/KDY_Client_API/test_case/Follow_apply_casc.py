@@ -133,50 +133,59 @@ class FollowApplyTestCase(unittest.TestCase):
         cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
+        cls.webApi.audit_List()
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+        cls.webApi.audit_List(auditLevel=2)
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
 
-    def setUp(self):
-        """残留审核 失败！！！"""
-        self.webApi.audit_List()
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            self.webApi.audit_List()
-        self.webApi.audit_List(auditLevel=2)
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            self.webApi.audit_List()
+    def test_follow_apply(self):
+        """3、客户暂缓审核中---不允许创建带看，不允许录成交，不允许流放公海（无论是否开启审核，都不允许操作）"""
+        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
+        self.flowPath.client_list_non_null()
+        self.flowPath.suspend_follow()
+
+        self.appApi.GetMatchingAreaHouse()
+        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
+                                   appointmentTime=dome,
+                                   seeingConsultant=self.appApi.appText.get('consultantId'),
+                                   appointConsultant=self.appApi.appText.get('consultantId'))
+        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
+
+        self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
+        assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
+        self.appApi.add_deal()  # 录入成交
+        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
+
+        self.appApi.client_exile_sea()
+        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
+
 
     def test_follow_apply_01(self):
         """1、客户申请暂缓        已同意                 已同意"""
-        self.flowPath.add_new_clue()
-        self.appApi.my_clue_list()
-        self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.appApi.ClueInfo()
-        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-                                   loanSituation='这个是贷款情况')
+        self.flowPath.client_list_non_null()
+        self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
+        dome = self.appText.get('total')
         self.flowPath.suspend_follow()
         self.appApi.ClientTask(taskType=2)  # 待办
         self.assertEqual(time.strftime("%Y-%m-%d"), self.appApi.appText.get('endTime')[:10])
-        dome = self.appApi.appText.get('clueId')
-        self.appApi.follow_apply()
-        self.assertNotEqual(dome, self.appApi.appText.get('clueId'))
-        self.appApi.client_exile_sea()
-        self.assertEqual(200, self.appApi.appText.get('code'))
+        self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
+        if self.appText.get('total') != dome:
+            raise RuntimeError("无审核的情况下 客户申请暂缓多了一个跟进")
 
     def test_follow_apply_03(self):
         """3、客户无效终止        已同意"""
-        self.flowPath.add_new_clue()
-        self.appApi.my_clue_list()
-        self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.appApi.ClueInfo()
-        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-                                   loanSituation='这个是贷款情况')
-        self.appApi.ClientList()
+        self.flowPath.client_list_non_null()
+        self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
+        dome = self.appText.get('total')
         self.appApi.client_exile_sea()
-        dome = self.appApi.appText.get('clueId')
-        self.appApi.follow_apply()
-        self.assertNotEqual(dome, self.appApi.appText.get('clueId'))
+        self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
+        if dome != self.appText.get('total'):
+            raise RuntimeError("无审核的情况下 客户终止会多添加一个跟进申请")
 
     def test_follow_apply_04(self):
         """1、客户申请暂缓跟进-待审核       申请中"""
@@ -184,32 +193,32 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         self.flowPath.suspend_follow()
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
 
         """2、客户申请暂缓跟进-审核失败     已驳回                 已取消"""
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.webApi.audit_List()  # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                isAudit=False, auditRemark=dome + ' python-跟进申请不通过',
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + ' python-跟进申请不通过', self.appApi.appText.get('auditRemark'))
         self.appApi.client_exile_sea()
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
 
     def test_follow_apply_06(self):
         """3、客户申请暂缓跟进-审核成功     已同意                 已同意"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         self.flowPath.suspend_follow()
-        self.webApi.audit_List()  # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
-        self.flowPath.apply_status(status='已同意')
+        self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
         self.appApi.client_exile_sea()
-        self.flowPath.apply_status(status='已同意')
+        self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
 
     def test_follow_apply_10(self):
         """7、客户无效终止-待审核           申请中"""
@@ -217,13 +226,13 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
         self.appApi.client_exile_sea()
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
         """8、客户无效终止-审核成功         已同意"""
-        self.webApi.audit_List()  # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'))
-        self.flowPath.apply_status(status='已同意')
+        self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
 
     def test_follow_apply_12(self):
         """9、客户无效终止-审核失败         已驳回"""
@@ -231,9 +240,9 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
         self.appApi.client_exile_sea()
-        self.webApi.audit_List()  # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
         self.webApi.auditApply(isAudit=False, auditRemark=dome + '客户无效终止审核失败')
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + '客户无效终止审核失败', self.appApi.appText.get('auditRemark'))
 
     def test_follow_apply_13(self):
@@ -242,33 +251,33 @@ class FollowApplyTestCase(unittest.TestCase):
         self.flowPath.client_list_non_null()
         self.flowPath.suspend_follow()
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
 
         """2、客户申请暂缓跟进-一级审核失败        已驳回            已驳回"""
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.webApi.audit_List()  # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                isAudit=False, auditRemark=dome + ' python-跟进申请不通过',
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + ' python-跟进申请不通过', self.appApi.appText.get('auditRemark'))
         self.appApi.client_exile_sea()
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
 
     def test_follow_apply_15(self):
         """3、客户申请暂缓跟进-一级审核成功        审核中            已取消"""
         self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
         self.flowPath.client_list_non_null()
         self.flowPath.suspend_follow()
-        self.webApi.audit_List()  # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
 
         """4、客户申请暂缓跟进-二级审核失败        已驳回            已取消"""
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -276,25 +285,25 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), isAudit=False,
                                auditRemark=dome + ' 暂申请不通过', vlue=2,
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + ' 暂申请不通过', self.appApi.appText.get('auditRemark'))
         self.appApi.client_exile_sea()
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
 
     def test_follow_apply_17(self):
         """5、客户申请暂缓跟进-二级审核成功        已同意            已同意"""
         self.webApi.Audit_management(suspend=True, suspendLevel=2)  # 修改配置审核
         self.flowPath.client_list_non_null()
         self.flowPath.suspend_follow()
-        self.webApi.audit_List()  # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
-        self.webApi.audit_List(auditLevel=2)
+        self.webApi.audit_List(auditLevel=2, keyWord=self.appText.get('cluePhone'))
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), vlue=2,
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
-        self.flowPath.apply_status(status='已同意')
+        self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
         self.appApi.client_exile_sea()
-        self.flowPath.apply_status(status='已同意')
+        self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
 
     def test_follow_apply_22(self):
         """  11、客户无效终止-待审核                 申请中"""
@@ -302,20 +311,22 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
         self.appApi.client_exile_sea()
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
 
         """12、客户无效终止-一级审核失败           已驳回"""
-        self.webApi.audit_List()        # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))        # 审核列表
         self.webApi.auditApply(isAudit=False, auditRemark=dome + '客户无效终止审核失败')
-        self.flowPath.apply_status(status='已驳回', vlue=1)
+        try:
+            self.flowPath.apply_status(status='已驳回', vlue=1, keyWord=self.appText.get('cluePhone'))
+        except:
+            self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + '客户无效终止审核失败', self.appApi.appText.get('auditRemark'))
 
     def test_follow_apply_23(self):
         """13、客户无效终止-一级审核成功           审核中"""
-        # self.flowPath.client_list_non_null()
         self.flowPath.clue_non_null()
         self.appApi.my_clue_list()
         self.appApi.ClueFollowList()
@@ -329,23 +340,23 @@ class FollowApplyTestCase(unittest.TestCase):
 
 
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.webApi.audit_List()        # 审核列表
         self.webApi.auditApply()
 
 
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
 
         """14、客户无效终止-二级审核失败           已驳回"""
         self.webApi.audit_List(auditLevel=2)        # 审核列表
         self.webApi.auditApply(vlue=2, isAudit=False, auditRemark=dome + '客户无效终止审核失败')
-        self.flowPath.apply_status(status='已驳回')
+        self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + '客户无效终止审核失败', self.appApi.appText.get('auditRemark'))
 
     def test_follow_apply_24(self):
@@ -354,21 +365,21 @@ class FollowApplyTestCase(unittest.TestCase):
         self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
         self.appApi.client_exile_sea()
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
         self.webApi.audit_List()        # 审核列表
         self.webApi.auditApply()
         try:
-            self.flowPath.apply_status(status='申请中')
+            self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         except:
-            self.flowPath.apply_status(status='审核中')
+            self.flowPath.apply_status(status='审核中', keyWord=self.appText.get('cluePhone'))
 
         """14、客户无效终止-二级审核失败           已驳回"""
-        self.webApi.audit_List(auditLevel=2)        # 审核列表
+        self.webApi.audit_List(auditLevel=2, keyWord=self.appText.get('cluePhone'))        # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                vlue=2)
-        self.flowPath.apply_status(status='已同意')
+        self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
 
     def test_follow_apply_26(self):
         """2、客户终止跟进审核中 ---不允许创建带看，不允许录成交，
@@ -394,34 +405,12 @@ class FollowApplyTestCase(unittest.TestCase):
         self.appApi.ClientTaskPause()
         self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
 
-    def test_follow_apply_27(self):
-        """3、客户暂缓审核中---不允许创建带看，不允许录成交，不允许流放公海（无论是否开启审核，都不允许操作）"""
-        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
-        self.flowPath.client_list_non_null()
-        self.flowPath.suspend_follow()
-
-        self.appApi.GetMatchingAreaHouse()
-        dome = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                   appointmentTime=dome,
-                                   seeingConsultant=self.appApi.appText.get('consultantId'),
-                                   appointConsultant=self.appApi.appText.get('consultantId'))
-        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
-
-        self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
-        assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
-        self.appApi.add_deal()  # 录入成交
-        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
-
-        self.appApi.client_exile_sea()
-        self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
-
     def test_follow_apply_28(self):
         """暂停后再次申请暂停"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         self.flowPath.suspend_follow()
-        self.webApi.audit_List()  # 审核列表
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
         self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'),
                                endTime=time.strftime("%Y-%m-%d ") + '22:00:00')
         self.appApi.ClientFollowList()

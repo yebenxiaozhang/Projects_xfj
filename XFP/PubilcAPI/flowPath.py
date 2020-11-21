@@ -35,6 +35,7 @@ class flowPath:
             if self.appApi.appText.get('total') == 0:
                 print('线索转客户异常？')
                 raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        self.appApi.client_info()
 
     def clue_non_null(self):
         """线索列表---非空"""
@@ -136,7 +137,6 @@ class flowPath:
     def suspend_follow(self):
         """暂缓跟进"""
         try:
-            self.client_list_non_null()
             self.appApi.ClientTaskPause()
             while self.appApi.appText.get('data') == '该客户已被暂缓!':
                 self.appApi.ClientFollowList()

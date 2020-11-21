@@ -870,7 +870,6 @@ class appApi:
         if globals()['r.text']['data']['total'] != 0:
             self.appText.set_map('customerId', globals()['r.text']['data']['records'][vlue]['customerId'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][vlue]['clueId'])
-            self.appText.set_map('clueId', globals()['r.text']['data']['records'][vlue]['clueId'])
             self.appText.set_map('taskCount', globals()['r.text']['data']['records'][vlue]['taskCount'])
 
     def ClientCallLog(self):
@@ -1184,10 +1183,16 @@ class appApi:
                              globals()['r.text']['data']['lastMonthWealthDifference'])
         self.appText.set_map('monthWealth', globals()['r.text']['data']['monthWealth'])
 
-    def wealthType(self):
+    def client_info(self):
         """post请求"""
-        self.PostRequest()
-
+        self.PostRequest(url='/api/a/customer/info',
+                         data={
+                             'clueId': self.appText.get('clueId'),
+                             'customerId': self.appText.get('customerId')
+                         })
+        if len(globals()['r.text']['data']) != 0:
+            self.appText.set_map('cluePhone',
+                                 globals()['r.text']['data']['saasClue']['cluePhone'])
 
 
 
