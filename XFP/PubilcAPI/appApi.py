@@ -352,6 +352,7 @@ class appApi:
             self.appText.set_map('clueId', globals()['r.text']['data']['clueId'])
             self.appText.set_map('cluePhone', cluePhone)
             self.appText.set_map('createdTime', globals()['r.text']['data']['createdTime'])
+            self.appText.set_map('orderNo', globals()['r.text']['data']['orderNo'])
 
     def ClientSave(self, GFYX, ZJZZ, areaId, phoneNum=None,
                    sex='1', clueNickName='潘师傅', XSLY=None, LYBQ='表单',  # 表单，来电，IM客服
@@ -681,6 +682,9 @@ class appApi:
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['clueId'])
             self.appText.set_map('cluePhone',
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['cluePhone'])
+            self.appText.set_map('orderNo',
+                                 globals()['r.text']['data']['records'][
+                                     len(globals()['r.text']['data']['records']) - vlue]['orderNo'])
         else:
             pass
         self.appText.set_map('total', globals()['r.text']['data']['total'])
@@ -722,7 +726,7 @@ class appApi:
                              'clueId': self.appText.get('clueId')
                          })
 
-    def GetLabelList(self, labelNo, labelName=None):
+    def GetLabelList(self, labelNo, labelName=None, saasCode=XfpsaasCode):
         """查询标签"""
         """
         线索标签        XSBQ             购房目的          GFND
@@ -734,7 +738,8 @@ class appApi:
 
         """
         self.PostRequest(url='/api/tool/getLabelList/parameter',
-                         data={'labelNo': labelNo})
+                         data={'labelNo': labelNo},
+                         saasCode=saasCode)
         if len(globals()['r.text']['data']) != 0:
             try:
                 if labelName is not None:
@@ -746,6 +751,7 @@ class appApi:
                     self.appText.set_map('labelId', globals()['r.text']['data'][0]['children'][a]['labelId'])
                     self.appText.set_map('labelName', globals()['r.text']['data'][0]['children'][a]['labelName'])
                     self.appText.set_map('labelNo', globals()['r.text']['data'][0]['children'][a]['labelNo'])
+                    self.appText.set_map('remark', globals()['r.text']['data'][0]['children'][a]['remark'])
                 else:
                     self.appText.set_map('labelId', globals()['r.text']['data'][0]['children'][0]['labelId'])
             except:
@@ -1057,18 +1063,29 @@ class appApi:
         self.appText.set_map('monthConsumeWealth', globals()['r.text']['data']['monthConsumeWealth'])  # 本月扣除
         self.appText.set_map('monthGetWealth', globals()['r.text']['data']['monthGetWealth'])   # 本月获得
 
-    def getWealthDetailList(self):
+    def getWealthDetailList(self, startTime, endTime, orderNo=None, wealthType=None):
         """财富值明细"""
         self.PostRequest(url='/api/b/wealth/getWealthDetailList',
                          data={
                              'consultantId': self.appText.get('consultantId'),
-                             'startTime': self.appText.get('start_date'),
-                             'endTime': self.appText.get('end_date'),
+                             'startTime': startTime,
+                             'endTime': endTime,
+                             'wealthType': wealthType,      # 类型
+                             'orderNo': orderNo,
                              'consultantIds': [self.appText.get('consultantId')]
                          })
-        self.appText.set_map('wealthValue', globals()['r.text']['data']['records'][0]['wealthValue'])
-        self.appText.set_map('typeStr', globals()['r.text']['data']['records'][0]['typeStr'])
-        self.appText.set_map('wealthId', globals()['r.text']['data']['records'][0]['wealthId'])
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+            self.appText.set_map('records', globals()['r.text']['data']['records'])
+            a = 0
+            vlue = 0
+            while a != self.appText.get('total'):
+                vlue = vlue + int(globals()['r.text']['data']['records'][a]['wealthValue'])
+                a = a + 1
+            self.appText.set_map('vlue', vlue)
+            self.appText.set_map('wealthValue', globals()['r.text']['data']['records'][0]['wealthValue'])
+            self.appText.set_map('typeStr', globals()['r.text']['data']['records'][0]['typeStr'])
+            self.appText.set_map('wealthId', globals()['r.text']['data']['records'][0]['wealthId'])
 
     def get_current_month_start_and_end(self, date):
         """
@@ -1166,6 +1183,14 @@ class appApi:
         self.appText.set_map('lastMonthWealthDifference',
                              globals()['r.text']['data']['lastMonthWealthDifference'])
         self.appText.set_map('monthWealth', globals()['r.text']['data']['monthWealth'])
+
+    def wealthType(self):
+        """post请求"""
+        self.PostRequest()
+
+
+
+
 
 
 if __name__ == '__main__':

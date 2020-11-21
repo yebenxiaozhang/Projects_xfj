@@ -1,20 +1,20 @@
 """客第壹-相关"""
-ApiXfpUrl = 'http://xfpapi.ykb100.com'
-ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
+# ApiXfpUrl = 'http://xfpapi.ykb100.com'
+# ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
+# XfpUser = '13062200301'
+# XfpPwd = '12345678'
+# XfpsaasCode = '000009'
+# XfpUser1 = '13062200304'
+# XfpPwd1 = '12345678'
+
+
+ApiXfpUrl = 'http://xfp.xfj100.com'
+ApiXfpUrl1 = 'https://xfpapi.xfj100.com'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
-XfpsaasCode = '000012'
+XfpsaasCode = 'test'
 XfpUser1 = '13062200304'
 XfpPwd1 = '12345678'
-
-
-# ApiXfpUrl = 'http://xfp.xfj100.com'
-# ApiXfpUrl1 = 'https://xfpapi.xfj100.com'
-# XfpUser = '19859080323'
-# XfpPwd = '12345678'
-# XfpsaasCode = 'test'
-# XfpUser1 = '19859080301'
-# XfpPwd1 = '12345678'
 
 
 # ApiXfpUrl = 'http://192.168.10.96:8381'
@@ -38,3 +38,4 @@ surname = ['赵', '钱', '孙', '李', '周', '吴', '郑', '王', '冯', '陈',
            '毛', '禹', '狄', '米', '贝', '明', '臧', '计', '伏', '成', '戴', '谈', '宋', '茅', '庞']
 
 PassWord = "tujkfawbxbifbhbg"
+

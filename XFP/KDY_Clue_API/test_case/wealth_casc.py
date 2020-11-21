@@ -1,10 +1,9 @@
 """财富值-相关"""
 from XFP.PubilcAPI.flowPath import *
-"""线索相关
-平台
-
-
-
+"""
+1、拨打时间在超时前---增加财富值(上传时间再超时后)
+2、正常首电-----------增加财富值
+3、超时首电-----------扣除财富值
 """
 
 
@@ -87,36 +86,61 @@ class TestCase(unittest.TestCase):
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
         cls.webApi.consultant_allocition(isAppoint=1)
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='首电及时率', saasCode='admin')
+        cls.appText.set_map('SDJSL', cls.appText.get('remark'))
 
-    # def test_config_01(self):
-    #     """项目大于3个"""
-    #     self.appApi.AllBuildingUpdate()
-    #     while self.appText.get('total') < 3:
-    #         dome = time.strftime("%Y-%m-%d %H:%M:%S")
-    #         self.webApi.add_house(houseName=dome)
-    #         self.appApi.AllBuildingUpdate()
-    #
-    # def test_config_02(self):
-    #     """资料信息"""
-    #     self.appApi.Information()
-    #     while self.appText.get('total') < 1:
-    #         self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
-    #         self.appApi.Information()
-    #
-    # def test_config_03(self):
-    #     """商务信息"""
-    #     self.appApi.BusinessInformation()
-    #     while self.appText.get('total') < 1:
-    #         self.webApi.add_house_business_information()
-    #         self.appApi.BusinessInformation()
-    #
-    # def test_config_04(self):
-    #     """楼盘问答"""
-    #     self.appApi.HouseQA()
-    #     while self.appText.get('total') < 1:
-    #         self.webApi.add_house_questions()
-    #         self.appApi.HouseQA()
-    #
+    def test_wealth_01(self):
+        """1、拨打时间在超时前---增加财富值(上传时间再超时后)"""
+        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appApi.appText.get('XSLY'),
+                             keyWords=self.appApi.appText.get('XSBQ'))
+        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
+        time.sleep(60)
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=dome1)
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != 10:
+            raise RuntimeError('拨打再超时前，上传超时算首电及时')
+
+    def test_wealth_02(self):
+        """2、正常首电-----------增加财富值"""
+        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appApi.appText.get('XSLY'),
+                             keyWords=self.appApi.appText.get('XSBQ'))
+        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=dome1)
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != 10:
+            raise RuntimeError('2、正常首电-----------增加财富值')
+
+    def test_wealth_03(self):
+        """3、超时首电-----------扣除财富值"""
+        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appApi.appText.get('XSLY'),
+                             keyWords=self.appApi.appText.get('XSBQ'))
+        dome = (datetime.datetime.now() + datetime.timedelta(minutes=2)).strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=dome)
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != -5:
+            raise RuntimeError('3、超时首电-----------扣除财富值')
+
+
+
+
+
+
+
 
 
 

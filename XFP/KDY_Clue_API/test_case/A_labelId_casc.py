@@ -80,6 +80,9 @@ class TestCase(unittest.TestCase):
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
         cls.webApi.consultant_allocition(isAppoint=1)
+        # 财富值类型
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='首电及时率', saasCode='admin')
+        cls.appText.set_map('SDJSL', cls.appText.get('remark'))
 
     def test_config_01(self):
         """项目大于3个"""
