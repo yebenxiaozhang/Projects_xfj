@@ -164,7 +164,6 @@ class FollowApplyTestCase(unittest.TestCase):
         self.appApi.client_exile_sea()
         self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
 
-
     def test_follow_apply_01(self):
         """1、客户申请暂缓        已同意                 已同意"""
         self.flowPath.client_list_non_null()

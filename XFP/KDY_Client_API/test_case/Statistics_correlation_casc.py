@@ -39,11 +39,11 @@ from XFP.PubilcAPI.flowPath import *
 """
 
 
-class StatisticsCorrelationTestCase(unittest.TestCase):
+class TestCase(unittest.TestCase):
     """客第壹——统计相关"""
 
     def __init__(self, *args, **kwargs):
-        super(StatisticsCorrelationTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 
@@ -138,103 +138,6 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
             self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
             self.webApi.audit_List()
 
-    def test_first_phone_TimelinessRate_01(self):
-        """1、在08:00:00-08:01:00 拨打再超时之前上传录音    -首电及时"""
-        self.flowPath.add_new_clue()
-        self.appApi.getConsultantCount()
-        dome = self.appApi.appText.get('firstCallRatio')
-        try:
-            self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
-                                  call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
-        except:
-            self.appApi.ClueFollowList()
-            self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-        self.appApi.getConsultantCount()
-        if dome < self.appApi.appText.get('firstCallRatio'):
-            pass
-        else:
-            print('在规定时间首电，不算超时')
-            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-                                   loanSituation='这个是贷款情况')
-        self.assertEqual('成功', self.appApi.appText.get('msg'))
-
-    def test_first_phone_TimelinessRate_02(self):
-        """2、在08:00:00-08:01:00 拨打再超时之后上传录音    -首电及时"""
-        self.flowPath.add_new_clue()
-        self.appApi.getConsultantCount()
-        dome = self.appApi.appText.get('firstCallRatio')
-        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
-        time.sleep(60)
-        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
-                              call_time=dome1)
-        self.appApi.getConsultantCount()
-        if dome < self.appApi.appText.get('firstCallRatio'):
-            pass
-        else:
-            print('2、在08:00:00-08:01:00 拨打再超时之后上传录音    -首电及时')
-            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-
-    def test_first_phone_TimelinessRate_03(self):
-        """3、在08:01:00之后拨打                            -首电超时"""
-        self.flowPath.add_new_clue()
-        self.appApi.getConsultantCount()
-        dome = self.appApi.appText.get('firstCallRatio')
-        time.sleep(60)
-        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
-                              call_time=dome1)
-        self.appApi.getConsultantCount()
-        if dome == self.appApi.appText.get('firstCallRatio'):
-            pass
-        else:
-            print('3、在08:01:00之后拨打                            -首电超时')
-            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-
-    def test_first_phone_TimelinessRate_04(self):
-        """4、在08:00:59拨打                                -首电及时"""
-        self.flowPath.add_new_clue()
-        self.appApi.getConsultantCount()
-        dome = self.appApi.appText.get('firstCallRatio')
-        self.appApi.time_add(second=59)
-        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
-                              call_time=self.appText.get('time_add'))
-        self.appApi.getConsultantCount()
-        if dome < self.appApi.appText.get('firstCallRatio'):
-            pass
-        else:
-            print('4、在08:00:59拨打                                -首电及时')
-            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-
-    def test_first_phone_TimelinessRate_05(self):
-        """5、在08:01:00拨打                                -首电超时"""
-        self.flowPath.add_new_clue()
-        self.appApi.getConsultantCount()
-        time.sleep(2)
-        self.appApi.time_add(second=60)
-        dome = self.appApi.appText.get('firstCallRatio')
-        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
-                              call_time=self.appText.get('time_add'))
-        self.appApi.getConsultantCount()
-        if dome == self.appApi.appText.get('firstCallRatio'):
-            pass
-        else:
-            print('5、在08:01:00拨打                                -首电超时')
-            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-
-    def test_first_phone_TimelinessRate_06(self):
-        """5、在08:01:00拨打                                -首电超时"""
-        self.flowPath.add_new_clue()
-        self.appApi.getConsultantCount()
-        self.appApi.time_add(second=61)
-        dome = self.appApi.appText.get('firstCallRatio')
-        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
-                              call_time=self.appText.get('time_add'))
-        self.appApi.getConsultantCount()
-        if dome != self.appApi.appText.get('firstCallRatio'):
-            print('5、在08:01:00拨打                                -首电超时')
-            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-
     def test_client_visit_rate_01(self):
         """1、创建带看，                 -邀约率不变"""
         self.appApi.getConsultantCount()
@@ -303,58 +206,6 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
             print('3、审核失败                     -成交率不变')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
-    def test_follow_rate_01(self):
-        """
-            1、线索跟进
-                - 查看线索规定时间跟进 超过6小时      跟进及时率下降
-                - 查看线索规定时间跟进 未过6小时      跟进及时率增加
-                - 无线索-新增线索      -跟进          跟进及时率增加
-        """
-        self.appApi.my_clue_list()
-        if self.appText.get('total') != 0:
-            self.appApi.getConsultantCount()
-            dome = self.appText.get('followRatio')
-            self.appApi.GetUserAgenda(clueId=self.appText.get('clueId'))
-            self.appApi.time_difference()
-            if int(self.appText.get('vlue')) > 1:
-                """查看线索规定时间跟进 超过1小时      跟进及时率下降"""
-                self.appApi.ClueFollowList()
-                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-                time.sleep(1)
-                self.appApi.getConsultantCount()
-                if int(dome) == 1:
-                    pass
-                else:
-                    if self.appText.get('followRatio') >= dome:
-                        print('查看线索规定时间跟进 超过1小时      跟进及时率下降')
-                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-            else:
-                self.appApi.ClueFollowList()
-                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-                time.sleep(1)
-                self.appApi.getConsultantCount()
-                if dome == 1:
-                    pass
-                else:
-                    if self.appText.get('followRatio') <= dome:
-                        print('- 查看线索规定时间跟进 未过1小时      跟进及时率增加')
-                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-        else:
-            """- 无线索-新增线索      -跟进          跟进及时率增加"""
-            self.flowPath.add_new_clue()
-            self.appApi.getConsultantCount()
-            dome = self.appText.get('followRatio')
-            self.appApi.ClueFollowList()
-            self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-            time.sleep(1)
-            self.appApi.getConsultantCount()
-            if int(dome) == 1:
-                pass
-            else:
-                if self.appText.get('followRatio') <= dome:
-                    print('- 无线索-新增线索      -跟进          跟进及时率增加')
-                    raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-
     def test_follow_rete_02(self):
         """ 2、客户跟进
                 - 查看客户规定时间跟进 超过6小时      跟进及时率下降
@@ -372,7 +223,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
                 self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
                 time.sleep(1)
                 self.appApi.getConsultantCount()
-                if dome == 1:
+                if float(dome) == 1:
                     pass
                 else:
                     if self.appText.get('followRatio') >= dome:
@@ -383,7 +234,7 @@ class StatisticsCorrelationTestCase(unittest.TestCase):
                 self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
                 time.sleep(1)
                 self.appApi.getConsultantCount()
-                if dome == 1:
+                if float(dome) == 1:
                     pass
                 else:
                     if self.appText.get('followRatio') <= dome:

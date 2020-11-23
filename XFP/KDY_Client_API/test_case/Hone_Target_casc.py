@@ -161,109 +161,6 @@ class HomeTestCase(unittest.TestCase):
                                    auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
             self.webApi.audit_List()
 
-    def test_await_first_phone_01(self):
-        """1、平台分派              + 1"""
-        if ApiXfpUrl == 'http://xfp.xfj100.com':
-            pass
-        else:
-            self.appApi.TodayClue(isFirst=0)
-            dome = self.appText.get('Total')
-            self.appApi.Login(userName='admin', saasCode='admin')
-            self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
-            if self.webText.get('code') != 200:
-                self.webApi.addGoldDetailInfo()
-                self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
-            self.assertEqual(200, self.webText.get('code'))
-            self.appApi.Login()
-            self.appApi.TodayClue(isFirst=0)
-            self.assertNotEqual(dome, self.appText.get('Total'))
-            self.assertEqual(dome + 1, self.appText.get('Total'))
-
-    def test_await_first_phone_02(self):
-        """2、添加线索              + 1"""
-        self.appApi.TodayClue(isFirst=0)
-        dome = self.appText.get('Total')
-        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
-                             sourceId=self.appText.get('XSLY'),
-                             keyWords=self.appText.get('XSBQ'))
-        self.appApi.TodayClue(isFirst=0)
-        self.assertNotEqual(dome, self.appText.get('Total'))
-        self.assertEqual(dome + 1, self.appText.get('Total'))
-
-    def test_await_first_phone_03(self):
-        """3、领取线索              + 1"""
-        self.appApi.TodayClue(isFirst=0)
-        dome = self.appText.get('Total')
-        self.appApi.SeaList()  # 公海列表
-        self.appApi.clue_Assigned()  # 领取线索
-        self.appApi.TodayClue(isFirst=0)
-        self.assertNotEqual(dome, self.appText.get('Total'))
-        self.assertEqual(dome + 1, self.appText.get('Total'))
-
-    def test_await_first_phone_04(self):
-        """4、线索转移（未首电）    - 1"""
-        self.appApi.TodayClue(isFirst=0)
-        dome = self.appText.get('Total')
-        if dome < 1:
-            self.flowPath.add_new_clue()
-        self.appText.set_map('clueId', (json.loads(json.dumps(self.appText.get('records'))))[0]['clueId'])
-        self.appApi.ClueChange()  # 线索转移
-        self.appApi.TodayClue(isFirst=0)
-        self.assertNotEqual(dome, self.appText.get('Total'))
-        self.assertEqual(dome - 1, self.appText.get('Total'))
-
-    def test_await_first_phone_05(self):
-        """5、线索流放公海（未首电）   - 不支持该操作"""
-        self.appApi.TodayClue(isFirst=0)
-        dome = self.appText.get('Total')
-        if dome < 1:
-            self.flowPath.add_new_clue()
-        self.appText.set_map('clueId', (json.loads(json.dumps(self.appText.get('records'))))[0]['clueId'])
-        self.appApi.ExileSea()
-        self.assertNotEqual(200, self.appText.get('code'))
-        self.assertEqual('该线索未首电,不能终止跟进!', self.appText.get('data'))
-
-    def test_await_follow_01(self):
-        """1、新增线索（未首电）     + 1"""
-        self.follow_front()
-        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
-                             sourceId=self.appText.get('XSLY'),
-                             keyWords=self.appText.get('XSBQ'))
-        self.follow_later(0)
-        self.appApi.ClueInfo()
-        """2、新增线索（已首电）     + 1"""
-        try:
-            self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
-                                  is_own_call=0, talk_time=12000,
-                                  call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
-        except:
-            self.appApi.ClueFollowList()
-            self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_later(vlue=1)
-
-    def test_await_follow_02(self):
-        """3、线索转移               - 1"""
-        self.flowPath.clue_non_null()
-        self.appApi.my_clue_list()
-        self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_front()
-        self.appApi.ClueChange()  # 线索转移
-        self.appApi.GetUserAgenda()
-        self.follow_later(vlue=-1)
-
-    def test_await_follow_03(self):
-        """4、线索转客户             + 0"""
-        self.flowPath.clue_non_null()
-        self.appApi.my_clue_list()
-        self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_front()
-        self.appApi.ClueInfo()
-        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-                                   loanSituation='这个是贷款情况')
-        self.follow_later()
-
     def test_await_follow_04(self):
         """5、客户转移（未申请暂缓） - 1"""
         self.flowPath.client_list_non_null()
@@ -323,36 +220,6 @@ class HomeTestCase(unittest.TestCase):
         self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False,
                                endTime=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.follow_later()
-
-    def test_await_follow_09(self):
-        """11、线索流放公海（无需审核）   - 1"""
-        self.webApi.Audit_management()  # 修改配置审核
-        self.clue_front()
-        self.follow_front()
-        self.flowPath.clue_exile_sea()
-        self.follow_later(vlue=-1)
-
-    def test_await_follow_10(self):
-        """12、线索流放公海（审核中）     - 0"""
-        self.clue_front()
-        self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
-        self.follow_front()
-        self.flowPath.clue_exile_sea()
-        self.follow_later()
-        """13、线索流放公海（审核失败）   - 0"""
-        self.webApi.audit_List()  # 审核列表
-        self.webApi.auditApply(isAudit=False)
-        self.follow_later()
-
-    def test_await_follow_11(self):
-        """14、线索流放公海（审核成功）   - 1"""
-        self.clue_front()
-        self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
-        self.follow_front()
-        self.flowPath.clue_exile_sea()
-        self.webApi.audit_List()  # 审核列表
-        self.webApi.auditApply()
-        self.follow_later(vlue=-1)
 
     def test_await_follow_12(self):
         """15、客户流放公海（未申请暂缓 | 无需审核）     - 1"""
@@ -434,17 +301,6 @@ class HomeTestCase(unittest.TestCase):
         """24、客户录入成交       - 0"""
         self.flowPath.add_deal()
         self.follow_later()
-
-    def test_await_follow_18(self):
-        """25、线索跟进（下次跟进日期为明日）      - 1"""
-        self.flowPath.clue_non_null()
-        self.appApi.my_clue_list()
-        self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_front()
-        tomorrow = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-        self.appApi.ClueFollowSave(taskEndTime=tomorrow)
-        self.follow_later(vlue=-1)
 
     def test_await_follow_19(self):
         """26、客户跟进（下次跟进日期为明日）      - 1"""
@@ -538,12 +394,6 @@ class HomeTestCase(unittest.TestCase):
                                        appointmentTime=tomorrow,
                                        seeingConsultant=self.appApi.appText.get('consultantId'),
                                        appointConsultant=self.appApi.appText.get('consultantId'))
-
-    def test_hone_wealth(self):
-        """首页财富值对比"""
-        self.appApi.hone_wealth()
-        self.assertEqual(self.appText.get('monthWealth'), self.appText.get('lastMonthWealth') +
-                         self.appText.get('lastMonthWealthDifference'))
 
     def visit_later(self, vlue=0):
         """带看后"""
