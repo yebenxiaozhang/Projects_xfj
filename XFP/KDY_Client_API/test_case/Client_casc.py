@@ -116,12 +116,16 @@ class ClientTestCase(unittest.TestCase):
     def test_client_change(self):
         """客户转移"""
         self.flowPath.client_list_non_null()
+        self.appApi.ClientFollowList()
+        dome = self.appText.get('total')
         self.appApi.client_change()
         self.appApi.Login(userName=XfpUser1)
         self.appApi.GetUserData()
         self.appApi.ClientList()
         self.appApi.ClientFollowList()
         self.assertEqual('客户转移', self.appText.get('followContent')[:4])
+        if self.appText.get('total') != dome + 1:
+            raise RuntimeError('客户转移后跟进记录的条数与转移前不一致')
 
 
 

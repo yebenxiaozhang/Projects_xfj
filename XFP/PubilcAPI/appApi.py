@@ -436,10 +436,12 @@ class appApi:
                                'followType': followType,
                                'customerId': self.appText.get('customerId')
                                })
-        self.appText.set_map('followContent',
-                             globals()['r.text']['data']['records'][value]['followContent'])
-        self.appText.set_map('followId', globals()['r.text']['data']['records'][value]['followId'])
-        self.appText.set_map('taskId', globals()['r.text']['data']['records'][value]['taskId'])
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+            self.appText.set_map('followContent',
+                                 globals()['r.text']['data']['records'][value]['followContent'])
+            self.appText.set_map('followId', globals()['r.text']['data']['records'][value]['followId'])
+            self.appText.set_map('taskId', globals()['r.text']['data']['records'][value]['taskId'])
 
     def ClientFolloow(self):
         """客户跟进"""
