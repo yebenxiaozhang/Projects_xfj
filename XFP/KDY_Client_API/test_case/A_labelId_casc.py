@@ -94,6 +94,11 @@ class Config_labelTestCase(unittest.TestCase):
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
         cls.webApi.consultant_allocition(isAppoint=1)
 
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='成交奖励', saasCode='admin')
+        cls.appText.set_map('CJJL', cls.appText.get('remark'))
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='邀约带看', saasCode='admin')
+        cls.appText.set_map('YYDK', cls.appText.get('remark'))
+
     def test_config_01(self):
         """项目大于3个"""
         self.appApi.AllBuildingUpdate()

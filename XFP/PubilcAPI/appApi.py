@@ -1085,6 +1085,8 @@ class appApi:
             self.appText.set_map('wealthValue', globals()['r.text']['data']['records'][0]['wealthValue'])
             self.appText.set_map('typeStr', globals()['r.text']['data']['records'][0]['typeStr'])
             self.appText.set_map('wealthId', globals()['r.text']['data']['records'][0]['wealthId'])
+        else:
+            self.appText.set_map('vlue', 0)
 
     def get_current_month_start_and_end(self, date):
         """
@@ -1193,6 +1195,8 @@ class appApi:
         if len(globals()['r.text']['data']) != 0:
             self.appText.set_map('cluePhone',
                                  globals()['r.text']['data']['saasClue']['cluePhone'])
+            self.appText.set_map('orderNo',
+                                 globals()['r.text']['data']['saasClue']['orderNo'])
 
     def ping_admin_(self):
         """"""

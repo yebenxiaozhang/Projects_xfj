@@ -54,11 +54,11 @@ class flowPath:
                     print('领取线索失败？')
         self.appApi.ClueInfo()
 
-    def add_visit(self):
+    def add_visit(self, dome=time.strftime("%Y-%m-%d %H:%M:%S")):
         """创建带看"""
         self.client_list_non_null()
         # self.appApi.GetMatchingAreaHouse()
-        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        # dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.flowPathText.set_map('time', dome)
         self.appApi.ClientTask(taskType='3')
         if self.appApi.appText.get('total') == 2:
@@ -67,6 +67,7 @@ class flowPath:
                 self.clue_non_null()
                 self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                            loanSituation='这个是贷款情况')
+                self.client_list_non_null()
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                    appointmentTime=dome,
                                    seeingConsultant=self.appApi.appText.get('consultantId'),
@@ -185,6 +186,7 @@ class flowPath:
                 self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                            loanSituation='这个是贷款情况')
                 self.appApi.ClientList()  # 客户列表
+                self.appApi.client_info()
                 self.appApi.add_deal()  # 录入成交
             self.appApi.deal_List()
             assert dome != self.appApi.appText.get('total')

@@ -114,7 +114,7 @@ class webApi:
                             "notFollowMonthWealth": 600,
                             "visitSwitch": True,
                             "visitSwitchWealth": 50,
-                            "notVisitSwitchWealth": 50,
+                            "notVisitSwitchWealth": 20,
                             "dealSwitch": True,
                             "dealWealth": 5000,
                             "dealPercentageWealth": 10,
