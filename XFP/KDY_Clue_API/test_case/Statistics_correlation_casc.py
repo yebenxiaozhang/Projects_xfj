@@ -67,6 +67,7 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.appApi.ping_admin_()
         cls.flow = flowPath()
         cls.flowPath = cls.flow
         cls.appText = GlobalMap()

@@ -5,7 +5,7 @@
 
 """首电-相关"""
 from XFP.PubilcAPI.flowPath import *
-
+import requests
 """
 首电：
     1、首电不管接通已否             --都算首电
@@ -48,6 +48,7 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.appApi.ping_admin_()
         cls.flow = flowPath()
         cls.flowPath = cls.flow
         cls.appText = GlobalMap()

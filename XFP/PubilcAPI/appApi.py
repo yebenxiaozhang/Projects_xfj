@@ -676,7 +676,7 @@ class appApi:
                              'keyWord': keyWord,
                          })
 
-        if globals()['r.text']['data']['total'] != 0:
+        if len(globals()['r.text']['data']['records']) != 0:
             vlue = vlue + 1
             self.appText.set_map('clueId',
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['clueId'])
@@ -1194,8 +1194,10 @@ class appApi:
             self.appText.set_map('cluePhone',
                                  globals()['r.text']['data']['saasClue']['cluePhone'])
 
-
-
+    def ping_admin_(self):
+        """"""
+        r = requests.post(url=ApiXfpUrl1)
+        r.raise_for_status()
 
 
 if __name__ == '__main__':

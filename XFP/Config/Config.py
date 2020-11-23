@@ -1,20 +1,20 @@
 """客第壹-相关"""
-# ApiXfpUrl = 'http://xfpapi.ykb100.com'
-# ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
-# XfpUser = '13062200301'
-# XfpPwd = '12345678'
-# XfpsaasCode = '000009'
-# XfpUser1 = '13062200304'
-# XfpPwd1 = '12345678'
-
-
-ApiXfpUrl = 'http://xfp.xfj100.com'
-ApiXfpUrl1 = 'https://xfpapi.xfj100.com'
+ApiXfpUrl = 'http://xfpapi.ykb100.com'
+ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
-XfpsaasCode = 'test'
+XfpsaasCode = '000012'
 XfpUser1 = '13062200304'
 XfpPwd1 = '12345678'
+
+
+# ApiXfpUrl = 'http://xfp.xfj100.com'
+# ApiXfpUrl1 = 'https://xfpapi.xfj100.com'
+# XfpUser = '13062200301'
+# XfpPwd = '12345678'
+# XfpsaasCode = 'test'
+# XfpUser1 = '13062200304'
+# XfpPwd1 = '12345678'
 
 
 # ApiXfpUrl = 'http://192.168.10.96:8381'
