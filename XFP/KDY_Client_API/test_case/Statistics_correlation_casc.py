@@ -249,7 +249,7 @@ class TestCase(unittest.TestCase):
             self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
             time.sleep(1)
             self.appApi.getConsultantCount()
-            if dome == 1:
+            if float(dome) == 1:
                 pass
             else:
                 if self.appText.get('followRatio') < dome:
