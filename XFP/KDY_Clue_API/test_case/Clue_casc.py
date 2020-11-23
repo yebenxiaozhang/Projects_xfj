@@ -151,7 +151,7 @@ class TestCase(unittest.TestCase):
         self.appApi.ClueFollowList()
         if '线索转移' != self.appText.get('followContent')[:4]:
             print(self.appText.get('followContent'))
-            print(self.appText.get('cluePhone'))
+            print(dome2)
             raise RuntimeError('线索转移没有跟进日志，或者跟进日志错误')
 
     def test_clue_ChangeClient(self):
