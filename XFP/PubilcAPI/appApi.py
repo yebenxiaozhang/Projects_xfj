@@ -1026,14 +1026,17 @@ class appApi:
             self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][vlue]['auditRemark'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][vlue]['clueId'])
 
-    def Task_Visit_List(self, appointmentTime=None, endTime=time.strftime("%Y-%m-%d"), visiteStatus=None):
+    def Task_Visit_List(self, appointmentTime=None,
+                        startTime=time.strftime("%Y-%m-%d") + ' 00:00:00',
+                        endTime=time.strftime("%Y-%m-%d") + ' 23:59:59',
+                        visiteStatus=None):
         """我的带看"""
-        self.PostRequest(url='/api/a/consultant/getTaskVisitList',
+        self.PostRequest(url='/api/a/visit/list',
                          data={
-                             'consultantId': self.appText.get('consultantId'),
-                             'startTime': time.strftime("%Y-%m-%d"),
+                             'consultantIds': [self.appText.get('consultantId')],
+                             'startTime': startTime,
                              'endTime': endTime,
-                             'visiteStatus': visiteStatus,
+                             'appVisitStatus': visiteStatus,
                          })
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
@@ -1136,6 +1139,9 @@ class appApi:
         self.appText.set_map('followRatio', globals()['r.text']['data']['followRatio'])         # 跟进
         self.appText.set_map('visitRatio', globals()['r.text']['data']['visitRatio'])           # 上户
         self.appText.set_map('dealRatio', globals()['r.text']['data']['dealRatio'])             # 带看
+        self.appText.set_map('newClueCount', globals()['r.text']['data']['newClueCount'])       # 上户总数
+        self.appText.set_map('visitCount', globals()['r.text']['data']['visitCount'])           # 带看总数
+        self.appText.set_map('dealCount', globals()['r.text']['data']['dealCount'])             # 成交总数
 
     def time_add(self, second):
         if int(self.appText.get('createdTime')[-2:]) + second > 60:
@@ -1201,7 +1207,7 @@ class appApi:
                                  globals()['r.text']['data']['saasClue']['orderNo'])
 
     def ping_admin_(self):
-        """"""
+        """测试网站是否正常"""
         r = requests.post(url=ApiXfpUrl1)
         r.raise_for_status()
 

@@ -2,7 +2,7 @@
 # @Time    : 2020/9/5 10:22
 # @Author  : 潘师傅
 # @File    : xfp_web_api.py
-
+# -*- coding: utf-8 -*-
 
 from XFP.PubilcAPI.appApi import *
 import random
@@ -505,6 +505,63 @@ class webApi:
                                 },
                                 "saasCode": XfpsaasCode
                             })
+
+    def get_group(self):
+        """获取团队ID"""
+        self.PostRequest(url='/api/b/systeminfo/part/departments',
+                         data={
+                         })
+        if len(globals()['r.text']['data']) != 0:
+            self.webText.set_map('departmentId', globals()['r.text']['data'][0]['departmentId'])
+
+    def deal_list(self):
+        """成交列表"""
+        self.PostRequest(url='/api/b/transationInfo/list',
+                         data={
+                             'transStatus': 1,
+                             'consultantId': self.appText.get('consultantId'),
+                             'endTime': self.appText.get('end_date'),
+                             'startTime': self.appText.get('start_date')
+                         })
+        self.webText.set_map('web_total', globals()['r.text']['data']['total'])
+
+    def visit_list(self):
+        """带看列表"""
+        self.PostRequest(url='/api/b/visit/list',
+                         data={
+                             'consultantIds': [self.appText.get('consultantId')],
+                             'endTime': self.appText.get('end_date') + ' 23:59:59',
+                             'startTime': self.appText.get('start_date') + ' 00:00:00',
+                             'visitStatus': 3
+                         })
+        self.appText.set_map('web_total', globals()['r.text']['data']['total'])
+
+    def visit_deal_statistics(self):
+        """带看成交统计"""
+        self.get_group()
+        self.PostRequest(url='/api/b/report/getVisitAndTransactionReport',
+                         data={
+                             'departmentId': self.webText.get('departmentId'),
+                             'startTime': self.appText.get('start_date'),
+                             'endTime': self.appText.get('end_date'),
+                         })
+        if len(globals()['r.text']['data']) != 0:
+            vlue = 0
+            while globals()['r.text']['data'][vlue]['consultantName'] != '咨询师01':
+                vlue = vlue + 1
+                if len(globals()['r.text']['data']) == vlue:
+                    break
+            dome = json.loads(json.dumps(globals()['r.text']['data'][vlue]))
+            self.webText.set_map('web_newClueCount', dome['newClueCount'])     # 上户批数
+            self.webText.set_map('web_resultsWealth', dome['resultsWealth'])   # 发放财富值
+            self.webText.set_map('web_transactionCount', dome['transactionCount'])
+            #   新增认购套数  带看成交率   业绩  带看次数    邀约带看率
+            self.webText.set_map('web_transactionRatio', dome['transactionRatio'])
+            self.webText.set_map('web_transactionResults', dome['transactionResults'])
+            self.webText.set_map('web_visitCount', dome['visitCount'])
+            # self.webText.set_map('web_visitOnTimeCount', dome['visitOnTimeCount'])
+            self.webText.set_map('web_visitRatio', dome['visitRatio'])
+
 
 
 if __name__ == '__main__':

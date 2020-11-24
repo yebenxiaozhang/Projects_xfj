@@ -1,15 +1,12 @@
-"""标签-相关"""
+"""后台-带看成交统计"""
 from XFP.PubilcAPI.flowPath import *
 
-"""
-"""
 
-
-class Config_labelTestCase(unittest.TestCase):
-    """幸福派——带看相关"""
+class TestCase(unittest.TestCase):
+    """客第壹后台——带看成交统计"""
 
     def __init__(self, *args, **kwargs):
-        super(Config_labelTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 
@@ -25,7 +22,7 @@ class Config_labelTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """登录幸福派 只执行一次
-        登录幸福派 获取ID"""
+        登录经纪人 获取ID"""
         cls.do_request = appApi()
         cls.appApi = cls.do_request
         cls.appApi.Login()
@@ -98,37 +95,34 @@ class Config_labelTestCase(unittest.TestCase):
         cls.appText.set_map('CJJL', cls.appText.get('remark'))
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='邀约带看', saasCode='admin')
         cls.appText.set_map('YYDK', cls.appText.get('remark'))
-        cls.appApi.
 
-    def test_config_01(self):
-        """项目大于3个"""
-        self.appApi.AllBuildingUpdate()
-        while self.appText.get('total') < 3:
-            dome = time.strftime("%Y-%m-%d %H:%M:%S")
-            self.webApi.add_house(houseName=dome)
-            self.appApi.AllBuildingUpdate()
+        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
-    def test_config_02(self):
-        """资料信息"""
-        self.appApi.Information()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
-            self.appApi.Information()
-
-    def test_config_03(self):
-        """商务信息"""
-        self.appApi.BusinessInformation()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_business_information()
-            self.appApi.BusinessInformation()
-
-    def test_config_04(self):
-        """楼盘问答"""
-        self.appApi.HouseQA()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_questions()
-            self.appApi.HouseQA()
-
+    def test_visit_deal_statistics(self):
+        """带看成交统计"""
+        self.webApi.visit_deal_statistics()
+        """上户数量对比"""
+        self.appApi.getConsultantCount()
+        if self.webText.get('web_newClueCount') != self.appText.get('newClueCount'):
+            raise RuntimeError('带看成交统计上户数量与APP本月概况上户数量不一致')
+        """带看数量对比"""
+        self.webApi.visit_list()
+        if self.webText.get('web_visitOnTimeCount') != self.appText.get('web_total'):
+            raise RuntimeError('带看成交统计的带看次数与后台带看次数不一致')
+        if self.webText.get('web_visitOnTimeCount') != self.appText.get('visitCount'):
+            raise RuntimeError('带看成交统计的带看次数与APP本月概况带看次数不一致')
+        """成交套数对比"""
+        self.webApi.deal_list()             # 后台查看已完成成交次数
+        if self.webText.get('web_transactionCount') != self.webText.get('web_total'):
+            raise RuntimeError('带看成交统计的成交与后台成交总套数不一致')
+        if self.webText.get('web_transactionCount') != self.webText.get('dealCount'):
+            raise RuntimeError('带看成交统计的成交与APP本月概况成交套数不一致')
+        """上户邀约率"""
+        if self.webText.get('web_visitRatio') != self.webText.get('visitRatio'):
+            raise RuntimeError('带看成交统计的成交与APP本月概况上户邀约率不一致')
+        """带看成交率"""
+        if self.webText.get('web_transactionRatio') != self.webText.get('dealRatio'):
+            raise RuntimeError('带看成交统计的成交与APP本月概况带看成交率不一致')
 
 
 
