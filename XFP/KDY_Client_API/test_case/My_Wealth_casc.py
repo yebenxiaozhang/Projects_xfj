@@ -178,8 +178,10 @@ class TestCase(unittest.TestCase):
                                         endTime=time.strftime("%Y-%m-%d"),
                                         wealthType=self.appText.get('CJJL'),
                                         orderNo=self.appText.get('orderNo'))
-        if self.appText.get('vlue') != dome + 5000:
-            raise RuntimeError('录入成交与设定成交值不符预设值：5000' + '计算值：' + self.appText.get('vlue'))
+        if self.appText.get('vlue') != int(dome) + 5000:
+            print('录入成交前财富值' + dome)
+            print('录入成交后财富值' + self.appText.get('vlue'))
+            raise RuntimeError('录入成交与设定成交值不符预设值')
         """2、修改成交              审核成功财富值无变化   """
         dome = self.appText.get('vlue')
         self.appApi.deal_List()
