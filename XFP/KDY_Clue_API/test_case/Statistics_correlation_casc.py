@@ -156,6 +156,7 @@ class TestCase(unittest.TestCase):
         else:
             print('在规定时间首电，不算超时')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
         self.assertEqual('成功', self.appApi.appText.get('msg'))

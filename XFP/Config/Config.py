@@ -3,7 +3,7 @@ ApiXfpUrl = 'http://xfpapi.ykb100.com'
 ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
-XfpsaasCode = '000009'
+XfpsaasCode = '000012'
 XfpUser1 = '13062200304'
 XfpPwd1 = '12345678'
 
@@ -37,4 +37,4 @@ surname = ['赵', '钱', '孙', '李', '周', '吴', '郑', '王', '冯', '陈',
            '元', '卜', '顾', '孟', '平', '黄', '和', '穆', '萧', '尹', '姚', '邵', '湛', '汪', '祁',
            '毛', '禹', '狄', '米', '贝', '明', '臧', '计', '伏', '成', '戴', '谈', '宋', '茅', '庞']
 
-PassWord = "tujkfawbxbifbhbg"
+PassWord = "nighqgkwmdkrbgic"

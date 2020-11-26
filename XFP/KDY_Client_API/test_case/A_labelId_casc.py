@@ -102,6 +102,14 @@ class Config_labelTestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        while cls.appText.get('total') >= 5:
+            cls.flowPath.clue_exile_sea()
+            cls.appApi.my_clue_list()
+
+        cls.appApi.ClientList()
+        while cls.appText.get('total') >= 5:
+            cls.appApi.client_exile_sea()
+            cls.appApi.ClientList()
 
     def test_config_01(self):
         """项目大于3个"""

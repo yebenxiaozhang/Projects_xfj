@@ -43,7 +43,7 @@ class appApi:
                               })
         else:
             data1 = {"page": {
-                'size': '50',
+                'size': '999',
                 'current': '1'
             },
                 "saasCode": saasCode,
