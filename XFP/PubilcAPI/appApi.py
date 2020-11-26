@@ -1056,14 +1056,14 @@ class appApi:
                 except:
                     self.appText.set_map('auditRemark',
                                          None)
-                self.appText.set_map('visitAuditStatusName',
-                                     globals()['r.text']['data']['records'][a]['visitAuditStatusName'])
                 self.appText.set_map('visitAuditStatus',
                                      globals()['r.text']['data']['records'][a]['visitAuditStatus'])
-                self.appText.set_map('visiteStatus',
+                self.appText.set_map('visitAuditStatusName',
+                                     globals()['r.text']['data']['records'][a]['visitAuditStatusName'])
+                self.appText.set_map('visitStatus',
                                      globals()['r.text']['data']['records'][a]['visitStatus'])
-            # self.appText.set_map('visitAuditStatus', globals()['r.text']['data']['records'][a]['visitAuditStatus'])
-            # self.appText.set_map('visitAuditStatusName', globals()['r.text']['data']['records'][a]['visitAuditStatusName'])
+                self.appText.set_map('visitStatusName',
+                                     globals()['r.text']['data']['records'][a]['visitStatusName'])
 
     def my_Wealth(self):
         """我的财富值"""

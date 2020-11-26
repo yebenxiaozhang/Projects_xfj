@@ -108,16 +108,16 @@ class flowPath:
         """带看状态"""
         self.appApi.Task_Visit_List(appointmentTime=self.flowPathText.get('time'))
         if status == '进行中':
-            assert self.appApi.appText.get('visitAuditStatus') == '0', '状态异常'
-            assert self.appApi.appText.get('visitAuditStatusName') == '进行中', '状态异常'
+            assert self.appApi.appText.get('visitStatus') == '2', '状态异常'
+            assert self.appApi.appText.get('visitStatusName') == '带看中', '状态异常'
         elif status == '已取消':
-            assert self.appApi.appText.get('visiteStatus') == '2', '状态异常'
+            assert self.appApi.appText.get('visitStatus') == '4', '状态异常'
         elif status == '已完成':
-            assert self.appApi.appText.get('visiteStatus') == '1', '状态异常'
+            assert self.appApi.appText.get('visitStatus') == '3', '状态异常'
         elif status == '已驳回':
             assert self.appApi.appText.get('visitAuditStatus') == '3', '状态异常'
             assert self.appApi.appText.get('visitAuditStatusName') == '已驳回', '状态异常'
-            assert self.appApi.appText.get('visiteStatus') == '2', '状态异常'
+            assert self.appApi.appText.get('visitStatus') == '4', '状态异常'
         elif status == '审核中':
             assert self.appApi.appText.get('visitAuditStatus') == '0', '状态异常'
             assert self.appApi.appText.get('visitAuditStatusName') == '进行中', '状态异常'
@@ -133,7 +133,7 @@ class flowPath:
         elif status == '总监审核中':
             assert self.appApi.appText.get('visitAuditStatus') == '1', '状态异常'
             assert self.appApi.appText.get('visitAuditStatusName') == '总监审核中', '状态异常'
-            assert self.appApi.appText.get('visiteStatus') == '0', '状态异常'
+            assert self.appApi.appText.get('visitStatus') == '2', '状态异常'
 
     def suspend_follow(self):
         """暂缓跟进"""

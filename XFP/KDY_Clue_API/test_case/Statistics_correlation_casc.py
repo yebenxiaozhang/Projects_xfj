@@ -249,8 +249,8 @@ class TestCase(unittest.TestCase):
             dome = self.appText.get('followRatio')
             self.appApi.GetUserAgenda(clueId=self.appText.get('clueId'))
             self.appApi.time_difference()
-            if int(self.appText.get('vlue')) > 6:
-                """查看线索规定时间跟进 超过6小时      跟进及时率下降"""
+            if int(self.appText.get('vlue')) > 1:
+                """查看线索规定时间跟进 超过1小时      跟进及时率下降"""
                 self.appApi.ClueFollowList()
                 self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
                 time.sleep(1)
@@ -258,7 +258,7 @@ class TestCase(unittest.TestCase):
                 if float(dome) == 1:
                     pass
                 else:
-                    if self.appText.get('followRatio') >= dome:
+                    if self.appText.get('followRatio') != dome:
                         print('查看线索规定时间跟进 超过6小时      跟进及时率下降')
                         raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
             else:
