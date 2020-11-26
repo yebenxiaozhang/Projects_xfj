@@ -1219,9 +1219,9 @@ class appApi:
             self.appText.set_map('orderNo',
                                  globals()['r.text']['data']['saasClue']['orderNo'])
 
-    def ping_admin_(self):
+    def ping_admin(self):
         """测试网站是否正常"""
-        r = requests.post(url=ApiXfpUrl1)
+        r = requests.get(url=ApiXfpUrl1)
         r.raise_for_status()
 
     def addWealthApply(self):
