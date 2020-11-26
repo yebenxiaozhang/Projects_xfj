@@ -1,15 +1,12 @@
-"""标签-相关"""
+"""后台-财富值统计"""
 from XFP.PubilcAPI.flowPath import *
 
-"""
-"""
 
-
-class Config_labelTestCase(unittest.TestCase):
-    """幸福派——带看相关"""
+class TestCase(unittest.TestCase):
+    """客第壹后台——财富值统计"""
 
     def __init__(self, *args, **kwargs):
-        super(Config_labelTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 
@@ -24,8 +21,6 @@ class Config_labelTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """登录幸福派 只执行一次
-        登录幸福派 获取ID"""
         cls.do_request = appApi()
         cls.appApi = cls.do_request
         cls.appApi.Login()
@@ -99,38 +94,92 @@ class Config_labelTestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='邀约带看', saasCode='admin')
         cls.appText.set_map('YYDK', cls.appText.get('remark'))
         cls.webApi.get_group()
+        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
-        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
-    def test_config_01(self):
-        """项目大于3个"""
-        self.appApi.AllBuildingUpdate()
-        while self.appText.get('total') < 3:
-            dome = time.strftime("%Y-%m-%d %H:%M:%S")
-            self.webApi.add_house(houseName=dome)
-            self.appApi.AllBuildingUpdate()
+    def test_Statistics_web_wealth(self):
+        """财富值统计"""
+        self.webApi.statistics_wealth()
+        self.appApi.my_Wealth()
+        """后台与app数值上的对比"""
+        if self.webText.get('web_clueCount') != self.appText.get('monthGetClueCount'):
+            raise RuntimeError('兑换线索（总数）不一致（后台财富值与APP我的财富值）')
+        dome2 = self.webText.get('web_clueCount')
+        
+        if self.webText.get('web_wealthClueSum') != self.appText.get('monthGetClueConsumeWealth'):
+            raise RuntimeError('兑换线索（消耗财富值）不一致（后台财富值与APP我的财富值）')
+        dome = self.webText.get('web_wealthClueSum')
 
-    def test_config_02(self):
-        """资料信息"""
-        self.appApi.Information()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
-            self.appApi.Information()
+        if self.webText.get('web_wealthConsume') != self.appText.get('monthConsumeWealth'):
+            raise RuntimeError('消耗财富值不一致（后台财富值与APP我的财富值）')
+        dome1 = self.webText.get('web_wealthConsume')
+        
+        if self.webText.get('web_wealthObtainSum') != self.appText.get('monthGetWealth'):
+            raise RuntimeError('本月获得财富值不一致（后台财富值与APP我的财富值）')
+        
+        if self.webText.get('web_wealthSum') != self.appText.get('lastMonthWealthDifference'):
+            raise RuntimeError('合计增减财富值（后台财富值与APP我的财富值）')
+        
+        # if self.webText.get('web_wealthSysDeduct') != self.appText.get('monthNotClueWealth'):
+        #     raise RuntimeError('系统扣除不一致（后台财富值与APP我的财富值）')
+        dome4 = self.webText.get('web_wealthSysDeduct')
 
-    def test_config_03(self):
-        """商务信息"""
-        self.appApi.BusinessInformation()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_business_information()
-            self.appApi.BusinessInformation()
+        """判断合计增减是否计算错误"""
+        if int(self.webText.get('web_wealthObtainSum')) + int(self.webText.get('web_wealthConsume')) \
+                != int(self.appText.get('web_wealthSum')):
+            raise RuntimeError('合计增减是否计算错误')
+        """业绩奖励  系统奖励  需要通过计算可得"""
 
-    def test_config_04(self):
-        """楼盘问答"""
-        self.appApi.HouseQA()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_questions()
-            self.appApi.HouseQA()
+        """申诉返还"""
+        dome3 = self.webText.get('web_clueApplyCount')
+        if ApiXfpUrl == 'http://xfp.xfj100.com':
+            pass
+        else:
+            self.appApi.Login(userName='admin', saasCode='admin')
+            self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
+            self.appApi.Login()
+            self.appApi.my_clue_list(keyWord=self.webText.get('cluePhone'))
+            self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                            endTime=time.strftime("%Y-%m-%d"),
+                                            wealthType=self.appText.get('PTSH'),
+                                            orderNo=self.appText.get('orderNo'))
+            self.webApi.statistics_wealth()
+            if self.webText.get('web_wealthClueSum') != dome - 300:
+                raise RuntimeError('我的财富值！ 平台上户后 线索扣除的财富值没有扣除')
+
+            if self.webText.get('web_wealthConsume') != dome1 - 300:
+                raise RuntimeError('我的财富值！ 平台上户后 消耗的财富值没有扣除')
+
+            if self.webText.get('web_clueCount') != dome2 + 1:
+                raise RuntimeError('我的财富值！ 平台上户后 兑换线索没有+1')
+
+            """申诉操作"""
+            self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                            endTime=time.strftime("%Y-%m-%d"),
+                                            wealthType=self.appText.get('PTSH'),
+                                            orderNo=self.appText.get('orderNo'))
+
+            self.appApi.addWealthApply()
+            self.webApi.getWealthApplyList(keyWord=self.appText.get('orderNo'))
+            self.webApi.wealthApply()
+
+            """申诉完成后财富值进行对比"""
+            self.webApi.statistics_wealth()
+            if self.webText.get('web_wealthSysDeduct') != dome4 + 300:
+                raise RuntimeError('我的财富值！ 申诉后系统扣除没有加上返还')
+
+            if self.webText.get('web_wealthConsume') != dome1:
+                raise RuntimeError('我的财富值！ 平台上户后再上户消耗不变')
+
+            if self.webText.get('web_clueApplyCount') != dome3 + 1:
+                raise RuntimeError('我的财富值！ 平台上户后 申诉返还条数不一致')
+
+
+
+        
+
+
 
 
 

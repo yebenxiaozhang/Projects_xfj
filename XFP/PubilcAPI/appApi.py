@@ -241,6 +241,10 @@ class appApi:
                                  globals()['r.text']['data']['records'][value]['followContent'])
             self.appText.set_map('followId', globals()['r.text']['data']['records'][value]['followId'])
             self.appText.set_map('taskId', globals()['r.text']['data']['records'][value]['taskId'])
+        else:
+            print('线索跟进列表为空？')
+            self.appText.set_map('followId', None)
+            self.appText.set_map('taskId', None)
 
     def ClueList(self, keyWord=''):
         """查询线索列表"""
@@ -1055,7 +1059,6 @@ class appApi:
 
     def my_Wealth(self):
         """我的财富值"""
-        self.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
         self.PostRequest(url='/api/a/wealth/getWealthDetailCount',
                          data={
                              'consultantId': self.appText.get('consultantId'),
@@ -1064,8 +1067,17 @@ class appApi:
                              'consultantIds': [self.appText.get('consultantId')]
                          })
         self.appText.set_map('monthWealth', globals()['r.text']['data']['monthWealth'])     # 当前财富值
-        self.appText.set_map('monthConsumeWealth', globals()['r.text']['data']['monthConsumeWealth'])  # 本月扣除
+        self.appText.set_map('monthConsumeWealth',
+                             globals()['r.text']['data']['monthConsumeWealth'])  # 本月扣除
         self.appText.set_map('monthGetWealth', globals()['r.text']['data']['monthGetWealth'])   # 本月获得
+        self.appText.set_map('lastMonthWealthDifference',
+                             globals()['r.text']['data']['lastMonthWealthDifference'])   # 本月增减
+        self.appText.set_map('monthGetClueConsumeWealth',
+                             globals()['r.text']['data']['monthGetClueConsumeWealth'])   # 线索消耗
+        self.appText.set_map('monthGetClueCount',
+                             globals()['r.text']['data']['monthGetClueCount'])   # 兑换线索总数
+        self.appText.set_map('monthNotClueWealth',
+                             globals()['r.text']['data']['monthNotClueWealth'])     # 系统扣除
 
     def getWealthDetailList(self, startTime, endTime, orderNo=None, wealthType=None):
         """财富值明细"""
@@ -1142,6 +1154,7 @@ class appApi:
         self.appText.set_map('newClueCount', globals()['r.text']['data']['newClueCount'])       # 上户总数
         self.appText.set_map('visitCount', globals()['r.text']['data']['visitCount'])           # 带看总数
         self.appText.set_map('dealCount', globals()['r.text']['data']['dealCount'])             # 成交总数
+        self.appText.set_map('seaClueCount', globals()['r.text']['data']['seaClueCount'])       # 成交总数
 
     def time_add(self, second):
         if int(self.appText.get('createdTime')[-2:]) + second > 60:
@@ -1211,6 +1224,34 @@ class appApi:
         r = requests.post(url=ApiXfpUrl1)
         r.raise_for_status()
 
+    def addWealthApply(self):
+        """财富值申诉"""
+        self.PostRequest(url='/api/b/wealthApply/addWealthApply',
+                         data={
+                                "applyContent": "python财富值申诉",
+                                "wealthId": self.appText.get('wealthId'),
+                                # "saasCode": "000009",
+                                # "wealthRelType": "1",
+                                # "wealthRelId": "105",
+                                "clueId": self.appText.get('clueId'),
+                                # "wealthType": "008",
+                                # "wealthTypeRelId": 435,
+                                # "wealthValue": 5000,
+                                # "wealthStatus": 1,
+                                # "applyStatus": "0",
+                                # "wealthRemark": "成交奖励财富值",
+                                # "createdBy": 146,
+                                # "createdTime": "2020-11-24 09:43:37",
+                                # "updatedBy": 146,
+                                # "updatedTime": "2020-11-24 09:43:37",
+                                "orderNo": self.appText.get('orderNo'),
+                                # "clueName": "许",
+                                # "cluePhone": "116****6835",
+                                # "customerId": 1436,
+                                # "isBefore30Day": true,
+                                # "typeStr": "成交奖励",
+                                # "createdTimeStr": "昨天 09:43"
+                            })
 
 if __name__ == '__main__':
     a = appApi()

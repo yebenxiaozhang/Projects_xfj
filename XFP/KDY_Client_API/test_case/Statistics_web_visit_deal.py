@@ -97,6 +97,10 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('YYDK', cls.appText.get('remark'))
 
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        cls.webApi.get_group()
+        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
+        cls.appText.set_map('PTSH', cls.appText.get('remark'))
 
     def test_visit_deal_statistics(self):
         """带看成交统计"""
@@ -106,23 +110,43 @@ class TestCase(unittest.TestCase):
         if self.webText.get('web_newClueCount') != self.appText.get('newClueCount'):
             raise RuntimeError('带看成交统计上户数量与APP本月概况上户数量不一致')
         """带看数量对比"""
-        self.webApi.visit_list()
-        if self.webText.get('web_visitOnTimeCount') != self.appText.get('web_total'):
-            raise RuntimeError('带看成交统计的带看次数与后台带看次数不一致')
-        if self.webText.get('web_visitOnTimeCount') != self.appText.get('visitCount'):
+        # self.webApi.visit_list()
+        # if self.webText.get('web_visitOnTimeCount') != self.appText.get('web_total'):
+        #     raise RuntimeError('带看成交统计的带看次数与后台带看次数不一致')
+        if self.webText.get('web_visitCount') != self.appText.get('visitCount'):
             raise RuntimeError('带看成交统计的带看次数与APP本月概况带看次数不一致')
-        """成交套数对比"""
-        self.webApi.deal_list()             # 后台查看已完成成交次数
-        if self.webText.get('web_transactionCount') != self.webText.get('web_total'):
-            raise RuntimeError('带看成交统计的成交与后台成交总套数不一致')
-        if self.webText.get('web_transactionCount') != self.webText.get('dealCount'):
-            raise RuntimeError('带看成交统计的成交与APP本月概况成交套数不一致')
         """上户邀约率"""
         if self.webText.get('web_visitRatio') != self.webText.get('visitRatio'):
             raise RuntimeError('带看成交统计的成交与APP本月概况上户邀约率不一致')
         """带看成交率"""
         if self.webText.get('web_transactionRatio') != self.webText.get('dealRatio'):
             raise RuntimeError('带看成交统计的成交与APP本月概况带看成交率不一致')
+
+        """成交套数对比"""
+        self.webApi.deal_list()             # 后台查看已完成成交次数
+        if self.webText.get('web_transactionCount') != self.webText.get('web_total'):
+            raise RuntimeError('带看成交统计的成交与后台成交总套数不一致')
+        if self.webText.get('web_transactionCount') != self.webText.get('dealCount'):
+            raise RuntimeError('带看成交统计的成交与APP本月概况成交套数不一致')
+
+        # """网签套数对比"""
+        # self.flowPath.get_label(labelNo='CJX', labelName='成交项目',
+        #                         newlabelName='网签')
+        # self.webApi.deal_list(transType=self.appText.get('labelId'))             # 后台查看已完成成交次数
+        # if self.webText.get('web_total') != self.webText.get('web_subscribeConvertSigning'):
+        #     raise RuntimeError('带看成交统计中网签套数与后台成交套数不一致')
+
+        """业绩对比"""
+        dome = self.webText.get('web_transactionResults')
+        self.webApi.deal_list()             # 后台查看已完成成交次数
+        dome1 = self.appText.get('transYeji')
+        self.appApi.add_deal(Status=1, transYeji=float(dome1) + float(500))
+        self.webApi.visit_deal_statistics()
+        if self.webText.get('web_transactionResults') != float(dome) + float(500):
+            raise RuntimeError('带看成交统计中业绩与成交业绩不一致')
+
+
+
 
 
 

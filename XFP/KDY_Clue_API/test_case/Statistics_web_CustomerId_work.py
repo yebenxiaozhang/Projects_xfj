@@ -1,15 +1,12 @@
-"""标签-相关"""
+"""后台-咨询师工作统计"""
 from XFP.PubilcAPI.flowPath import *
 
-"""
-"""
 
-
-class Config_labelTestCase(unittest.TestCase):
-    """幸福派——带看相关"""
+class TestCase(unittest.TestCase):
+    """客第壹后台——咨询师工作统计"""
 
     def __init__(self, *args, **kwargs):
-        super(Config_labelTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 
@@ -25,7 +22,7 @@ class Config_labelTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """登录幸福派 只执行一次
-        登录幸福派 获取ID"""
+        登录经纪人 获取ID"""
         cls.do_request = appApi()
         cls.appApi = cls.do_request
         cls.appApi.Login()
@@ -99,38 +96,40 @@ class Config_labelTestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='邀约带看', saasCode='admin')
         cls.appText.set_map('YYDK', cls.appText.get('remark'))
         cls.webApi.get_group()
-        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
-        cls.appText.set_map('PTSH', cls.appText.get('remark'))
+        # cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        # cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
+        # cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
-    def test_config_01(self):
-        """项目大于3个"""
-        self.appApi.AllBuildingUpdate()
-        while self.appText.get('total') < 3:
-            dome = time.strftime("%Y-%m-%d %H:%M:%S")
-            self.webApi.add_house(houseName=dome)
-            self.appApi.AllBuildingUpdate()
+    def test_CustomerId_work_statistics(self):
+        """咨询师工作统计"""
+        self.webApi.work_statistics()
+        """上户数量   ！   首电及时率         ！ 跟进及时率"""
+        self.appApi.getConsultantCount()
+        if self.webText.get('web_newClueCount') != self.appText.get('newClueCount'):
+            raise RuntimeError('咨询师工作统计上户数量与APP本月概况上户数量不一致')
+        if self.webText.get('web_firstCallRatio') != self.appText.get('firstCallRatio'):
+            raise RuntimeError('咨询师工作统计首电及时率与APP本月概况首电及时率不一致')
+        if self.webText.get('web_followRatio') != self.appText.get('followRatio'):
+            raise RuntimeError('咨询师工作统计跟进及时率与APP本月概况首电及时率不一致')
 
-    def test_config_02(self):
-        """资料信息"""
-        self.appApi.Information()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
-            self.appApi.Information()
+        """通话记录"""
+        self.webApi.phoneLogList()
+        if self.appText.get('web_total') != self.webText.get('web_newClueCount'):
+            print('咨询师工作统计与通话记录中的通话次数不一致')
 
-    def test_config_03(self):
-        """商务信息"""
-        self.appApi.BusinessInformation()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_business_information()
-            self.appApi.BusinessInformation()
+        """公海领取"""
+        dome = self.webText.get('web_seaClaimClueCount')
+        self.appApi.SeaList()  # 公海列表
+        if self.appApi.appText.get('total') != 0:
+            self.appApi.clue_Assigned()  # 领取线索
+            if dome + 1 == self.webText.get('web_seaClaimClueCount'):
+                print('咨询师工作统计中领取线索后 没有加1（公海领取）')
 
-    def test_config_04(self):
-        """楼盘问答"""
-        self.appApi.HouseQA()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_questions()
-            self.appApi.HouseQA()
+        """释放公海批次"""
+        if self.webText.get('web_seaClueCount') != self.appText.get('seaClueCount'):
+            print('咨询师工作统计中释放公海批次与APP本月概况释放批次不一致')
+
 
 
 

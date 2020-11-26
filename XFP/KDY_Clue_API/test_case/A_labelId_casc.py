@@ -83,6 +83,10 @@ class TestCase(unittest.TestCase):
         # 财富值类型
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='首电及时率', saasCode='admin')
         cls.appText.set_map('SDJSL', cls.appText.get('remark'))
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
+        cls.appText.set_map('PTSH', cls.appText.get('remark'))
+        cls.webApi.get_group()
+        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
     def test_config_01(self):
         """项目大于3个"""

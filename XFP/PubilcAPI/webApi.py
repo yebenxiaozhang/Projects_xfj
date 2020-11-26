@@ -514,16 +514,22 @@ class webApi:
         if len(globals()['r.text']['data']) != 0:
             self.webText.set_map('departmentId', globals()['r.text']['data'][0]['departmentId'])
 
-    def deal_list(self):
+    def deal_list(self, transType=None):
         """成交列表"""
         self.PostRequest(url='/api/b/transationInfo/list',
                          data={
                              'transStatus': 1,
                              'consultantId': self.appText.get('consultantId'),
                              'endTime': self.appText.get('end_date'),
-                             'startTime': self.appText.get('start_date')
+                             'startTime': self.appText.get('start_date'),
+                             'transType': transType
                          })
         self.webText.set_map('web_total', globals()['r.text']['data']['total'])
+        if self.webText.get('web_total') != 0:
+            self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
+            self.appText.set_map('transId', globals()['r.text']['data']['records'][0]['transId'])
+            self.appText.set_map('customerId', globals()['r.text']['data']['records'][0]['customerId'])
+            self.appText.set_map('transYeji', globals()['r.text']['data']['records'][0]['transYeji'])
 
     def visit_list(self):
         """带看列表"""
@@ -538,7 +544,6 @@ class webApi:
 
     def visit_deal_statistics(self):
         """带看成交统计"""
-        self.get_group()
         self.PostRequest(url='/api/b/report/getVisitAndTransactionReport',
                          data={
                              'departmentId': self.webText.get('departmentId'),
@@ -554,15 +559,101 @@ class webApi:
             dome = json.loads(json.dumps(globals()['r.text']['data'][vlue]))
             self.webText.set_map('web_newClueCount', dome['newClueCount'])     # 上户批数
             self.webText.set_map('web_resultsWealth', dome['resultsWealth'])   # 发放财富值
-            self.webText.set_map('web_transactionCount', dome['transactionCount'])
-            #   新增认购套数  带看成交率   业绩  带看次数    邀约带看率
+
+            """带看成交率   业绩  带看次数    邀约带看率"""
             self.webText.set_map('web_transactionRatio', dome['transactionRatio'])
             self.webText.set_map('web_transactionResults', dome['transactionResults'])
             self.webText.set_map('web_visitCount', dome['visitCount'])
             # self.webText.set_map('web_visitOnTimeCount', dome['visitOnTimeCount'])
             self.webText.set_map('web_visitRatio', dome['visitRatio'])
+            """认购套数     网签套数        业绩"""
+            self.webText.set_map('web_transactionCount', dome['transactionCount'])
+            self.webText.set_map('web_subscribeConvertSigning', dome['subscribeConvertSigning'])
+            self.webText.set_map('web_transactionResults', dome['transactionResults'])
 
+    def work_statistics(self):
+        """咨询师工作统计"""
+        self.PostRequest(url='/api/b/consultant/getConsultantWorkReport',
+                         data={
+                             'departmentId': self.webText.get('departmentId'),
+                             'startTime': self.appText.get('start_date'),
+                             'endTime': self.appText.get('end_date'),
+                         })
+        if len(globals()['r.text']['data']) != 0:
+            vlue = 0
+            while globals()['r.text']['data'][vlue]['consultantName'] != '咨询师01':
+                vlue = vlue + 1
+                if len(globals()['r.text']['data']) == vlue:
+                    break
+            dome = json.loads(json.dumps(globals()['r.text']['data'][vlue]))
+            self.webText.set_map('web_newClueCount', dome['newClueCount'])     # 上户批数
+            self.webText.set_map('web_firstCallCount', dome['firstCallCount'])     # 及时首电
+            self.webText.set_map('web_firstCallOutCount', dome['firstCallOutCount'])     # 首电超时
+            self.webText.set_map('web_firstCallRatio', dome['firstCallRatio'])     # 首电及时率
+            self.webText.set_map('web_followCount', dome['followCount'])     # 跟进次数
+            self.webText.set_map('web_followInTimeCount', dome['followInTimeCount'])     # 及时跟进次数
+            self.webText.set_map('web_followOutTimeCount', dome['followOutTimeCount'])     # 超时跟进次数
+            self.webText.set_map('web_followRatio', dome['followRatio'])     # 跟进及时率
+            self.webText.set_map('web_newClueCount', dome['newClueCount'])     # 通话次数
+            self.webText.set_map('web_seaClaimClueCount', dome['seaClaimClueCount'])     # 公海领取
+            self.webText.set_map('web_seaClueCount', dome['seaClueCount'])     # 释放公海批次
 
+    def statistics_wealth(self):
+        """财富值统计"""
+        self.PostRequest(url='/api/b/wealth/getWealthDetailReportList',
+                         data={
+                             'departmentId': self.webText.get('departmentId'),
+                             'startTime': self.appText.get('start_date'),
+                             'endTime': self.appText.get('end_date'),
+                         })
+        if len(globals()['r.text']['data']) != 0:
+            vlue = 0
+            while globals()['r.text']['data'][vlue]['consultantName'] != '咨询师01':
+                vlue = vlue + 1
+                if len(globals()['r.text']['data']) == vlue:
+                    break
+            dome = json.loads(json.dumps(globals()['r.text']['data'][vlue]))
+            self.webText.set_map('web_clueCount', dome['clueCount'])     # 兑换线索数
+            self.webText.set_map('web_wealthClueSum', dome['wealthClueSum'])     # 兑换线索消耗财富总数
+            self.webText.set_map('web_wealthConsume', dome['wealthConsume'])     # 消耗财富值总数
+            self.webText.set_map('web_wealthObtainSum', dome['wealthObtainSum'])     # 新增财富值总数
+            self.webText.set_map('web_wealthPerformanceSum', dome['wealthPerformanceSum'])     # 财富业绩
+            self.webText.set_map('web_wealthSum', dome['wealthSum'])     # 合计增减
+            self.webText.set_map('web_wealthSysDeduct', dome['wealthSysDeduct'])     # 系统扣除
+            self.webText.set_map('web_wealthSysSum', dome['wealthSysSum'])     # 系统奖励
+            self.webText.set_map('web_clueApplyCount', dome['clueApplyCount'])     # 系统奖励
+
+    def getWealthApplyList(self, keyWord=None):
+        """财富值申诉列表"""
+        self.PostRequest(url='/api/b/wealthApply/getWealthApplyList',
+                         data={
+                            'keyWord': keyWord
+                         })
+        self.appText.set_map('applyId', globals()['r.text']['data']['records'][0]['applyId'])
+
+    def wealthApply(self):
+        """申诉审核"""
+        self.PostRequest(url='/api/b/wealthApply/apply',
+                         data={
+                             "type": "yes",
+                             'applyId': self.appText.get('applyId'),
+                             'applyIds': [self.appText.get('applyId')],
+                             'wealthId': self.appText.get('wealthId'),
+                             'auditRemark': None,
+                             'auditStatus': 1,
+                             'applyStatus': 2,
+
+                         })
+
+    def phoneLogList(self):
+        """通话记录"""
+        self.PostRequest(url='/api/b/customer/getPhoneLogList',
+                         data={
+                             'consultantId': self.appText.get('consultantId'),
+                             'startTime': self.appText.get('start_date'),
+                             'endTime': self.appText.get('end_date'),
+                         })
+        self.appText.set_map('web_total', globals()['r.text']['data']['total'])
 
 if __name__ == '__main__':
     a = webApi()
