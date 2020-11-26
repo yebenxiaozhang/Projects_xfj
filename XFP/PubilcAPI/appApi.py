@@ -1046,14 +1046,22 @@ class appApi:
         if self.appText.get('total') != 0:
             a = 0
             if appointmentTime is not None:
-                while globals()['r.text']['data']['records'][a]['appointmentTime'] != appointmentTime:
+                while globals()['r.text']['data']['records'][a]['appointmentTime'] != appointmentTime[:-3]:
                     a = a + 1
                     if a == self.appText.get('total'):
                         break
-                self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][a]['auditRemark'])
-                self.appText.set_map('visitAuditStatusName', globals()['r.text']['data']['records'][a]['visitAuditStatusName'])
-                self.appText.set_map('visitAuditStatus', globals()['r.text']['data']['records'][a]['visitAuditStatus'])
-                self.appText.set_map('visiteStatus', globals()['r.text']['data']['records'][a]['visiteStatus'])
+                try:
+                    self.appText.set_map('auditRemark',
+                                         globals()['r.text']['data']['records'][a]['auditRemark'])
+                except:
+                    self.appText.set_map('auditRemark',
+                                         None)
+                self.appText.set_map('visitAuditStatusName',
+                                     globals()['r.text']['data']['records'][a]['visitAuditStatusName'])
+                self.appText.set_map('visitAuditStatus',
+                                     globals()['r.text']['data']['records'][a]['visitAuditStatus'])
+                self.appText.set_map('visiteStatus',
+                                     globals()['r.text']['data']['records'][a]['visitStatus'])
             # self.appText.set_map('visitAuditStatus', globals()['r.text']['data']['records'][a]['visitAuditStatus'])
             # self.appText.set_map('visitAuditStatusName', globals()['r.text']['data']['records'][a]['visitAuditStatusName'])
 

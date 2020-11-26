@@ -3,7 +3,7 @@
 # @Author  : 潘师傅
 # @File    : My_Wealth_casc.py
 
-"""客户相关"""
+"""客户-财富值相关"""
 from XFP.PubilcAPI.flowPath import *
 """
 带看相关
@@ -17,7 +17,7 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class TestCase(unittest.TestCase):
-    """客第壹——客户列表"""
+    """客第壹——财富值相关"""
 
     def __init__(self, *args, **kwargs):
         super(TestCase, self).__init__(*args, **kwargs)
