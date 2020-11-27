@@ -141,12 +141,15 @@ class appApi:
                          })
         self.appText.set_map('dome', globals()['r.text']['data'][0])
         dome = json.loads(self.appText.get('dome'))
-        dome1 = 0
-        while int(dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['taskTypeAlias']) != tesk:
-            dome1 = dome1 + 1
-
         self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['taskVos']))
         if self.appText.get('total') != 0:
+            dome1 = 0
+            while int(dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['taskTypeAlias']) != tesk:
+                dome1 = dome1 + 1
+                if dome1 == self.appText.get('total'):
+                    break
+            if dome1 == self.appText.get('total'):
+                dome1 = dome1 - 1
             self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['endTime'])
             self.appText.set_map('clueId', dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['clueId'])
             self.appText.set_map('taskType', dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['taskType'])

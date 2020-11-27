@@ -157,6 +157,24 @@ class TestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        cls.webApi.audit_List()
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+        cls.webApi.audit_List(auditLevel=2)
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+
+        cls.appApi.my_clue_list()
+        while cls.appText.get('total') >= 1:
+            cls.flowPath.clue_exile_sea()
+            cls.appApi.my_clue_list()
+
+        cls.appApi.ClientList()
+        while cls.appText.get('total') >= 1:
+            cls.appApi.client_exile_sea()
+            cls.appApi.ClientList()
 
     def setUp(self):
         """残留审核 失败！！！"""
@@ -420,7 +438,7 @@ class TestCase(unittest.TestCase):
 
     def follow_front(self):
         """跟进前"""
-        self.appApi.GetUserAgenda()
+        self.appApi.GetUserAgenda(tesk=2)
         globals()['dome'] = self.appText.get('total')
 
     def follow_later(self, vlue=0):
