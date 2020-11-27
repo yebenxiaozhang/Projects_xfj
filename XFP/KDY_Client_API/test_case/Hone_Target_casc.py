@@ -315,16 +315,7 @@ class TestCase(unittest.TestCase):
 
     def test_await_follow_17(self):
         """23、客户创建带看       - 0"""
-        self.flowPath.clue_non_null()
-        self.appApi.my_clue_list()
-        self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_front()
-        self.appApi.GetMatchingAreaHouse()
-        self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                   appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
-                                   seeingConsultant=self.appApi.appText.get('consultantId'),
-                                   appointConsultant=self.appApi.appText.get('consultantId'))
+        self.flowPath.add_visit()
         self.follow_later()
         """24、客户录入成交       - 0"""
         self.flowPath.add_deal()
