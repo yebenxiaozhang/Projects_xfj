@@ -109,10 +109,12 @@ class TestCase(unittest.TestCase):
         self.appApi.getConsultantCount()
         if self.webText.get('web_newClueCount') != self.appText.get('newClueCount'):
             raise RuntimeError('带看成交统计上户数量与APP本月概况上户数量不一致')
+
         """带看数量对比"""
-        # self.webApi.visit_list()
-        # if self.webText.get('web_visitOnTimeCount') != self.appText.get('web_total'):
-        #     raise RuntimeError('带看成交统计的带看次数与后台带看次数不一致')
+        self.webApi.visit_list()
+        if self.webText.get('web_visitOnTimeCount') != self.appText.get('web_total'):
+            raise RuntimeError('带看成交统计的带看次数与后台带看次数不一致')
+
         if self.webText.get('web_visitCount') != self.appText.get('visitCount'):
             raise RuntimeError('带看成交统计的带看次数与APP本月概况带看次数不一致')
         """上户邀约率"""
