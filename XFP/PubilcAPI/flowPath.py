@@ -29,8 +29,26 @@ class flowPath:
                 self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
             else:
                 pass
-            self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-                                       loanSituation='这个是贷款情况')
+            try:
+                self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                           loanSituation='这个是贷款情况')
+            except:     # 线索抓客户报错后 进行流放公海的操作
+                self.appApi.ExileSea()
+                self.appApi.ClientList()  # 客户列表
+                if self.appApi.appText.get('total') == 0:
+                    self.clue_non_null()
+                    self.appApi.ClueInfo()
+                    try:
+                        self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
+                                              is_own_call=0, talk_time=12000,
+                                              call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
+                    except:
+                        self.appApi.ClueFollowList()
+                        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+                    else:
+                        pass
+                    self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                               loanSituation='这个是贷款情况')
             self.appApi.ClientList()  # 客户列表
             if self.appApi.appText.get('total') == 0:
                 print('线索转客户异常？')
