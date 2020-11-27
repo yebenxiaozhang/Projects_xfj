@@ -226,7 +226,7 @@ class TestCase(unittest.TestCase):
                 if float(dome) == 1:
                     pass
                 else:
-                    if self.appText.get('followRatio') >= dome:
+                    if self.appText.get('followRatio') != dome:
                         print('查看客户规定时间跟进 超过6小时      跟进及时率下降')
                         raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
             else:
@@ -237,7 +237,7 @@ class TestCase(unittest.TestCase):
                 if float(dome) == 1:
                     pass
                 else:
-                    if self.appText.get('followRatio') <= dome:
+                    if self.appText.get('followRatio') < dome:
                         print('- 查看客户规定时间跟进 未过1小时      跟进及时率增加')
                         raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         else:
