@@ -564,7 +564,7 @@ class webApi:
             self.webText.set_map('web_transactionRatio', dome['transactionRatio'])
             self.webText.set_map('web_transactionResults', dome['transactionResults'])
             self.webText.set_map('web_visitCount', dome['visitCount'])
-            # self.webText.set_map('web_visitOnTimeCount', dome['visitOnTimeCount'])
+            self.webText.set_map('web_visitOnTimeCount', dome['visitOnTimeCount'])
             self.webText.set_map('web_visitRatio', dome['visitRatio'])
             """认购套数     网签套数        业绩"""
             self.webText.set_map('web_transactionCount', dome['transactionCount'])
