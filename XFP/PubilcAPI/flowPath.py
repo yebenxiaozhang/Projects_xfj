@@ -33,6 +33,7 @@ class flowPath:
                 self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                            loanSituation='这个是贷款情况')
             except:     # 线索抓客户报错后 进行流放公海的操作
+                print('可能存在多个待办', self.appApi.appText.get('clueId'))
                 self.appApi.ExileSea()
                 self.appApi.ClientList()  # 客户列表
                 if self.appApi.appText.get('total') == 0:

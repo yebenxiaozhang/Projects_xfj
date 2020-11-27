@@ -157,22 +157,12 @@ class TestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
-        cls.webApi.audit_List()
-        while cls.webApi.webText.get('total') != 0:
-            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            cls.webApi.audit_List()
-        cls.webApi.audit_List(auditLevel=2)
-        while cls.webApi.webText.get('total') != 0:
-            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            cls.webApi.audit_List()
-
-        cls.appApi.my_clue_list()
-        while cls.appText.get('total') >= 1:
+        while cls.appText.get('total') >= 5:
             cls.flowPath.clue_exile_sea()
             cls.appApi.my_clue_list()
 
         cls.appApi.ClientList()
-        while cls.appText.get('total') >= 1:
+        while cls.appText.get('total') >= 5:
             cls.appApi.client_exile_sea()
             cls.appApi.ClientList()
 
@@ -315,7 +305,18 @@ class TestCase(unittest.TestCase):
 
     def test_await_follow_17(self):
         """23、客户创建带看       - 0"""
-        self.flowPath.add_visit()
+        self.flowPath.clue_non_null()
+        self.appApi.my_clue_list()
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                   loanSituation='这个是贷款情况')
+        self.follow_front()
+        self.flowPath.client_list_non_null()
+        self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
+                                   appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
+                                   seeingConsultant=self.appApi.appText.get('consultantId'),
+                                   appointConsultant=self.appApi.appText.get('consultantId'))
         self.follow_later()
         """24、客户录入成交       - 0"""
         self.flowPath.add_deal()
