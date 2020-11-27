@@ -136,9 +136,6 @@ class TestCase(unittest.TestCase):
         while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
             dome1 = dome1 + 1
         self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
-        # 检查待跟进状态
-        self.appApi.GetUserAgenda(keyWord=self.appText.get('cluePhone'))
-        self.assertNotEqual(0, self.appText.get('total'))
         # 后台查看是否已首电
         globals()['clueId'] = self.appText.get('clueId')
         self.webApi.TodayClue()

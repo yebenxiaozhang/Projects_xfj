@@ -236,10 +236,11 @@ class TestCase(unittest.TestCase):
             self.appApi.phone_log(callee_num=self.appApi.appText.get('cluePhone'),
                                   is_own_call=0, talk_time=12000,
                                   call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
+            self.follow_later()
         except:
             self.appApi.ClueFollowList()
             self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.follow_later(vlue=1)
+            self.follow_later(vlue=1)
 
     def test_await_follow_02(self):
         """3、线索转移               - 1"""

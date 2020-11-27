@@ -182,8 +182,7 @@ class TestCase(unittest.TestCase):
         self.flowPath.add_new_clue()
         self.appApi.getConsultantCount()
         dome = self.appApi.appText.get('firstCallRatio')
-        time.sleep(60)
-        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
+        dome1 = (datetime.datetime.now() + datetime.timedelta(minutes=2)).strftime("%Y-%m-%d %H:%M:%S")
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
                               call_time=dome1)
         self.appApi.getConsultantCount()
@@ -218,7 +217,7 @@ class TestCase(unittest.TestCase):
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
                               call_time=self.appText.get('time_add'))
         self.appApi.getConsultantCount()
-        if dome == self.appApi.appText.get('firstCallRatio'):
+        if dome <= self.appApi.appText.get('firstCallRatio'):
             pass
         else:
             print('5、在08:01:00拨打                                -首电超时')
@@ -248,7 +247,7 @@ class TestCase(unittest.TestCase):
         if self.appText.get('total') != 0:
             self.appApi.getConsultantCount()
             dome = self.appText.get('followRatio')
-            self.appApi.GetUserAgenda(clueId=self.appText.get('clueId'))
+            self.appApi.GetUserAgenda()
             self.appApi.time_difference()
             if int(self.appText.get('vlue')) > 1:
                 """查看线索规定时间跟进 超过1小时      跟进及时率下降"""
@@ -260,8 +259,7 @@ class TestCase(unittest.TestCase):
                     pass
                 else:
                     if self.appText.get('followRatio') != dome:
-                        print('查看线索规定时间跟进 超过6小时      跟进及时率下降')
-                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+                        print('查看线索规定时间跟进 超过1小时      跟进及时率下降')
             else:
                 self.appApi.ClueFollowList()
                 self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
@@ -272,7 +270,7 @@ class TestCase(unittest.TestCase):
                 else:
                     if self.appText.get('followRatio') <= dome:
                         print('- 查看线索规定时间跟进 未过6小时      跟进及时率增加')
-                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+
         else:
             """- 无线索-新增线索      -跟进          跟进及时率增加"""
             self.flowPath.add_new_clue()
@@ -287,7 +285,6 @@ class TestCase(unittest.TestCase):
             else:
                 if self.appText.get('followRatio') <= dome:
                     print('- 无线索-新增线索      -跟进          跟进及时率增加')
-                    raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
 
 

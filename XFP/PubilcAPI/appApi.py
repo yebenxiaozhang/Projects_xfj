@@ -141,14 +141,33 @@ class appApi:
                          })
         self.appText.set_map('dome', globals()['r.text']['data'][0])
         dome = json.loads(self.appText.get('dome'))
-        if tesk == 1:
-            self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['taskVos']))
-            if self.appText.get('total') != 0:
-                self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['endTime'])
-        else:
-            self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['visitVos']))
-            if self.appText.get('total') != 0:
-                self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['visitVos'][0]['endTime'])
+        dome1 = 0
+        while int(dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['taskTypeAlias']) != tesk:
+            dome1 = dome1 + 1
+
+        self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['taskVos']))
+        if self.appText.get('total') != 0:
+            self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['endTime'])
+            self.appText.set_map('clueId', dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['clueId'])
+            self.appText.set_map('taskType', dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['taskType'])
+            self.appText.set_map('customerId',
+                                 dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['customerId'])
+        # if tesk == 1:
+        #     self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['taskVos']))
+        #     if self.appText.get('total') != 0:
+        #         self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['endTime'])
+        #         self.appText.set_map('clueId', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['clueId'])
+        #         self.appText.set_map('taskType', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['taskType'])
+        #         self.appText.set_map('customerId',
+        #                              dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['customerId'])
+        # else:
+        #     self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['visitVos']))
+        #     if self.appText.get('total') != 0:
+        #         self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['visitVos'][0]['endTime'])
+        #         self.appText.set_map('clueId', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['clueId'])
+        #         self.appText.set_map('taskType', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['taskType'])
+        #         self.appText.set_map('customerId',
+        #                              dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['customerId'])
         # self.appText.set_map('pages', globals()['r.text']['data']['pages'])
 
     def CluePhoneLog(self):
@@ -1189,11 +1208,18 @@ class appApi:
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         time_1_struct = datetime.strptime(self.appText.get('endTime'), "%Y-%m-%d %H:%M:%S")
         time_2_struct = datetime.strptime(dome, "%Y-%m-%d %H:%M:%S")
-        if dome[:10] == self.appText.get('endTime'):
-            self.appText.set_map('vlue', (time_2_struct - time_1_struct).seconds/60/60)
-        else:
-            total_seconds = (time_2_struct - time_1_struct).total_seconds()
-            self.appText.set_map('vlue', (total_seconds)/60/60)
+        if time_1_struct > time_2_struct:
+            if dome[:10] == self.appText.get('endTime'):
+                self.appText.set_map('vlue', (time_1_struct - time_2_struct).seconds/60/60)
+            else:
+                total_seconds = (time_1_struct - time_2_struct).total_seconds()
+                self.appText.set_map('vlue', -(total_seconds)/60/60)
+        elif time_1_struct < time_2_struct:
+            if dome[:10] == self.appText.get('endTime'):
+                self.appText.set_map('vlue', (time_2_struct - time_1_struct).seconds/60/60)
+            else:
+                total_seconds = (time_2_struct - time_1_struct).total_seconds()
+                self.appText.set_map('vlue', (total_seconds)/60/60)
 
     def hone_wealth(self):
         """首页财富值"""
@@ -1238,27 +1264,9 @@ class appApi:
                          data={
                                 "applyContent": "python财富值申诉",
                                 "wealthId": self.appText.get('wealthId'),
-                                # "saasCode": "000009",
-                                # "wealthRelType": "1",
-                                # "wealthRelId": "105",
                                 "clueId": self.appText.get('clueId'),
-                                # "wealthType": "008",
-                                # "wealthTypeRelId": 435,
-                                # "wealthValue": 5000,
-                                # "wealthStatus": 1,
-                                # "applyStatus": "0",
-                                # "wealthRemark": "成交奖励财富值",
-                                # "createdBy": 146,
-                                # "createdTime": "2020-11-24 09:43:37",
-                                # "updatedBy": 146,
-                                # "updatedTime": "2020-11-24 09:43:37",
                                 "orderNo": self.appText.get('orderNo'),
-                                # "clueName": "许",
-                                # "cluePhone": "116****6835",
-                                # "customerId": 1436,
-                                # "isBefore30Day": true,
-                                # "typeStr": "成交奖励",
-                                # "createdTimeStr": "昨天 09:43"
+
                             })
 
 if __name__ == '__main__':
