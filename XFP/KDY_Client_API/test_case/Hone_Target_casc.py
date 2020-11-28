@@ -306,7 +306,6 @@ class TestCase(unittest.TestCase):
     def test_await_follow_17(self):
         """23、客户创建带看       - 0"""
         self.flowPath.clue_non_null()
-        self.appApi.my_clue_list()
         self.appApi.ClueFollowList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
@@ -317,10 +316,10 @@ class TestCase(unittest.TestCase):
                                    appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
                                    seeingConsultant=self.appApi.appText.get('consultantId'),
                                    appointConsultant=self.appApi.appText.get('consultantId'))
-        self.follow_later()
+        self.follow_later(vlue=1)
         """24、客户录入成交       - 0"""
         self.flowPath.add_deal()
-        self.follow_later()
+        self.follow_later(vlue=1)
 
     def test_await_follow_19(self):
         """26、客户跟进（下次跟进日期为明日）      - 1"""
