@@ -44,12 +44,12 @@ class flowPath:
             if self.appApi.appText.get('total') == 0:
                 self.add_new_clue()
                 self.appApi.my_clue_list()  # 线索列表
-                if self.appApi.appText.get('total') == '0':
+                if self.appApi.appText.get('total') == 0:
                     print('新增线索失败？')
             else:
                 self.appApi.clue_Assigned()  # 领取线索
                 self.appApi.my_clue_list()  # 线索列表
-                if self.appApi.appText.get('total') == '0':
+                if self.appApi.appText.get('total') == 0:
                     print('领取线索失败？')
         self.appApi.ClueInfo()
 
