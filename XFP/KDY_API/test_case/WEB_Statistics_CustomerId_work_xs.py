@@ -3,7 +3,7 @@ from XFP.PubilcAPI.flowPath import *
 
 
 class TestCase(unittest.TestCase):
-    """客第壹后台——咨询师工作统计"""
+    """后台——咨询师工作统计"""
 
     def __init__(self, *args, **kwargs):
         super(TestCase, self).__init__(*args, **kwargs)
