@@ -25,7 +25,9 @@ from XFP.PubilcAPI.flowPath import *
   1、审核中的成交              ---只能操作跟进，其他动作都不允许操作
   2、修改成交后（如设置审核）  ---需重新审核
   3、已确认的成交              ---不允许删除
-    
+
+补：
+    1、一级审核没有通过的情况下耳机列表不应该显示出来
 """
 
 
@@ -242,8 +244,15 @@ class MyDealTestCase(unittest.TestCase):
         self.appApi.add_deal(Status=2, isDeleted=1)
         self.assertEqual('该成交已完成,无法删除!', self.appApi.appText.get('data'))
 
-
-
-
+    def test_my_deal_10(self):
+        """一级审核没有通过的情况下不显示出来"""
+        self.webApi.Audit_management(customerDeal=True, customerDealLevel=2)
+        self.flowPath.client_list_non_null()
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'), auditLevel=2)
+        dome = self.webApi.webText.get('total')
+        self.appApi.add_deal()  # 录入成交
+        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'), auditLevel=2)
+        if self.webApi.webText.get('total') != dome:
+            raise RuntimeError('审核管理（成交）一级审核没有通过的情况， 总监审核出来了')
 
 

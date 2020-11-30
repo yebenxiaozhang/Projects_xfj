@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/XFP/KDY_Client_API/test_case/Statistics_web_visit_deal.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/XFP/KDY_API/test_case/WEB_Statistics_visit_dea_kh.py" charset="UTF-8" />
   </component>
 </project>

@@ -4,6 +4,7 @@ from XFP.PubilcAPI.flowPath import *
 1、拨打时间在超时前---增加财富值(上传时间再超时后)
 2、正常首电-----------增加财富值
 3、超时首电-----------扣除财富值
+4、线索转移过后------进行首电|跟进  不增加首电及时率财富值
 """
 
 
@@ -120,6 +121,19 @@ class TestCase(unittest.TestCase):
                                         orderNo=self.appText.get('orderNo'))
         if self.appText.get('vlue') != 10:
             raise RuntimeError('2、正常首电-----------增加财富值')
+        """4、线索转移过后------进行首电|跟进  不增加首电及时率财富值"""
+        self.appApi.ClueChange()
+        self.appApi.Login(userName=XfpUser1)
+        self.appApi.GetUserData()
+        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                              call_time=dome1, is_me=2)
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != 10:
+            raise RuntimeError('已首电转移过后不能在加财富值')
 
     def test_wealth_03(self):
         """3、超时首电-----------扣除财富值"""

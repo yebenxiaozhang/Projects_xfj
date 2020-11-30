@@ -1,11 +1,15 @@
 """标签-相关"""
 from XFP.PubilcAPI.flowPath import *
 
+"""
+"""
 
-class TestCase(unittest.TestCase):
+
+class Config_labelTestCase(unittest.TestCase):
+    """幸福派——带看相关"""
 
     def __init__(self, *args, **kwargs):
-        super(TestCase, self).__init__(*args, **kwargs)
+        super(Config_labelTestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 
@@ -51,6 +55,14 @@ class TestCase(unittest.TestCase):
         cls.flowPath.get_label(labelNo='SZGJYY', labelName='终止跟进原因',
                                newlabelName='客户已成交')
         cls.appText.set_map('ZZGJ', cls.appText.get('labelId'))
+        """成交项"""
+        cls.flowPath.get_label(labelNo='CJX', labelName='成交项目',
+                               newlabelName='认购')
+        cls.appText.set_map('CJX', cls.appText.get('labelId'))
+        """出行方式"""
+        cls.flowPath.get_label(labelNo='CXFS', labelName='出行方式',
+                               newlabelName='自驾')
+        cls.appText.set_map('CXFS', cls.appText.get('labelId'))
         """客户意向等级"""
         cls.appApi.GetLabelList(labelNo='KHYXDJ')                       # 查询购房意向loanSituation
         cls.appText.set_map('KHYXDJ', cls.appText.get('labelId'))
@@ -69,7 +81,8 @@ class TestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='QTKHXQ')                       # 查询客户需求
         cls.appText.set_map('QTKHXQ', cls.appText.get('labelId'))
         cls.appApi.ConsultantList()                                     # 咨询师列表
-
+        cls.appApi.GetLabelList(labelNo='SQZHGJ', labelName='其他')
+        cls.appText.set_map('ZHGJ', cls.appText.get('labelId'))         # 暂缓跟进
         cls.flowPath.get_label(labelNo='XXFL', labelName='信息分类',
                                newlabelName='信息分类一')
         cls.appText.set_map('XXFL', cls.appText.get('labelId'))         # 信息分类
@@ -80,12 +93,14 @@ class TestCase(unittest.TestCase):
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
         cls.webApi.consultant_allocition(isAppoint=1)
-        # 财富值类型
-        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='首电及时率', saasCode='admin')
-        cls.appText.set_map('SDJSL', cls.appText.get('remark'))
+
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='成交奖励', saasCode='admin')
+        cls.appText.set_map('CJJL', cls.appText.get('remark'))
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='邀约带看', saasCode='admin')
+        cls.appText.set_map('YYDK', cls.appText.get('remark'))
+        cls.webApi.get_group()
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
-        cls.webApi.get_group()
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
         cls.appApi.my_clue_list()
         while cls.appText.get('total') >= 5:
