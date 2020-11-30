@@ -87,6 +87,7 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.webApi.get_group()
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+
         """残余审核"""
         cls.webApi.audit_List()
         while cls.webApi.webText.get('total') != 0:
@@ -96,6 +97,7 @@ class TestCase(unittest.TestCase):
         while cls.webApi.webText.get('total') != 0:
             cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
             cls.webApi.audit_List()
+
         """去除一些客户及线索"""
         cls.appApi.my_clue_list()
         while cls.appText.get('total') >= 5:
