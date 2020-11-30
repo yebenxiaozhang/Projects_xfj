@@ -34,7 +34,6 @@ class TestCase(unittest.TestCase):
         self.flowPath = self.flow
 
         self.appText = GlobalMap()
-
         self.webText = GlobalMap()
         
     @classmethod
