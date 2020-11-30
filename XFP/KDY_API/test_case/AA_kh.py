@@ -5,11 +5,11 @@ from XFP.PubilcAPI.flowPath import *
 """
 
 
-class Config_labelTestCase(unittest.TestCase):
-    """幸福派——带看相关"""
+class TestCase(unittest.TestCase):
+    """客第壹——初始化"""
 
     def __init__(self, *args, **kwargs):
-        super(Config_labelTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 
@@ -102,6 +102,18 @@ class Config_labelTestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+
+        """残余审核"""
+        cls.webApi.audit_List()
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+        cls.webApi.audit_List(auditLevel=2)
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+
+        """去除一些客户及线索"""
         cls.appApi.my_clue_list()
         while cls.appText.get('total') >= 5:
             cls.flowPath.clue_exile_sea()
