@@ -35,11 +35,11 @@ from XFP.PubilcAPI.flowPath import *
 """
 
 
-class MyVisitTestCase(unittest.TestCase):
+class TestCase(unittest.TestCase):
     """幸福派——我的带看"""
 
     def __init__(self, *args, **kwargs):
-        super(MyVisitTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 

@@ -31,11 +31,11 @@ from XFP.PubilcAPI.flowPath import *
 """
 
 
-class MyDealTestCase(unittest.TestCase):
+class TestCase(unittest.TestCase):
     """客第壹——我的成交"""
 
     def __init__(self, *args, **kwargs):
-        super(MyDealTestCase, self).__init__(*args, **kwargs)
+        super(TestCase, self).__init__(*args, **kwargs)
         self.xfp_web = webApi()
         self.webApi = self.xfp_web
 
@@ -44,6 +44,11 @@ class MyDealTestCase(unittest.TestCase):
 
         self.flow = flowPath()
         self.flowPath = self.flow
+
+        self.appText = GlobalMap()
+        self.webText = GlobalMap()
+
+
 
     @classmethod
     def setUpClass(cls):
