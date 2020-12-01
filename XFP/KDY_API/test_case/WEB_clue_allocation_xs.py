@@ -137,6 +137,7 @@ class TestCase(unittest.TestCase):
             self.assertNotEqual(self.appText.get('receptionTime'), self.appText.get('createdTime'))
             self.assertEqual(self.webText.get('createdTime'), self.appText.get('createdTime'))
             self.webApi.consultant_allocition(isAppoint=1)
+
             """总部分配到分站-分站无在线人员 通过手动分派人员 要扣除财富值"""
             self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
                                             endTime=time.strftime("%Y-%m-%d"),

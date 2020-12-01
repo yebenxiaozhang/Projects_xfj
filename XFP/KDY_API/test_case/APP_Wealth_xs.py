@@ -132,7 +132,7 @@ class TestCase(unittest.TestCase):
                                         endTime=time.strftime("%Y-%m-%d"),
                                         wealthType=self.appText.get('SDJSL'),
                                         orderNo=self.appText.get('orderNo'))
-        if self.appText.get('vlue') != 10:
+        if self.appText.get('vlue') != 0:
             raise RuntimeError('已首电转移过后不能在加财富值')
 
     def test_wealth_03(self):
