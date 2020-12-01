@@ -535,7 +535,7 @@ class webApi:
         """带看列表"""
         self.PostRequest(url='/api/b/visit/list',
                          data={
-                             'belongConsultantId': [self.appText.get('consultantId')],
+                             'belongConsultantId': self.appText.get('consultantId'),
                              'endTime': self.appText.get('end_date') + ' 23:59:59',
                              'startTime': self.appText.get('start_date') + ' 00:00:00',
                              'visitStatus': 3

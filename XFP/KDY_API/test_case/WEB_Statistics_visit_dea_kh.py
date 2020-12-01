@@ -95,12 +95,31 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('CJJL', cls.appText.get('remark'))
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='邀约带看', saasCode='admin')
         cls.appText.set_map('YYDK', cls.appText.get('remark'))
-
-        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
         cls.webApi.get_group()
-        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
+        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+
+        """残余审核"""
+        cls.webApi.audit_List()
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+        cls.webApi.audit_List(auditLevel=2)
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+
+        """去除一些客户及线索"""
+        cls.appApi.my_clue_list()
+        while cls.appText.get('total') >= 5:
+            cls.flowPath.clue_exile_sea()
+            cls.appApi.my_clue_list()
+
+        cls.appApi.ClientList()
+        while cls.appText.get('total') >= 5:
+            cls.appApi.client_exile_sea()
+            cls.appApi.ClientList()
 
     def test_visit_deal_statistics(self):
         """带看成交统计"""

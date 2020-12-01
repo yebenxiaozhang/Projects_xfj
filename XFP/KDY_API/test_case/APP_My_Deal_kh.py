@@ -48,8 +48,6 @@ class TestCase(unittest.TestCase):
         self.appText = GlobalMap()
         self.webText = GlobalMap()
 
-
-
     @classmethod
     def setUpClass(cls):
         """登录幸福派 只执行一次
