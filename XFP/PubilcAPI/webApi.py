@@ -594,7 +594,7 @@ class webApi:
             self.webText.set_map('web_followInTimeCount', dome['followInTimeCount'])     # 及时跟进次数
             self.webText.set_map('web_followOutTimeCount', dome['followOutTimeCount'])     # 超时跟进次数
             self.webText.set_map('web_followRatio', dome['followRatio'])     # 跟进及时率
-            self.webText.set_map('web_newClueCount', dome['newClueCount'])     # 通话次数
+            self.webText.set_map('web_callCount', dome['callCount'])     # 通话次数
             self.webText.set_map('web_seaClaimClueCount', dome['seaClaimClueCount'])     # 公海领取
             self.webText.set_map('web_seaClueCount', dome['seaClueCount'])     # 释放公海批次
 
@@ -654,6 +654,15 @@ class webApi:
                              'endTime': self.appText.get('end_date'),
                          })
         self.appText.set_map('web_total', globals()['r.text']['data']['total'])
+
+    def clue_detail(self):
+        """留点记录"""
+        self.PostRequest(url='/api/b/clue/detail',
+                         data={
+                             'clueId': self.appText.get('clueId')
+                         })
+        if len(globals()['r.text']['data']['clueFollowList']) != 0:
+            self.appText.set_map('remark', globals()['r.text']['data']['remark'])
 
 if __name__ == '__main__':
     a = webApi()

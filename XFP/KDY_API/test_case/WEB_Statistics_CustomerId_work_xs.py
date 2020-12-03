@@ -115,7 +115,7 @@ class TestCase(unittest.TestCase):
 
         """通话记录"""
         self.webApi.phoneLogList()
-        if self.appText.get('web_total') != self.webText.get('web_newClueCount'):
+        if self.appText.get('web_total') != self.webText.get('web_callCount'):
             print('咨询师工作统计与通话记录中的通话次数不一致')
 
         """公海领取"""

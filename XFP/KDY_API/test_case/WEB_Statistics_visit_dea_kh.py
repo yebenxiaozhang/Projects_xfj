@@ -160,11 +160,12 @@ class TestCase(unittest.TestCase):
         """业绩对比"""
         dome = self.webText.get('web_transactionResults')
         self.webApi.deal_list()             # 后台查看已完成成交次数
-        dome1 = self.appText.get('transYeji')
-        self.appApi.add_deal(Status=1, transYeji=float(dome1) + float(500))
-        self.webApi.visit_deal_statistics()
-        if self.webText.get('web_transactionResults') != float(dome) + float(500):
-            raise RuntimeError('带看成交统计中业绩与成交业绩不一致')
+        if self.webText.get('web_total') != 0:
+            dome1 = self.appText.get('transYeji')
+            self.appApi.add_deal(Status=1, transYeji=float(dome1) + float(500))
+            self.webApi.visit_deal_statistics()
+            if self.webText.get('web_transactionResults') != float(dome) + float(500):
+                raise RuntimeError('带看成交统计中业绩与成交业绩不一致')
 
 
 

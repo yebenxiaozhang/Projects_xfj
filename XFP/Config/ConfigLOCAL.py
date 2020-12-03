@@ -17,8 +17,8 @@
 # XfpPwd1 = '12345678'
 
 
-ApiXfpUrl = 'http://192.168.10.96:8381'
-ApiXfpUrl1 = 'http://192.168.10.52/xfp_api'
+ApiXfpUrl = 'http://10.6.5.96:8381'
+ApiXfpUrl1 = 'http://10.6.5.1/xfp_api'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
 XfpsaasCode = '000009'

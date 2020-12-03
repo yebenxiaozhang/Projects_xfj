@@ -138,6 +138,11 @@ class TestCase(unittest.TestCase):
             self.assertEqual(self.webText.get('createdTime'), self.appText.get('createdTime'))
             self.webApi.consultant_allocition(isAppoint=1)
 
+            """留点记录"""
+            self.webApi.clue_detail()
+            if self.appText.get('remark') != '总站添加线索':
+                print('线索存在留点记录，但是分派给咨询师后，留点记录为空')
+
             """总部分配到分站-分站无在线人员 通过手动分派人员 要扣除财富值"""
             self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
                                             endTime=time.strftime("%Y-%m-%d"),

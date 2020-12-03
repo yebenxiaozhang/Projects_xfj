@@ -82,7 +82,7 @@ class appApi:
             print(self.appText.get('ApiXfpUrl'))
         if r.elapsed.total_seconds() > 10:
             print('接口请求过慢大于10秒')
-            raise RuntimeError(self.appText.get('ApiXfpUrl'))
+            print(self.appText.get('ApiXfpUrl'))
 
     def Sign(self, userName, password='123456789'):
         """注册"""
@@ -300,6 +300,7 @@ class appApi:
                              'taskId': self.appText.get('taskId'),
                              'followId': self.appText.get('followId'),
                              'endTime': taskEndTime,
+                             'taskOldId': self.appText.get('taskId'),
                              'taskEndTime': taskEndTime
                          })
 
