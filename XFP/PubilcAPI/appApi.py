@@ -807,14 +807,14 @@ class appApi:
 
     def GetMatchingAreaHouse(self, value=0):
         """匹配楼盘"""
-        self.PostRequest(url='/api/tool/getAreaHouse',
+        self.PostRequest(url='/api/b/house/list',
                          data={})
         self.appText.set_map('total', len(globals()['r.text']['data']))
-        if len(globals()['r.text']['data']) != 0:
-            self.appText.set_map('houseId', globals()['r.text']['data'][value]['value'])
-            self.appText.set_map('projectAId', globals()['r.text']['data'][value]['value'])
-            self.appText.set_map('projectBId', globals()['r.text']['data'][1]['value'])
-            self.appText.set_map('projectCId', globals()['r.text']['data'][2]['value'])
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('houseId', globals()['r.text']['data']['records'][value]['houseId'])
+            self.appText.set_map('projectAId', globals()['r.text']['data']['records'][value]['houseId'])
+            self.appText.set_map('projectBId', globals()['r.text']['data']['records'][1]['houseId'])
+            self.appText.set_map('projectCId', globals()['r.text']['data']['records'][2]['houseId'])
 
     def ClientEntering(self, callName=None, sex=1, projectBId=0, projectCId=0,
                        loanSituation='', paymentRatio='',
@@ -924,7 +924,7 @@ class appApi:
         requests.post(url=(ApiXfpUrl + '/api/b/systembase/uploadFiles'),
                       files=all_imgs)
 
-    def add_deal(self, transFloorage=25, Status=0,
+    def add_deal_former(self, transFloorage=25, Status=0,
                         transHouseBuilding='2', transHouseUnit='1-1',
                         transOwnerName='潘师傅', transRemark='python-签约', transReservedTellphone='17600000000',
                         transTotalPrice='998888.56',isDeleted=None,
@@ -955,11 +955,90 @@ class appApi:
                                'attachmentIds': attachmentIds})  # 附件
         self.appText.set_map('data', globals()['r.text']['data'])
 
-    def deal_List(self, transStatus=None):
-        """成交列表"""
-        self.PostRequest(url='/api/a/transaction/list',
+    def add_deal(self, transFloorage=25, Status=0,
+                        transHouseBuilding='2', transHouseUnit='1-1',
+                        transOwnerName=None, transRemark='python-签约', transReservedTellphone=None,
+                        transTotalPrice='998888.56',isDeleted=None,
+                        transYeji='88.88',
+                        attachmentIds=12):
+        """成交录入"""
+        if Status == 0:
+            transId = None
+            visitDealId = None
+        else:
+            transId = self.appText.get('transId')
+            visitDealId = self.appText.get('visitDealId')
+        if transReservedTellphone is None:
+            transReservedTellphone = '1' + str(int(time.time()))
+        if transOwnerName is None:
+            transOwnerName = self.RandomText(textArr=surname)
+        self.PostRequest(url='/api/a/trans/save',
+                         data={'consultantId': self.appText.get('consultantId'),  # 咨询师ID
+                               'transId': transId,  # 成交ID
+                               'customerId': self.appText.get('customerId'),  # 客户ID
+                               'clueId': self.appText.get('clueId'),  # 线索ID
+                               'houseId': self.appText.get('houseId'),  # 楼盘ID
+                               'transContractDate': time.strftime("%Y-%m-%d"),  # 成交日期
+                               'transFloorage': transFloorage,  # 建筑面积
+                               'transHouseBuilding': transHouseBuilding,  # 楼栋
+                               'transHouseUnit': transHouseUnit,  # 房号
+                               'transOwnerName': transOwnerName,  # 业主姓名
+                               'transRemark': transRemark,  # 备注
+                               'transReservedTellphone': transReservedTellphone,  # 电话
+                               'transTotalPrice': transTotalPrice,  # 成交总价
+                               'transType': self.appText.get('CJX'),  # 成交项
+                               'transYeji': transYeji,  # 业绩
+                               # 'isDeleted': isDeleted,  # 是否删除
+                               'attachmentIds': attachmentIds,
+                               'applyRemark': '成交审核备注信息',
+                               'transVisitDealForm': {
+                                   'agencyId': self.appText.get('DLGS'),      # 代理公司
+                                   'appointConsultant': self.appText.get('consultantId'),    # 邀请咨询师
+                                   'attachmentIds': attachmentIds,            # 带看报备附件
+                                   'receptionName': self.appText.get('JDRXM'),            # 接待人姓名
+                                   'receptionPhone': self.appText.get('JDRDH'),          # 接待人电话
+                                   'reportingRules': self.appText.get('BBGZ'),          # 报备规则
+                                   'reward': self.appText.get('YJXJJ'),                          # 佣金现金奖
+                                   'seeingConsultant': self.appText.get('consultantId'),      # 带看咨询师
+                                   'settlementConditions': self.appText.get('JSTJ'),      # 结算条件
+                                   'visitDealId': visitDealId,            # 成交带看报备ID
+                                   'visitProjectId': self.appText.get('visitProjectId')       # 关联带看报备ID
+                               }
+                               })  # 附件
+        self.appText.set_map('data', globals()['r.text']['data'])
+        self.appText.set_map('transYeji', transYeji)
+        self.appText.set_map('dealPhone', transReservedTellphone)
+
+    def visitProject_list(self):
+        """带看报备列表"""
+        self.PostRequest(url='/api/a/visit/visitProject/list',
                          data={
-                             'consultantId': self.appText.get('consultantId')
+                             "customerId": self.appText.get('customerId'),
+                             "houseId": self.appText.get('houseId'),
+                             "visitStatus": 1
+                         })
+        self.appText.set_map('web_total', len(globals()['r.text']['data']))
+        if len(globals()['r.text']['data']) != 0:
+            self.appText.set_map('visitProjectId', globals()['r.text']['data'][0]['visitProjectId'])
+            dome = 0
+            dome1 = 1
+            while globals()['r.text']['data'][0]['houseBusinessInfo']['residentInfo'][dome:dome1] != '+':
+                dome = dome1
+                dome1 = dome1 + 1
+            self.appText.set_map('DLGS', globals()['r.text']['data'][0]['houseBusinessInfo']['agencyId'])
+            self.appText.set_map('BBGZ', globals()['r.text']['data'][0]['houseBusinessInfo']['reportingRules'])
+            self.appText.set_map('JDRXM', globals()['r.text']['data'][0]['houseBusinessInfo']['residentInfo'][0:dome])
+            self.appText.set_map('JDRDH', globals()['r.text']['data'][0]['houseBusinessInfo']['residentInfo'][dome1:])
+            self.appText.set_map('YJXJJ', globals()['r.text']['data'][0]['houseBusinessInfo']['reward'])
+            self.appText.set_map('JSTJ', globals()['r.text']['data'][0]['houseBusinessInfo']['settlementConditions'])
+
+    def deal_List(self, transStatus=None, ApplyStatus=None, keyWord=None):
+        """成交列表"""
+        self.PostRequest(url='/api/a/trans/list',
+                         data={
+                             'consultantId': self.appText.get('consultantId'),
+                             'transApplyStatus': ApplyStatus,
+                             'keyWord': keyWord
                          })
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
@@ -972,13 +1051,11 @@ class appApi:
                         raise RuntimeError(self.appText.get('ApiXfpUrl'))
             else:
                 dome = 0
-            self.appText.set_map('transStatus', globals()['r.text']['data']['records'][dome]['transStatus'])
+            self.appText.set_map('transStatus', globals()['r.text']['data']['records'][dome]['transApplyStatus'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][dome]['clueId'])
-            self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][dome]['auditRemark'])
+
             self.appText.set_map('transId', globals()['r.text']['data']['records'][dome]['transId'])
             self.appText.set_map('customerId', globals()['r.text']['data']['records'][dome]['customerId'])
-            self.appText.set_map('houseId', globals()['r.text']['data']['records'][dome]['houseId'])
-            self.appText.set_map('labelId', globals()['r.text']['data']['records'][dome]['transType'])
 
     def deal_Info(self):
         """成交详情"""

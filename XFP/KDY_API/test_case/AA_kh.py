@@ -103,6 +103,24 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
+        cls.webApi.deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.deal_auditList()
+
+        """审核-成交相关-总监"""
+        cls.webApi.deal_auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.deal_auditList(auditLevel=2)
+
         """残余审核"""
         cls.webApi.audit_List()
         while cls.webApi.webText.get('total') != 0:
@@ -145,6 +163,7 @@ class TestCase(unittest.TestCase):
         while self.appText.get('total') < 1:
             self.webApi.add_house_business_information()
             self.appApi.BusinessInformation()
+        self.webApi.getHouseBusinessList()
 
     def test_config_04(self):
         """楼盘问答"""

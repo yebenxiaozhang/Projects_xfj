@@ -104,6 +104,36 @@ class ClientTestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
+        cls.webApi.deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.deal_auditList()
+
+        """审核-成交相关-总监"""
+        cls.webApi.deal_auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.deal_auditList(auditLevel=2)
+
+        """残余审核"""
+        cls.webApi.audit_List()
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+        cls.webApi.audit_List(auditLevel=2)
+        while cls.webApi.webText.get('total') != 0:
+            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+            cls.webApi.audit_List()
+
+        """去除一些客户及线索"""
         cls.appApi.my_clue_list()
         while cls.appText.get('total') >= 5:
             cls.flowPath.clue_exile_sea()
@@ -174,9 +204,16 @@ class ClientTestCase(unittest.TestCase):
             self.appApi.deal_List()
             dome = self.appText.get('total')
             self.flowPath.client_list_non_null()
-            self.flowPath.add_deal()
+            self.appApi.visitProject_list()
+            if self.appApi.appText.get('web_total') == 0:
+                self.flowPath.add_visit()
+                self.flowPath.accomplish_visit()
+                self.appApi.visitProject_list()
+            self.appApi.add_deal()  # 录入成交
             self.appApi.deal_List()
             self.assertNotEqual(dome, self.appText.get('total'))
+            self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+            self.webApi.finance_deal_audit()
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appText.get('ApiXfpUrl'))

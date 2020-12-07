@@ -258,6 +258,23 @@ class webApi:
                                 # "startTime": ""
                             })
 
+    def getHouseBusinessList(self):
+        """商务详情"""
+        self.PostRequest(url='/api/b/house/getHouseBusinessList',
+                         data={
+                             'houseId': self.appText.get('houseId')
+                         })
+        dome = 0
+        dome1 = 1
+        while globals()['r.text']['data']['records'][0]['residentInfo'][dome:dome1] != '+':
+            dome = dome1
+            dome1 = dome1 + 1
+        self.appText.set_map('BBGZ', globals()['r.text']['data']['records'][0]['reportingRules'])
+        self.appText.set_map('JDRXM', globals()['r.text']['data']['records'][0]['residentInfo'][0:dome])
+        self.appText.set_map('JDRDH', globals()['r.text']['data']['records'][0]['residentInfo'][dome1:])
+        self.appText.set_map('YJXJJ', globals()['r.text']['data']['records'][0]['reward'])
+        self.appText.set_map('JSTJ', globals()['r.text']['data']['records'][0]['settlementConditions'])
+
     def add_house_questions(self, answer='这个是答案', title='这个是问题'):
         """添加楼盘问答"""
         self.PostRequest(url='/api/b/house/addOrUpdateHouseQuestion',
@@ -371,13 +388,17 @@ class webApi:
         if self.webText.get('total') != 0:
             self.webText.set_map('r.text', globals()['r.text'])
 
-    def clue_list(self, myClue='Y', rderNo=None, vlue=0):
+    def clue_list(self, myClue='Y', rderNo=None, vlue=0, consultantId=None, sourceId=None):
         """线索列表"""
         self.PostRequest(url='/api/b/clue/list',
                          data={
                              'myClue': myClue,
                              'isWork': True,
-                             'orderNo': rderNo
+                             'orderNo': rderNo,
+                             'consultantId': consultantId,
+                             'sourceId': sourceId,
+                             'startTime': self.appText.get('start_date'),
+                             'endTime': self.appText.get('end_date'),
                          })
         if globals()['r.text']['data']['total'] != 0:
             vlue = vlue + 1
@@ -516,7 +537,7 @@ class webApi:
 
     def deal_list(self, transType=None):
         """成交列表"""
-        self.PostRequest(url='/api/b/transationInfo/list',
+        self.PostRequest(url='/api/b/trans/list',
                          data={
                              'transStatus': 1,
                              'consultantId': self.appText.get('consultantId'),
@@ -663,6 +684,68 @@ class webApi:
                          })
         if len(globals()['r.text']['data']['clueFollowList']) != 0:
             self.appText.set_map('remark', globals()['r.text']['data']['remark'])
+
+    def deal_auditList(self, auditLevel=1, phoneNum=None):
+        """成交审核列表"""
+        self.PostRequest(url='/api/b/auditApply/auditList',
+                         data={
+                             'auditLevel': auditLevel,
+                             'auditStatue': 0,
+                             'phoneNum': phoneNum,
+                         })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('auditId', globals()['r.text']['data']['records'][0]['auditId'])
+        self.appText.set_map('web_total', len(globals()['r.text']['data']['records']))
+
+    def deal_audit(self, auditStatue=1, auditRemark=None):
+        """成交审核"""
+        if auditStatue == 1:
+            auditRemark = None
+        self.PostRequest(url='/api/b/auditApply/audit',
+                         data={
+                             'auditId': self.appText.get('auditId'),
+                             'auditRemark': auditRemark,
+                             'auditStatue': auditStatue,
+                         })
+
+    def finance_deal_auditList(self, keyWord=None, dealStatus=1):
+        """成交-财务审核列表"""
+        self.PostRequest(url='/api/b/trans/deal/auditList',
+                         data={
+                             'keyWord': keyWord,
+                             'dealStatus': dealStatus
+
+                         })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('dealId', globals()['r.text']['data']['records'][0]['dealId'])
+        self.appText.set_map('web_total', globals()['r.text']['data']['total'])
+
+    def finance_deal_audit(self, auditStatue=1, dealAmount=None, remark=None):
+        """财务审核"""
+        if dealAmount is None:
+            dealAmount = self.appText.get('transYeji')
+        if auditStatue == 1:
+            remark = None
+        elif auditStatue==2:
+            dealAmount = ''
+        self.PostRequest(url='/api/b/trans/deal/audit',
+                         data={
+                             'auditStatue': auditStatue,
+                             'dealAmount': dealAmount,
+                             'dealId': self.appText.get('dealId'),
+                             'remark': remark
+                         })
+
+    def detail(self):
+        """成交详情"""
+        self.PostRequest(url='/api/b/trans/detail/' + str(self.appText.get('transId')),
+                         data={
+
+                         })
+        self.appText.set_map('transYeji', globals()['r.text']['data']['transYeji'])
+        self.appText.set_map('visitDealId', globals()['r.text']['data']['transVisitDeal']['visitDealId'])
+        self.appText.set_map('dealPhone', globals()['r.text']['data']['transReservedTellphone'])
+
 
 if __name__ == '__main__':
     a = webApi()

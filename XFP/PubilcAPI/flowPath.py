@@ -173,7 +173,6 @@ class flowPath:
             self.appApi.deal_List()
             dome = self.appApi.appText.get('total')
             self.client_list_non_null()
-            self.appApi.add_deal()                  # 录入成交
             if self.appApi.appText.get('code') != 200:
                 self.clue_non_null()
                 self.appApi.ClueInfo()
@@ -184,23 +183,35 @@ class flowPath:
                                            loanSituation='这个是贷款情况')
                 self.appApi.ClientList()  # 客户列表
                 self.appApi.client_info()
-                self.appApi.add_deal()  # 录入成交
+            self.appApi.visitProject_list()
+            if self.appApi.appText.get('web_total') == 0:
+                self.add_visit()
+                self.accomplish_visit()
+                self.appApi.visitProject_list()
+            self.appApi.add_deal()  # 录入成交
             self.appApi.deal_List()
-            assert dome != self.appApi.appText.get('total')
+            assert dome != self.appApi.appText.get('total'), '录入成交总数不变？'
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
-    def deal_status(self, status):
+    def add_deal_new(self):
+        """录入成交"""
+        self.client_list_non_null()
+        self.appApi.client_info()
+        self.appApi.visitProject_list()
+        self.appApi.add_deal()  # 录入成交
+
+    def deal_status(self, status, keyWord):
         """成交状态"""
         dome = self.appApi.appText.get('clueId')
-        self.appApi.deal_List()
+        self.appApi.deal_List(ApplyStatus=status, keyWord=keyWord)
         if status == '0' or status == 0:
-            assert self.appApi.appText.get('transStatus') == 0, '状态异常'
+            assert self.appApi.appText.get('transStatus') == '0', '状态异常'
         elif status == '1' or status == 1:
-            assert self.appApi.appText.get('transStatus') == 1, '状态异常'
+            assert self.appApi.appText.get('transStatus') == '1', '状态异常'
         elif status == '2' or status == 2:
-            assert self.appApi.appText.get('transStatus') == 2, '状态异常'
+            assert self.appApi.appText.get('transStatus') == '2', '状态异常'
         assert self.appApi.appText.get('clueId') == dome, '跟进申请-无记录'
 
     def first_phone_non_null(self):
