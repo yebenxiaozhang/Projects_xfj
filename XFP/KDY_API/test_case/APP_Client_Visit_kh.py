@@ -118,26 +118,14 @@ class VisitTestCase(unittest.TestCase):
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
 
     def setUp(self):
-        """残留审核 失败！！！"""
-        self.webApi.audit_List()
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            self.webApi.audit_List()
-        self.webApi.audit_List(auditLevel=2)
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            self.webApi.audit_List()
+        """一个客户-进行带看测试"""
         self.flowPath.client_list_non_null()
-        self.appApi.GetMatchingAreaHouse()
         globals()['dome'] = time.strftime("%Y-%m-%d %H:%M:%S")
         self.appApi.ClientTask(taskType='3')
         if self.appApi.appText.get('total') == 2:
             self.flowPath.advance_over_visit()
             if self.appApi.appText.get('code') != 200:
-                self.flowPath.clue_non_null()
-                self.appApi.ClueInfo()
-                self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
-                                           loanSituation='这个是贷款情况')
+                self.flowPath.client_list_non_null()
 
     def test_visit_01(self):
         """3、邀约人默认是登录人也可以选其他咨询师"""
