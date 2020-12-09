@@ -162,7 +162,10 @@ class TestCase(unittest.TestCase):
             # self.appApi.ClueInfo()
             self.webApi.goldApply_addGoldApply()
             self.webApi.goldApply_addGoldApply()
-            self.assertEqual(self.appText.get('data'), '该线索已索赔，详情可查看索赔记录!')
+            if self.appText.get('data') != '该线索已索赔，详情可查看索赔记录!':
+                print(self.appText.get('data'))
+                print(self.appText.get('orderNo'))
+                raise RuntimeError('索赔提示文案不对？')
 
             """审核失败后 再次申请是否可以？"""
             self.webApi.getGoldApplyList()
