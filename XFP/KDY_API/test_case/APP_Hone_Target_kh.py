@@ -323,10 +323,15 @@ class TestCase(unittest.TestCase):
             self.flowPath.add_visit()
             self.flowPath.accomplish_visit()
             self.appApi.visitProject_list()
-        self.appApi.add_deal()
-        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-        self.webApi.finance_deal_audit()
-        self.follow_later(vlue=1)
+            self.appApi.add_deal()
+            self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+            self.webApi.finance_deal_audit()
+            self.follow_later(vlue=2)
+        else:
+            self.appApi.add_deal()
+            self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+            self.webApi.finance_deal_audit()
+            self.follow_later(vlue=1)
 
     def test_await_follow_19(self):
         """26、客户跟进（下次跟进日期为明日）      - 1"""
@@ -393,10 +398,16 @@ class TestCase(unittest.TestCase):
             self.flowPath.add_visit()
             self.flowPath.accomplish_visit()
             self.appApi.visitProject_list()
-        self.appApi.add_deal()
-        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-        self.webApi.finance_deal_audit()
-        self.visit_later()
+
+            self.appApi.add_deal()
+            self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+            self.webApi.finance_deal_audit()
+            self.visit_later(vlue=1)
+        else:
+            self.appApi.add_deal()
+            self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+            self.webApi.finance_deal_audit()
+            self.visit_later()
 
     def test_await_visit_09(self):
         """10、录入客户带看（七天后） + 0"""
@@ -455,6 +466,8 @@ class TestCase(unittest.TestCase):
             self.assertNotEqual(globals()['dome'], self.appText.get('total'))
             if vlue == -1:
                 self.assertEqual(globals()['dome'] - 1, self.appText.get('total'))
+            elif vlue == 2:
+                self.assertEqual(globals()['dome'] + 2, self.appText.get('total'))
             else:
                 self.assertEqual(globals()['dome'] + 1, self.appText.get('total'))
 
