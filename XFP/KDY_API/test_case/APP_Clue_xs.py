@@ -159,8 +159,11 @@ class TestCase(unittest.TestCase):
         self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
-        self.assertNotEqual(200, self.appText.get('code'))
-        self.assertEqual('该线索未首电,不能转为客户!', self.appText.get('data'))
+        if self.appText.get('该线索未首电,不能转为客户!') != self.appText.get('data'):
+            print(self.appText.get('data'))
+            self.appApi.ClueFollowList()
+            print(self.appText.get('data'))
+            raise RuntimeError('该线索未首电,不能转为客户!')
 
     def test_admin_clue(self):
         """通过总部分配的线索不允许修改来源"""
