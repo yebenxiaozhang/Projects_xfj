@@ -137,6 +137,24 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
+        cls.webApi.deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.deal_auditList()
+
+        """审核-成交相关-总监"""
+        cls.webApi.deal_auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.deal_auditList(auditLevel=2)
+
         """残余审核"""
         cls.webApi.audit_List()
         while cls.webApi.webText.get('total') != 0:
@@ -202,36 +220,58 @@ class TestCase(unittest.TestCase):
     def test_deal_rate_01(self):
         """1、录入成交（需要审核）         -成交率不变"""
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=1)
+        self.flowPath.client_list_non_null()
+        self.flowPath.add_visit()
+        self.flowPath.accomplish_visit()
+        self.appApi.visitProject_list()
+
         self.appApi.getConsultantCount()
         dome = self.appApi.appText.get('dealRatio')
-        self.flowPath.add_deal()
+        self.appApi.add_deal()
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('dealRatio') != dome:
             print('1、录入成交（需要审核）         -成交率不变')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+
         """2、审核成功                     -成交率提高"""
-        self.webApi.audit_List()
-        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'))
+        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.deal_audit()
+
+        """财务审核还没通过"""
+        self.appApi.getConsultantCount()
+        if self.appApi.appText.get('dealRatio') != dome:
+            raise RuntimeError('录入成交财务还没审核 带看成交率不变')
+
+        """财务审核通过后成交率提高"""
+        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+        self.webApi.finance_deal_audit()
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('dealRatio') <= dome:
-            print('2、审核成功                     -成交率提高')
-            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+            raise RuntimeError('2、审核成功                     -成交率提高')
+
         """4、录入成交，审核成功后转移     -成交率提高"""
         dome = self.appApi.appText.get('dealRatio')
         self.appApi.client_change()
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('dealRatio') != dome:
-            print('4、录入成交，审核成功后转移     -成交率提高')
-            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+            raise RuntimeError('4、录入成交，审核成功后转移     -成交率提高')
 
     def test_deal_rate_02(self):
         """3、审核失败                     -成交率不变"""
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=1)
+        self.flowPath.client_list_non_null()
+        self.appApi.visitProject_list()
+        if self.appApi.appText.get('web_total') == 0:
+            self.flowPath.add_visit()
+            self.flowPath.accomplish_visit()
+            self.appApi.visitProject_list()
         self.appApi.getConsultantCount()
         dome = self.appApi.appText.get('dealRatio')
-        self.flowPath.add_deal()
-        self.webApi.audit_List()
-        self.webApi.auditApply(customerId=self.appApi.appText.get('customerId'), isAudit=False)
+        self.appApi.add_deal()  # 录入成交
+
+        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.deal_audit(auditStatue=2,
+                               auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('dealRatio') != dome:
             print('3、审核失败                     -成交率不变')

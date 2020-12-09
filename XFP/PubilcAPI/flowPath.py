@@ -198,7 +198,7 @@ class flowPath:
     def add_deal_new(self):
         """录入成交"""
         self.client_list_non_null()
-        self.appApi.client_info()
+        # self.appApi.client_info()
         self.appApi.visitProject_list()
         self.appApi.add_deal()  # 录入成交
 

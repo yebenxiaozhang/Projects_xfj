@@ -106,7 +106,16 @@ class TestCase(unittest.TestCase):
         if self.webText.get('web_clueCount') != self.appText.get('monthGetClueCount'):
             raise RuntimeError('兑换线索（总数）不一致（后台财富值与APP我的财富值）')
         dome2 = self.webText.get('web_clueCount')
-        
+
+        """通过财富值兑换线索与财富值统计兑换线索进行对比"""
+        self.appApi.getWealthDetailList(startTime=self.appText.get('start_date'),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('PTSH'),
+                                        orderNo=None)
+
+        if self.webText.get('web_clueCount') != self.appText.get('web_total'):
+            raise RuntimeError('通过财富值兑换线索与财富值统计兑换线索进行对比')
+
         if self.webText.get('web_wealthClueSum') != self.appText.get('monthGetClueConsumeWealth'):
             raise RuntimeError('兑换线索（消耗财富值）不一致（后台财富值与APP我的财富值）')
         dome = self.webText.get('web_wealthClueSum')

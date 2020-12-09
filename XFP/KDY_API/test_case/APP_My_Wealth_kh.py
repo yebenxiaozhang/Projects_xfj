@@ -107,6 +107,20 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('CJJL', cls.appText.get('remark'))
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='邀约带看', saasCode='admin')
         cls.appText.set_map('YYDK', cls.appText.get('remark'))
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        cls.webApi.deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.deal_auditList()
+
+        cls.webApi.deal_auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.deal_auditList(auditLevel=2)
 
     def test_Wealth_01(self):
         """1、准时完成带看        增加财富值"""
@@ -173,7 +187,20 @@ class TestCase(unittest.TestCase):
                                         wealthType=self.appText.get('CJJL'),
                                         orderNo=self.appText.get('orderNo'))
         dome = self.appText.get('vlue')
+        self.flowPath.add_visit()
+        self.flowPath.accomplish_visit()
+        self.appApi.visitProject_list()
         self.appApi.add_deal()
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('CJJL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != int(dome):
+            raise RuntimeError('录入成交后财务还没审核 加财富值？')
+
+        """财务审核"""
+        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+        self.webApi.finance_deal_audit()
         self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
                                         endTime=time.strftime("%Y-%m-%d"),
                                         wealthType=self.appText.get('CJJL'),
@@ -182,9 +209,11 @@ class TestCase(unittest.TestCase):
             print('录入成交前财富值' + dome)
             print('录入成交后财富值' + self.appText.get('vlue'))
             raise RuntimeError('录入成交与设定成交值不符预设值')
+
         """2、修改成交              审核成功财富值无变化   """
         dome = self.appText.get('vlue')
         self.appApi.deal_List()
+        self.webApi.detail()
         self.appApi.add_deal(Status=1, transTotalPrice='1000000')
         self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
                                         endTime=time.strftime("%Y-%m-%d"),
@@ -193,5 +222,7 @@ class TestCase(unittest.TestCase):
         if self.appText.get('vlue') != dome:
             raise RuntimeError('修改成交单不添加财富值')
 
+        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+        self.webApi.finance_deal_audit()
 
 

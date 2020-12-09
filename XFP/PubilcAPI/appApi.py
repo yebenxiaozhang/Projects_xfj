@@ -43,7 +43,7 @@ class appApi:
                               })
         else:
             data1 = {"page": {
-                'size': '999',
+                'size': '100',
                 'current': '1'
             },
                 "saasCode": saasCode,
@@ -776,6 +776,7 @@ class appApi:
                     while labelName != globals()['r.text']['data'][0]['children'][a]['labelName']:
                         a = a + 1
                         if a == len((globals()['r.text']['data'][0]['children'])):  # 看看有多少个标签
+                            a = a - 1
                             break
                     self.appText.set_map('labelId', globals()['r.text']['data'][0]['children'][a]['labelId'])
                     self.appText.set_map('labelName', globals()['r.text']['data'][0]['children'][a]['labelName'])
@@ -960,7 +961,7 @@ class appApi:
                         transOwnerName=None, transRemark='python-签约', transReservedTellphone=None,
                         transTotalPrice='998888.56',isDeleted=None,
                         transYeji='88.88',
-                        attachmentIds=12):
+                        attachmentIds='13'):
         """成交录入"""
         if Status == 0:
             transId = None
@@ -1198,6 +1199,7 @@ class appApi:
                              'orderNo': orderNo,
                              'consultantIds': [self.appText.get('consultantId')]
                          })
+        self.appText.set_map('web_total', globals()['r.text']['data']['total'])
         if len(globals()['r.text']['data']['records']) != 0:
             self.appText.set_map('total', len(globals()['r.text']['data']['records']))
             self.appText.set_map('records', globals()['r.text']['data']['records'])
@@ -1350,8 +1352,36 @@ class appApi:
 
                             })
 
+    def agoTime(self, days=60):
+        """几天前的数据"""
+        # import time
+        import datetime
+
+        # 先获得时间数组格式的日期
+        threeDayAgo = (datetime.datetime.now() - datetime.timedelta(days=days))
+        # 转换为时间戳
+        timeStamp = int(time.mktime(threeDayAgo.timetuple()))
+        # 转换为其他字符串格式
+        otherStyleTime = threeDayAgo.strftime("%Y-%m-%d")
+        self.appText.set_map('start_date', otherStyleTime)
+        # print(time.strftime('%Y-%m-%d', LocalTime))
+
+    def deal_statistics(self):
+        """我的成交统计 60天的数据"""
+        self.PostRequest(url='/api/a/trans/getMyDealAmountTotal',
+                         data={
+
+                         })
+        self.appText.set_map('dealCount',
+                             globals()['r.text']['data']['my60DealAmountTotal']['dealCount'])
+        self.appText.set_map('totalAmount',
+                             globals()['r.text']['data']['my60DealAmountTotal']['totalAmount'])
+
+
 if __name__ == '__main__':
     a = appApi()
+
+
 
 
 

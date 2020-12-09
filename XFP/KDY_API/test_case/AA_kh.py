@@ -101,6 +101,8 @@ class TestCase(unittest.TestCase):
         cls.webApi.get_group()
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
+        cls.appApi.GetLabelList(labelNo='XSSPYY', labelName='电话空号', saasCode='admin')
+        cls.appText.set_map('DHWK', cls.appText.get('labelId'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
         """审核-成交相关-财务"""

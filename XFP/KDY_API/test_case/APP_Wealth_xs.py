@@ -5,6 +5,7 @@ from XFP.PubilcAPI.flowPath import *
 2、正常首电-----------增加财富值
 3、超时首电-----------扣除财富值
 4、线索转移过后------进行首电|跟进  不增加首电及时率财富值
+5、公海领取--立即写一个跟进 --增加财富值
 """
 
 
@@ -36,7 +37,7 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
-        cls.appApi.ping_admin()
+        # cls.appApi.ping_admin()
         cls.flow = flowPath()
         cls.flowPath = cls.flow
         cls.appText = GlobalMap()
@@ -150,8 +151,26 @@ class TestCase(unittest.TestCase):
         if self.appText.get('vlue') != -5:
             raise RuntimeError('3、超时首电-----------扣除财富值')
 
+    def test_wealth_04(self):
+        """公海领取-首电|写跟进"""
+        self.appApi.SeaList()  # 公海列表
+        self.appApi.clue_Assigned()  # 领取线索
+        self.appApi.my_clue_list()  # 线索列表
+        self.appApi.ClueInfo()
+        try:
+            dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
+            self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
+                                  call_time=dome1)
+        except:
+            self.appApi.ClueFollowList()
+            self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
 
-
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != 10:
+            raise RuntimeError('公海领取-首电|写跟进 及时跟进 没有加财富值')
 
 
 

@@ -90,6 +90,8 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.webApi.get_group()
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        cls.appApi.GetLabelList(labelNo='XSSPYY', labelName='电话空号', saasCode='admin')
+        cls.appText.set_map('DHWK', cls.appText.get('labelId'))
 
         """残余审核"""
         cls.webApi.audit_List()
@@ -150,6 +152,23 @@ class TestCase(unittest.TestCase):
                                             orderNo=self.appText.get('orderNo'))
             if self.appText.get('vlue') != -300:
                 raise RuntimeError('总部分配到分站-分站无在线人员 通过手动分派人员 要扣除财富值')
+
+    def test_repetition_compensation(self):
+        """重复申请索赔"""
+        if ApiXfpUrl == 'http://xfp.xfj100.com':
+            pass
+        else:
+            # self.webApi.clue_list(myClue='N', sourceId=self.appText.get('XSLY_admin'))
+            # self.appApi.ClueInfo()
+            self.webApi.goldApply_addGoldApply()
+            self.webApi.goldApply_addGoldApply()
+            self.assertEqual(self.appText.get('data'), '该线索已索赔，详情可查看索赔记录!')
+
+            """审核失败后 再次申请是否可以？"""
+            self.webApi.getGoldApplyList()
+            self.webApi.auditGoldApply(applyStatus=False)
+            self.webApi.goldApply_addGoldApply()
+            self.assertEqual(self.appText.get('data'), '该线索已索赔，详情可查看索赔记录!')
 
 
 

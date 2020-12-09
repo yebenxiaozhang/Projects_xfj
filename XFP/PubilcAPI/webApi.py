@@ -35,15 +35,15 @@ class webApi:
         globals()['xfp_web_Text'] = globals()['r.text'] = json.loads(r.text)
         self.webText.set_map('ApiXfpUrl', url)
         time.sleep(0.2)
-        if globals()['r.text']['code'] != 200:
-            raise RuntimeError(self.webText.get('ApiXfpUrl'))
+        # if globals()['r.text']['code'] != 200:
+        #     raise RuntimeError(self.webText.get('ApiXfpUrl'))
 
         if r.elapsed.total_seconds() > 5:
             print('接口请求过慢')
             print(self.webText.get('URL'))
         if r.elapsed.total_seconds() > 10:
             print('接口请求过慢大于10秒')
-            raise RuntimeError(self.webText.get('URL'))
+            print(self.webText.get('URL'))
 
 
     def Audit_management(self, suspend=False, suspendLevel=1, clueStop=False, clueStopLevel=1,
@@ -406,6 +406,9 @@ class webApi:
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['clueId'])
             self.appText.set_map('cluePhone',
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['cluePhone'])
+            self.appText.set_map('orderNo',
+                                 globals()['r.text']['data']['records'][
+                                     len(globals()['r.text']['data']['records']) - vlue]['orderNo'])
         else:
             pass
         self.webText.set_map('total', globals()['r.text']['data']['total'])
@@ -535,22 +538,20 @@ class webApi:
         if len(globals()['r.text']['data']) != 0:
             self.webText.set_map('departmentId', globals()['r.text']['data'][0]['departmentId'])
 
-    def deal_list(self, transType=None):
+    def deal_list(self, transType=1):
         """成交列表"""
         self.PostRequest(url='/api/b/trans/list',
                          data={
-                             'transStatus': 1,
                              'consultantId': self.appText.get('consultantId'),
-                             'endTime': self.appText.get('end_date'),
-                             'startTime': self.appText.get('start_date'),
-                             'transType': transType
+                             'endTime': self.appText.get('end_date') + ' 23:59:59',
+                             'startTime': self.appText.get('start_date') + ' 00:00:00',
+                             'transApplyStatus': transType
                          })
         self.webText.set_map('web_total', globals()['r.text']['data']['total'])
         if self.webText.get('web_total') != 0:
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
             self.appText.set_map('transId', globals()['r.text']['data']['records'][0]['transId'])
             self.appText.set_map('customerId', globals()['r.text']['data']['records'][0]['customerId'])
-            self.appText.set_map('transYeji', globals()['r.text']['data']['records'][0]['transYeji'])
 
     def visit_list(self):
         """带看列表"""
@@ -745,6 +746,50 @@ class webApi:
         self.appText.set_map('transYeji', globals()['r.text']['data']['transYeji'])
         self.appText.set_map('visitDealId', globals()['r.text']['data']['transVisitDeal']['visitDealId'])
         self.appText.set_map('dealPhone', globals()['r.text']['data']['transReservedTellphone'])
+
+        self.appText.set_map('BBGZ', globals()['r.text']['data']['transVisitDeal']['reportingRules'])
+        self.appText.set_map('JDRXM', globals()['r.text']['data']['transVisitDeal']['receptionName'])
+        self.appText.set_map('JDRDH', globals()['r.text']['data']['transVisitDeal']['receptionPhone'])
+        self.appText.set_map('YJXJJ', globals()['r.text']['data']['transVisitDeal']['reward'])
+        self.appText.set_map('JSTJ', globals()['r.text']['data']['transVisitDeal']['settlementConditions'])
+        self.appText.set_map('visitProjectId',
+                             globals()['r.text']['data']['transVisitDeal']['visitProjectId'])
+
+    def goldApply_addGoldApply(self):
+        """线索索赔申请"""
+        self.PostRequest(url='/api/b/goldApply/addGoldApply',
+                         data={
+                             'orderNo': self.appText.get('orderNo'),
+                             'clueId': self.appText.get('clueId'),
+                             # 'sourceId': self.appText.get('XSLY_admin'),
+                             'applyId': None,
+                             'applyLabelId': self.appText.get('DHWK'),
+                             'applyStatus': None,
+                             'auditRemark': '1'
+
+                         })
+        self.appText.set_map('data', globals()['r.text']['data'])
+
+    def getGoldApplyList(self):
+        """待处理索赔"""
+        self.PostRequest(url='/api/b/goldApply/getGoldApplyList',
+                         data={
+                             'keyWord': self.appText.get('cluePhone')
+                         })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('applyId', globals()['r.text']['data']['records'][0]['applyId'])
+
+    def auditGoldApply(self, applyStatus=True, remark=''):
+        """审核索赔"""
+        if applyStatus == True:
+            remark =''
+        self.PostRequest(url='/api/b/goldApply/auditGoldApply',
+                         data={
+                             'applyId': self.appText.get('applyId'),
+                             'applyIds': [self.appText.get('applyId')],
+                             'applyStatus': applyStatus,
+                             'remark': remark
+                         })
 
 
 if __name__ == '__main__':
