@@ -87,6 +87,8 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.webApi.get_group()
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        cls.appApi.GetLabelList(labelNo='XSSPYY', labelName='电话空号', saasCode='admin')
+        cls.appText.set_map('DHWK', cls.appText.get('labelId'))
 
         """残余审核"""
         cls.webApi.audit_List()
