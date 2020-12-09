@@ -157,6 +157,7 @@ class TestCase(unittest.TestCase):
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        cls.appApi.my_clue_list()
         while cls.appText.get('total') >= 5:
             cls.flowPath.clue_exile_sea()
             cls.appApi.my_clue_list()
@@ -318,20 +319,13 @@ class TestCase(unittest.TestCase):
                                    appointConsultant=self.appApi.appText.get('consultantId'))
         self.follow_later(vlue=1)
         """24、客户录入成交       - 0"""
+
+        self.flowPath.accomplish_visit()
         self.appApi.visitProject_list()
-        if self.appApi.appText.get('web_total') == 0:
-            self.flowPath.add_visit()
-            self.flowPath.accomplish_visit()
-            self.appApi.visitProject_list()
-            self.appApi.add_deal()
-            self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-            self.webApi.finance_deal_audit()
-            self.follow_later(vlue=2)
-        else:
-            self.appApi.add_deal()
-            self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-            self.webApi.finance_deal_audit()
-            self.follow_later(vlue=1)
+        self.appApi.add_deal()
+        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+        self.webApi.finance_deal_audit()
+        self.follow_later(vlue=0)
 
     def test_await_follow_19(self):
         """26、客户跟进（下次跟进日期为明日）      - 1"""
@@ -466,8 +460,6 @@ class TestCase(unittest.TestCase):
             self.assertNotEqual(globals()['dome'], self.appText.get('total'))
             if vlue == -1:
                 self.assertEqual(globals()['dome'] - 1, self.appText.get('total'))
-            elif vlue == 2:
-                self.assertEqual(globals()['dome'] + 2, self.appText.get('total'))
             else:
                 self.assertEqual(globals()['dome'] + 1, self.appText.get('total'))
 
