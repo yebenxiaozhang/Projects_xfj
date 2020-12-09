@@ -106,6 +106,7 @@ class TestCase(unittest.TestCase):
                                         wealthType=self.appText.get('SDJSL'),
                                         orderNo=self.appText.get('orderNo'))
         if self.appText.get('vlue') != 10:
+            print(self.appText.get('orderNo'))
             raise RuntimeError('拨打再超时前，上传超时算首电及时')
 
     def test_wealth_02(self):
@@ -121,6 +122,7 @@ class TestCase(unittest.TestCase):
                                         wealthType=self.appText.get('SDJSL'),
                                         orderNo=self.appText.get('orderNo'))
         if self.appText.get('vlue') != 10:
+            print(self.appText.get('orderNo'))
             raise RuntimeError('2、正常首电-----------增加财富值')
         """4、线索转移过后------进行首电|跟进  不增加首电及时率财富值"""
         self.appApi.ClueChange()
@@ -134,6 +136,7 @@ class TestCase(unittest.TestCase):
                                         wealthType=self.appText.get('SDJSL'),
                                         orderNo=self.appText.get('orderNo'))
         if self.appText.get('vlue') != 0:
+            print(self.appText.get('orderNo'))
             raise RuntimeError('已首电转移过后不能在加财富值')
 
     def test_wealth_03(self):
@@ -149,6 +152,7 @@ class TestCase(unittest.TestCase):
                                         wealthType=self.appText.get('SDJSL'),
                                         orderNo=self.appText.get('orderNo'))
         if self.appText.get('vlue') != -5:
+            print(self.appText.get('orderNo'))
             raise RuntimeError('3、超时首电-----------扣除财富值')
 
     def test_wealth_04(self):
@@ -170,6 +174,7 @@ class TestCase(unittest.TestCase):
                                         wealthType=self.appText.get('SDJSL'),
                                         orderNo=self.appText.get('orderNo'))
         if self.appText.get('vlue') != 10:
+            print(self.appText.get('orderNo'))
             raise RuntimeError('公海领取-首电|写跟进 及时跟进 没有加财富值')
 
 

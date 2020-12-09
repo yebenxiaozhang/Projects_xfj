@@ -318,7 +318,14 @@ class TestCase(unittest.TestCase):
                                    appointConsultant=self.appApi.appText.get('consultantId'))
         self.follow_later(vlue=1)
         """24、客户录入成交       - 0"""
-        self.flowPath.add_deal()
+        self.appApi.visitProject_list()
+        if self.appApi.appText.get('web_total') == 0:
+            self.flowPath.add_visit()
+            self.flowPath.accomplish_visit()
+            self.appApi.visitProject_list()
+        self.appApi.add_deal()
+        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+        self.webApi.finance_deal_audit()
         self.follow_later(vlue=1)
 
     def test_await_follow_19(self):
@@ -381,7 +388,14 @@ class TestCase(unittest.TestCase):
     def test_await_visit_08(self):
         """8、客户录入客户            - 0"""
         self.visit_front(vlue=0)
-        self.flowPath.add_deal()
+        self.appApi.visitProject_list()
+        if self.appApi.appText.get('web_total') == 0:
+            self.flowPath.add_visit()
+            self.flowPath.accomplish_visit()
+            self.appApi.visitProject_list()
+        self.appApi.add_deal()
+        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+        self.webApi.finance_deal_audit()
         self.visit_later()
 
     def test_await_visit_09(self):
