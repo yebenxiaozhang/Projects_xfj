@@ -147,8 +147,14 @@ class TestCase(unittest.TestCase):
 
     def test_follow_apply(self):
         """3、客户暂缓审核中---不允许创建带看，不允许录成交，不允许流放公海（无论是否开启审核，都不允许操作）"""
-        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         self.flowPath.client_list_non_null()
+        self.appApi.visitProject_list()
+        if self.appApi.appText.get('web_total') == 0:
+            self.flowPath.add_visit()
+            self.flowPath.accomplish_visit()
+            self.appApi.visitProject_list()
+        self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
+
         self.flowPath.suspend_follow()
 
         self.appApi.GetMatchingAreaHouse()
@@ -159,8 +165,6 @@ class TestCase(unittest.TestCase):
                                    appointConsultant=self.appApi.appText.get('consultantId'))
         self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
 
-        self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
-        assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
         self.appApi.add_deal()  # 录入成交
         self.assertEqual('已申请暂缓跟进,正在审核中!', self.appApi.appText.get('data'))
 
@@ -387,19 +391,20 @@ class TestCase(unittest.TestCase):
         """2、客户终止跟进审核中 ---不允许创建带看，不允许录成交，
         不允许暂缓，（无论是否开启审核，都不允许操作）"""
         self.flowPath.client_list_non_null()
+        self.appApi.visitProject_list()
+        if self.appApi.appText.get('web_total') == 0:
+            self.flowPath.add_visit()
+            self.flowPath.accomplish_visit()
+            self.appApi.visitProject_list()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=1)  # 修改配置审核
         self.appApi.client_exile_sea()
 
-        self.appApi.GetMatchingAreaHouse()
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                    appointmentTime=dome,
                                    seeingConsultant=self.appApi.appText.get('consultantId'),
                                    appointConsultant=self.appApi.appText.get('consultantId'))
         self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
-
-        self.appApi.GetMatchingAreaHouse()  # 匹配楼盘
-        assert 0 != self.appApi.appText.get('total'), '匹配楼盘为空？'
 
         self.appApi.add_deal()  # 录入成交
         self.assertEqual('已申请客户终止,正在审核中!', self.appApi.appText.get('data'))
