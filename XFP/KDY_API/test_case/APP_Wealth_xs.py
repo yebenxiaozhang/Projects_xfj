@@ -179,12 +179,13 @@ class TestCase(unittest.TestCase):
             raise RuntimeError('公海领取-首电|写跟进 及时跟进 没有加财富值')
 
     def test_wealth_05(self):
-        """在超时前写跟进 查看奖励"""
+        """在超时前写跟进 要有及时率奖励"""
         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
                              sourceId=self.appApi.appText.get('XSLY'),
                              keyWords=self.appApi.appText.get('XSBQ'))
         self.appApi.my_clue_list()  # 线索列表
         self.appApi.ClueFollowList()
+        time.sleep(30)
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
                                         endTime=time.strftime("%Y-%m-%d"),
@@ -192,7 +193,7 @@ class TestCase(unittest.TestCase):
                                         orderNo=self.appText.get('orderNo'))
         if self.appText.get('vlue') != 10:
             print(self.appText.get('orderNo'))
-            raise RuntimeError('公海领取-首电|写跟进 及时跟进 没有加财富值')
+            raise RuntimeError('首电及时率在超时前写跟进 要有及时率奖励')
 
     def test_wealth_06(self):
         """首电及时奖励为0 及时跟进"""
