@@ -48,7 +48,8 @@ class webApi:
 
     def Audit_management(self, suspend=False, suspendLevel=1, clueStop=False, clueStopLevel=1,
                          customerStop=False, customerStopLevel=1, customerVisit=False,
-                         customerVisitLevel=1, customerDeal=False, customerDealLevel=1):
+                         customerVisitLevel=1, customerDeal=False, customerDealLevel=1,
+                         firstCallDaySwitch=True, firstCallDayWealth=10, notFirstCallDayWealth=5):
         """审核管理"""
         try:
             configValue = {
@@ -93,9 +94,9 @@ class webApi:
                             "notPlatformAddClueWealth": 0,
                             "notPlatformAddClueWealthSwitch": False,
                             "firstCallSwitch": True,
-                            "firstCallDaySwitch": True,
-                            "firstCallDayWealth": 10,
-                            "notFirstCallDayWealth": 5,
+                            "firstCallDaySwitch": firstCallDaySwitch,           # 首电开关
+                            "firstCallDayWealth": firstCallDayWealth,           # 首电及时奖励
+                            "notFirstCallDayWealth": notFirstCallDayWealth,     # 首电超时奖励
                             "firstCallMonthSwitch": True,
                             "firstCallMonthInvalid": 20,
                             "firstCallMonthPercentage": 98,

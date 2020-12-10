@@ -6,6 +6,7 @@ from XFP.PubilcAPI.flowPath import *
 3、超时首电-----------扣除财富值
 4、线索转移过后------进行首电|跟进  不增加首电及时率财富值
 5、公海领取--立即写一个跟进 --增加财富值
+6、新增线索-立即写一个跟进
 """
 
 
@@ -177,9 +178,71 @@ class TestCase(unittest.TestCase):
             print(self.appText.get('orderNo'))
             raise RuntimeError('公海领取-首电|写跟进 及时跟进 没有加财富值')
 
+    def test_wealth_05(self):
+        """在超时前写跟进 查看奖励"""
+        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appApi.appText.get('XSLY'),
+                             keyWords=self.appApi.appText.get('XSBQ'))
+        self.appApi.my_clue_list()  # 线索列表
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != 10:
+            print(self.appText.get('orderNo'))
+            raise RuntimeError('公海领取-首电|写跟进 及时跟进 没有加财富值')
 
+    def test_wealth_06(self):
+        """首电及时奖励为0 及时跟进"""
+        self.webApi.Audit_management(firstCallDayWealth=0)
+        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appApi.appText.get('XSLY'),
+                             keyWords=self.appApi.appText.get('XSBQ'))
+        self.appApi.my_clue_list()  # 线索列表
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != 0:
+            print(self.appText.get('orderNo'))
+            raise RuntimeError('首电及时奖励为0 及时跟进 奖励应该为0')
 
+    def test_wealth_07(self):
+        """首电及时奖励为0 30秒后跟进"""
+        self.webApi.Audit_management(firstCallDayWealth=0)
+        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appApi.appText.get('XSLY'),
+                             keyWords=self.appApi.appText.get('XSBQ'))
+        self.appApi.my_clue_list()  # 线索列表
+        self.appApi.ClueFollowList()
+        time.sleep(30)
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != 0:
+            print(self.appText.get('orderNo'))
+            raise RuntimeError('首电及时奖励为0 超时前跟进 应该为0或者空')
 
-
-
-
+    def test_wealth_08(self):
+        """首电及时奖励为0 超时跟进"""
+        self.webApi.Audit_management(firstCallDayWealth=0)
+        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appApi.appText.get('XSLY'),
+                             keyWords=self.appApi.appText.get('XSBQ'))
+        self.appApi.my_clue_list()  # 线索列表
+        self.appApi.ClueFollowList()
+        time.sleep(60)
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        wealthType=self.appText.get('SDJSL'),
+                                        orderNo=self.appText.get('orderNo'))
+        if self.appText.get('vlue') != -5:
+            print(self.appText.get('orderNo'))
+            raise RuntimeError('首电及时奖励为0 超时前跟进 应该为0或者空')
