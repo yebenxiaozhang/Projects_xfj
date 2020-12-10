@@ -256,22 +256,30 @@ class TestCase(unittest.TestCase):
         # self.webApi.detail()
         self.appApi.add_deal(Status=1)
 
+        self.appApi.Login(userName='13062200302')
         self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.deal_audit(auditStatue=1)
 
         self.flowPath.deal_status(status=0, keyWord=self.appText.get('dealPhone'))
 
         """4、录入成交-二级审核成功    已确认                         已确认"""
+        self.appApi.Login(userName='13062200303')
         self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
         self.webApi.deal_audit(auditStatue=1)
 
         """财务审核"""
+        self.appApi.Login(userName='13062200310')
         self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
         self.webApi.finance_deal_audit()
         self.flowPath.deal_status(status=1, keyWord=self.appText.get('dealPhone'))
+        self.appApi.transProgress()
+        self.assertIn('总监', self.appText.get('directorAuditDesc'))
+        self.assertIn('财务', self.appText.get('financialAuditDesc'))
+        self.assertIn('经理', self.appText.get('managerAuditDesc'))
 
     def test_my_deal_06(self):
         """5、录入成交-二级审核失败    已驳回                         已驳回"""
+        self.appApi.Login()
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=2)
         # self.appApi.deal_List(transStatus=1)
         # self.webApi.detail()
@@ -391,4 +399,9 @@ class TestCase(unittest.TestCase):
 
         """还原日期"""
         self.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+
+    def test_my_deal_13(self):
+        """查看成交进度审核人"""
+
+
 

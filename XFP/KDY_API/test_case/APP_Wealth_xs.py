@@ -183,9 +183,9 @@ class TestCase(unittest.TestCase):
         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
                              sourceId=self.appApi.appText.get('XSLY'),
                              keyWords=self.appApi.appText.get('XSBQ'))
+        time.sleep(30)
         self.appApi.my_clue_list()  # 线索列表
         self.appApi.ClueFollowList()
-        time.sleep(30)
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
                                         endTime=time.strftime("%Y-%m-%d"),

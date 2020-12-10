@@ -1352,6 +1352,17 @@ class appApi:
 
                             })
 
+    def transProgress(self):
+        """成交进度"""
+        self.PostRequest(url='/api/a/trans/progress',
+                         data={
+                             'id': self.appText.get('transId')
+                         })
+        if len(globals()['r.text']['data']['nodes']) != 0:
+            self.appText.set_map('directorAuditDesc', globals()['r.text']['data']['nodes'][0]['nodeLists'][0]['directorAuditDesc'])     # 总监
+            self.appText.set_map('financialAuditDesc', globals()['r.text']['data']['nodes'][0]['nodeLists'][0]['financialAuditDesc'])   # 财务
+            self.appText.set_map('managerAuditDesc', globals()['r.text']['data']['nodes'][0]['nodeLists'][0]['managerAuditDesc'])       # 经理
+
     def agoTime(self, days=60):
         """几天前的数据"""
         # import time
