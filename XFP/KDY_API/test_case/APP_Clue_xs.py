@@ -181,6 +181,6 @@ class TestCase(unittest.TestCase):
             self.appApi.ClueSave(Status=2,
                                  clueNickName=self.appApi.RandomText(textArr=surname),
                                  sourceId=self.appText.get('XSLY'))
-            if self.appText.get('code') != 200:
+            if self.appText.get('code') == 200:
                 raise RuntimeError('总部分配过来的线索,线索来源不能修改')
 
