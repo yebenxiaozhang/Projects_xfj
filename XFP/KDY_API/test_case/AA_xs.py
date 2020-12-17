@@ -25,23 +25,14 @@ class TestCase(unittest.TestCase):
         cls.do_request = appApi()
         cls.appApi = cls.do_request
         cls.appApi.Login(authCode=1)
+
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
         cls.appText = GlobalMap()
         cls.request = webApi()
         cls.webApi = cls.request
-        cls.webApi.DeptUserListPage(deviceNo=deviceId)
-        cls.webApi.UserIdList(keyWord=XfpUser1)
-        dome = cls.appText.get('userId')
-        cls.webApi.UserIdList(keyWord=XfpUser11)
-        dome1 = cls.appText.get('userId')
-        cls.webApi.UserIdList(keyWord=XfpUser)
-        dome2 = cls.appText.get('userId')
-        userId = [dome, dome1, dome2]
-        cls.webApi.DeviceBinding(userId=userId)
         cls.appApi.GetUserData()
         cls.webApi.Audit_management()
-        cls.flow = flowPath()
-        cls.flowPath = cls.flow
-
         cls.webApi.DeptUserListPage(deviceNo=deviceId)
         cls.webApi.UserIdList(keyWord=XfpUser1)
         dome = cls.appText.get('userId')
