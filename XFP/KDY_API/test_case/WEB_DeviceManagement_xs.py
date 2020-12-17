@@ -65,6 +65,7 @@ class TestCase(unittest.TestCase):
 
     def test_Device_02(self):
         """添加默认设备人员"""
+        self.appApi.Login(authCode=1)
         self.webApi.DeptUserListPage(deviceNo=deviceId)
         self.webApi.UserIdList(keyWord=XfpUser1)
         dome = self.appText.get('userId')
