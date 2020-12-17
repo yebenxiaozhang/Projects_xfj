@@ -147,19 +147,33 @@ class TestCase(unittest.TestCase):
         cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
 
-    def setUp(self):
-        """残留审核 失败！！！"""
-        self.webApi.audit_List()
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False,
-                                   auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
-            self.webApi.audit_List()
-        self.webApi.audit_List(auditLevel=2)
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False,
-                                   auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
-            self.webApi.audit_List()
+        """审核-成交相关-经理"""
+        cls.webApi.auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
+
+    # def setUp(self):
+    #     """残留审核 失败！！！"""
+    #     self.webApi.audit_List()
+    #     while self.webApi.webText.get('total') != 0:
+    #         self.webApi.auditApply(isAudit=False,
+    #                                auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
+    #         self.webApi.audit_List()
+    #     self.webApi.audit_List(auditLevel=2)
+    #     while self.webApi.webText.get('total') != 0:
+    #         self.webApi.auditApply(isAudit=False,
+    #                                auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
+    #         self.webApi.audit_List()
 
     def test_await_first_phone_01(self):
         """1、平台分派              + 1"""
@@ -168,7 +182,7 @@ class TestCase(unittest.TestCase):
         else:
             self.appApi.TodayClue(isFirst=0)
             dome = self.appText.get('Total')
-            self.appApi.Login(userName='admin', saasCode='admin')
+            self.appApi.Login(userName='admin', saasCode='admin', authCode=0)
             self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
             if self.webText.get('code') != 200:
                 self.webApi.addGoldDetailInfo()

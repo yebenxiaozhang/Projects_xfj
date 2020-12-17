@@ -139,45 +139,45 @@ class webApi:
 
         except BaseException as e:
             print("没有找到配置管理%s" % e)
-
-    def audit_List(self, keyWord=None, auditStatue=0, auditLevel=1):
-        """审核列表"""
-        self.PostRequest(url='/api/b/audit/auditList',
-                         data={
-                            'keyWord': keyWord,
-                            'auditLevel': auditLevel,       # 1是经理 2是总监
-                            'auditStatue': auditStatue      # 状态 0是待审核 1 同意 2 是拒绝
-                         })
-        self.webText.set_map('total', globals()['r.text']['data']['total'])
-        if globals()['r.text']['data']['total'] != 0:
-            self.webText.set_map('applyReason', globals()['r.text']['data']['records'][0]['applyReason'])
-            self.webText.set_map('auditId', globals()['r.text']['data']['records'][0]['auditId'])
-            self.webText.set_map('auditType', globals()['r.text']['data']['records'][0]['auditType'])
-            self.webText.set_map('auditLevel', globals()['r.text']['data']['records'][0]['auditLevel'])
-            self.webText.set_map('parentAuditId', globals()['r.text']['data']['records'][0]['parentAuditId'])
-            self.webText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
-            self.webText.set_map('customerId', globals()['r.text']['data']['records'][0]['customerId'])
-
-    def auditApply(self, vlue=1, auditRemark=None, isAudit=True, customerId='', endTime=''):
-        """审核"""
-        if vlue == 2:
-            parentAuditId = self.appText.get('parentAuditId')
-        else:
-            parentAuditId = ''
-        self.PostRequest(url='/api/b/audit/auditApply',
-                         data={
-                             'clueId': self.appText.get('clueId'),
-                             'auditId': self.webText.get('auditId'),
-                             'customerId': customerId,
-                             'applyReason': self.webText.get('applyReason'),
-                             'consultantId': self.appText.get('consultantId'),
-                             'auditLevel': self.webText.get('auditLevel'),
-                             'auditType': self.webText.get('auditType'),
-                             'isAudit': isAudit,
-                             'parentAuditId': parentAuditId,
-                             'endTime': endTime,
-                             'auditRemark': auditRemark,
-                         })
+    #
+    # def audit_List(self, keyWord=None, auditStatue=0, auditLevel=1):
+    #     """审核列表"""
+    #     self.PostRequest(url='/api/b/audit/auditList',
+    #                      data={
+    #                         'keyWord': keyWord,
+    #                         'auditLevel': auditLevel,       # 1是经理 2是总监
+    #                         'auditStatue': auditStatue      # 状态 0是待审核 1 同意 2 是拒绝
+    #                      })
+    #     self.webText.set_map('total', globals()['r.text']['data']['total'])
+    #     if globals()['r.text']['data']['total'] != 0:
+    #         self.webText.set_map('applyReason', globals()['r.text']['data']['records'][0]['applyReason'])
+    #         self.webText.set_map('auditId', globals()['r.text']['data']['records'][0]['auditId'])
+    #         self.webText.set_map('auditType', globals()['r.text']['data']['records'][0]['auditType'])
+    #         self.webText.set_map('auditLevel', globals()['r.text']['data']['records'][0]['auditLevel'])
+    #         self.webText.set_map('parentAuditId', globals()['r.text']['data']['records'][0]['parentAuditId'])
+    #         self.webText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
+    #         self.webText.set_map('customerId', globals()['r.text']['data']['records'][0]['customerId'])
+    #
+    # def auditApply(self, vlue=1, auditRemark=None, isAudit=True, customerId='', endTime=''):
+    #     """审核"""
+    #     if vlue == 2:
+    #         parentAuditId = self.appText.get('parentAuditId')
+    #     else:
+    #         parentAuditId = ''
+    #     self.PostRequest(url='/api/b/audit/auditApply',
+    #                      data={
+    #                          'clueId': self.appText.get('clueId'),
+    #                          'auditId': self.webText.get('auditId'),
+    #                          'customerId': customerId,
+    #                          'applyReason': self.webText.get('applyReason'),
+    #                          'consultantId': self.appText.get('consultantId'),
+    #                          'auditLevel': self.webText.get('auditLevel'),
+    #                          'auditType': self.webText.get('auditType'),
+    #                          'isAudit': isAudit,
+    #                          'parentAuditId': parentAuditId,
+    #                          'endTime': endTime,
+    #                          'auditRemark': auditRemark,
+    #                      })
 
     def add_label(self, labelName, labelId, pid):
         """新增标签"""

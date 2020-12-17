@@ -53,12 +53,12 @@ class TestCase(unittest.TestCase):
         self.webApi.addDeviceInfo(deviceName='设备', deviceNo=deviceId)
         self.assertEqual('设备已存在,请勿重复添加!', self.appText.get('data'))
         """尝试登录"""
-        self.appApi.Login()
+        self.appApi.Login(userName=XfpUser11)
         self.assertEqual('用户暂无设备授权,登录失败!', self.appText.get('resultStr'))
         """绑定设备"""
         self.appApi.Login(authCode=1)
         self.webApi.DeptUserListPage(deviceNo=deviceId)
-        self.webApi.UserIdList(keyWord=XfpUser)
+        self.webApi.UserIdList(keyWord=XfpUser11)
         self.webApi.DeviceBinding()
         self.appApi.Login()
 
