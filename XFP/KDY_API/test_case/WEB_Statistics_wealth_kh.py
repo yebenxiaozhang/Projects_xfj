@@ -145,7 +145,7 @@ class TestCase(unittest.TestCase):
         if ApiXfpUrl == 'http://xfp.xfj100.com':
             pass
         else:
-            self.appApi.Login(userName='admin', saasCode='admin')
+            self.appApi.Login(userName='admin', saasCode='admin', authCode='0')
             self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
             self.appApi.Login()
             self.appApi.my_clue_list(keyWord=self.webText.get('cluePhone'))

@@ -234,8 +234,8 @@ class TestCase(unittest.TestCase):
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
         """2、审核成功                     -成交率提高"""
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit()
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
 
         """财务审核还没通过"""
         self.appApi.getConsultantCount()
@@ -269,8 +269,8 @@ class TestCase(unittest.TestCase):
         dome = self.appApi.appText.get('dealRatio')
         self.appApi.add_deal()  # 录入成交
 
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit(auditStatue=2,
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=2,
                                auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('dealRatio') != dome:
