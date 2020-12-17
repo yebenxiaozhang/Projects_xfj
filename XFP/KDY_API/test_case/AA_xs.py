@@ -32,6 +32,15 @@ class TestCase(unittest.TestCase):
         cls.flow = flowPath()
         cls.flowPath = cls.flow
         cls.appText = GlobalMap()
+        cls.webApi.DeptUserListPage(deviceNo=deviceId)
+        cls.webApi.UserIdList(keyWord=XfpUser1)
+        dome = cls.appText.get('userId')
+        # cls.webApi.UserIdList(keyWord=XfpUser11)
+        # dome1 = cls.appText.get('userId')
+        cls.webApi.UserIdList(keyWord=XfpUser)
+        dome2 = cls.appText.get('userId')
+        userId = [dome, dome2]
+        cls.webApi.DeviceBinding(userId=userId)
         """线索来源"""
         cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
                                newlabelName='百度小程序')

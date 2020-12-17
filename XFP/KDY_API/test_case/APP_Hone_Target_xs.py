@@ -265,35 +265,37 @@ class TestCase(unittest.TestCase):
                                    loanSituation='这个是贷款情况')
         self.follow_later()
 
-    def test_await_follow_09(self):
-        """11、线索流放公海（无需审核）   - 1"""
-        self.webApi.Audit_management()  # 修改配置审核
-        self.clue_front()
-        self.follow_front()
-        self.flowPath.clue_exile_sea()
-        self.follow_later(vlue=-1)
-
-    def test_await_follow_10(self):
-        """12、线索流放公海（审核中）     - 0"""
-        self.clue_front()
-        self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
-        self.follow_front()
-        self.flowPath.clue_exile_sea()
-        self.follow_later()
-        """13、线索流放公海（审核失败）   - 0"""
-        self.webApi.audit_List()  # 审核列表
-        self.webApi.auditApply(isAudit=False)
-        self.follow_later()
-
-    def test_await_follow_11(self):
-        """14、线索流放公海（审核成功）   - 1"""
-        self.clue_front()
-        self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
-        self.follow_front()
-        self.flowPath.clue_exile_sea()
-        self.webApi.audit_List()  # 审核列表
-        self.webApi.auditApply()
-        self.follow_later(vlue=-1)
+    # def test_await_follow_09(self):
+    #     """11、线索流放公海（无需审核）   - 1"""
+    #     self.webApi.Audit_management()  # 修改配置审核
+    #     self.clue_front()
+    #     self.follow_front()
+    #     self.flowPath.clue_exile_sea()
+    #     self.follow_later(vlue=-1)
+    #
+    # def test_await_follow_10(self):
+    #     """12、线索流放公海（审核中）     - 0"""
+    #     self.clue_front()
+    #     self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
+    #     self.follow_front()
+    #     self.flowPath.clue_exile_sea()
+    #     self.follow_later()
+    #     """13、线索流放公海（审核失败）   - 0"""
+    #     self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+    #     self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
+    #     # self.webApi.audit_List()  # 审核列表
+    #     # self.webApi.auditApply(isAudit=False)
+    #     self.follow_later()
+    #
+    # def test_await_follow_11(self):
+    #     """14、线索流放公海（审核成功）   - 1"""
+    #     self.clue_front()
+    #     self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
+    #     self.follow_front()
+    #     self.flowPath.clue_exile_sea()
+    #     self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+    #     self.webApi.audit()
+    #     self.follow_later(vlue=-1)
 
     def test_await_follow_18(self):
         """25、线索跟进（下次跟进日期为明日）      - 1"""
