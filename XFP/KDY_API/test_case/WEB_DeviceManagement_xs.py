@@ -60,7 +60,8 @@ class TestCase(unittest.TestCase):
         self.webApi.DeptUserListPage(deviceNo=deviceId)
         self.webApi.UserIdList(keyWord=XfpUser11)
         self.webApi.DeviceBinding()
-        self.appApi.Login()
+        self.appApi.Login(XfpUser11)
+        self.assertEqual(self.appText.get('msg'), '成功')
 
     def test_Device_02(self):
         """添加默认设备人员"""
