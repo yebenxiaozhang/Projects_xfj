@@ -128,17 +128,6 @@ class TestCase(unittest.TestCase):
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
 
-    def setUp(self):
-        """残留审核 失败！！！"""
-        self.webApi.audit_List()
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            self.webApi.audit_List()
-        self.webApi.audit_List(auditLevel=2)
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            self.webApi.audit_List()
-
     def test_first_phone_TimelinessRate_01(self):
         """1、在08:00:00-08:01:00 拨打再超时之前上传录音    -首电及时"""
         self.flowPath.add_new_clue()
