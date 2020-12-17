@@ -3,9 +3,8 @@ ApiXfpUrl = 'http://xfpapi.ykb100.com'
 ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
-XfpsaasCode = '000012'
+XfpsaasCode = '000013'
 XfpUser1 = '13062200304'
-XfpUser11 = '13062200311'
 XfpPwd1 = '12345678'
 
 

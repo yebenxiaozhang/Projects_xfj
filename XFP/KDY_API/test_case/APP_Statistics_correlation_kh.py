@@ -143,28 +143,6 @@ class TestCase(unittest.TestCase):
             cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
             cls.webApi.finance_deal_auditList()
 
-        """审核-成交相关-经理"""
-        cls.webApi.deal_auditList()
-        while cls.appText.get('web_total') != 0:
-            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
-            cls.webApi.deal_auditList()
-
-        """审核-成交相关-总监"""
-        cls.webApi.deal_auditList(auditLevel=2)
-        while cls.appText.get('web_total') != 0:
-            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
-            cls.webApi.deal_auditList(auditLevel=2)
-
-        """残余审核"""
-        cls.webApi.audit_List()
-        while cls.webApi.webText.get('total') != 0:
-            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            cls.webApi.audit_List()
-        cls.webApi.audit_List(auditLevel=2)
-        while cls.webApi.webText.get('total') != 0:
-            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            cls.webApi.audit_List()
-
         """去除一些客户及线索"""
         cls.appApi.my_clue_list()
         while cls.appText.get('total') >= 5:
@@ -175,17 +153,6 @@ class TestCase(unittest.TestCase):
         while cls.appText.get('total') >= 5:
             cls.appApi.client_exile_sea()
             cls.appApi.ClientList()
-
-    def setUp(self):
-        """残留审核 失败！！！"""
-        self.webApi.audit_List()
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            self.webApi.audit_List()
-        self.webApi.audit_List(auditLevel=2)
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            self.webApi.audit_List()
 
     def test_client_visit_rate_01(self):
         """1、创建带看，                 -邀约率不变"""
@@ -271,7 +238,7 @@ class TestCase(unittest.TestCase):
 
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2,
-                               auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+                          auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('dealRatio') != dome:
             print('3、审核失败                     -成交率不变')
