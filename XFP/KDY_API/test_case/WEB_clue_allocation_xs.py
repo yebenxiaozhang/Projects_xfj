@@ -122,7 +122,7 @@ class TestCase(unittest.TestCase):
             self.webApi.consultant_allocition(isAppoint=0)
             self.appApi.my_clue_list()
             dome = self.appText.get('total')
-            self.appApi.Login(userName='admin', saasCode='admin')
+            self.appApi.Login(userName='admin', saasCode='admin', authCode=0)
             self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
             self.appApi.Login()
             self.webApi.clue_await_allocition(keyWord=self.webText.get('cluePhone'))
@@ -178,7 +178,7 @@ class TestCase(unittest.TestCase):
         self.appApi.Login()
         self.webApi.clue_list(sourceId=self.appText.get('XSLY_admin'), myClue='N')
         self.appApi.ClueInfo()
-        self.appApi.Login(userName='admin', saasCode='admin')
+        self.appApi.Login(userName='admin', saasCode='admin', authCode=0)
         self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname),
                                    cluePhone=self.appText.get('cluePhone'))
         self.assertEqual(self.appText.get('data'), '该线索已存在')
