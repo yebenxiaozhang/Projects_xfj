@@ -138,16 +138,16 @@ class TestCase(unittest.TestCase):
             cls.webApi.finance_deal_auditList()
 
         """审核-成交相关-经理"""
-        cls.webApi.deal_auditList()
+        cls.webApi.auditList()
         while cls.appText.get('web_total') != 0:
-            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
-            cls.webApi.deal_auditList()
+            cls.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.auditList()
 
         """审核-成交相关-总监"""
-        cls.webApi.deal_auditList(auditLevel=2)
+        cls.webApi.auditList(auditLevel=2)
         while cls.appText.get('web_total') != 0:
-            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
-            cls.webApi.deal_auditList(auditLevel=2)
+            cls.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.auditList(auditLevel=2)
 
         """残余审核"""
         cls.webApi.audit_List()
@@ -218,8 +218,8 @@ class TestCase(unittest.TestCase):
 
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         """2、录入成交-审核失败        已驳回                         已驳回"""
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
         self.flowPath.deal_status(status=2, keyWord=self.appText.get('dealPhone'))
 
     def test_my_deal_03(self):
@@ -228,8 +228,8 @@ class TestCase(unittest.TestCase):
         # self.appApi.deal_List(transStatus=1)
         # self.webApi.detail()
         self.appApi.add_deal(Status=1)
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit()
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
         self.flowPath.deal_status(status=0, keyWord=self.appText.get('dealPhone'))
         self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
         self.webApi.finance_deal_audit()
@@ -244,8 +244,8 @@ class TestCase(unittest.TestCase):
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
         """2、录入成交-一级审核失败    已驳回                         已驳回"""
 
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
 
         self.flowPath.deal_status(status=2, keyWord=self.appText.get('dealPhone'))
 
@@ -257,15 +257,15 @@ class TestCase(unittest.TestCase):
         self.appApi.add_deal(Status=1)
 
         self.appApi.Login(userName='13062200302')
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit(auditStatue=1)
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=1)
 
         self.flowPath.deal_status(status=0, keyWord=self.appText.get('dealPhone'))
 
         """4、录入成交-二级审核成功    已确认                         已确认"""
         self.appApi.Login(userName='13062200303')
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
-        self.webApi.deal_audit(auditStatue=1)
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
+        self.webApi.audit(auditStatue=1)
 
         """财务审核"""
         self.appApi.Login(userName='13062200310')
@@ -285,11 +285,11 @@ class TestCase(unittest.TestCase):
         # self.webApi.detail()
         self.appApi.add_deal(Status=1)
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit(auditStatue=1)
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=1)
 
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
-        self.webApi.deal_audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
+        self.webApi.audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
 
         self.flowPath.deal_status(status=2, keyWord=self.appText.get('dealPhone'))
 
@@ -322,8 +322,8 @@ class TestCase(unittest.TestCase):
         self.assertEqual('已申请客户成交,正在审核中!', self.appApi.appText.get('data'))
 
         """审核及财务审核"""
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit()
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
         self.webApi.finance_deal_auditList(keyWord=dome1)
         self.webApi.finance_deal_audit()
 
@@ -339,35 +339,21 @@ class TestCase(unittest.TestCase):
         self.assertEqual(dome, self.webApi.webText.get('clueId'))
 
         """审核及财务审核"""
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit()
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
         self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
         self.webApi.finance_deal_audit()
-
-    # def test_my_deal_09(self):
-    #     """3、已确认的成交              ---不允许删除"""
-    #     self.webApi.Audit_management()
-    #     self.test_my_deal_01()
-    #     self.appApi.deal_List()
-    #     self.appApi.add_deal(Status=2, isDeleted=1)
-    #     self.assertEqual('该成交已完成,无法删除!', self.appApi.appText.get('data'))
 
     def test_my_deal_10(self):
         """一级审核没有通过的情况下不显示出来"""
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=2)
         self.flowPath.add_deal_new()
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit(auditStatue=2, auditRemark='审核失败')
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=2, auditRemark='审核失败')
 
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
         if self.webText.get('web_total') != 0:
             raise RuntimeError('审核管理（成交）一级审核没有通过的情况， 总监审核出来了')
-
-        # """审核及财务审核"""
-        # self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        # self.webApi.deal_audit()
-        # self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-        # self.webApi.finance_deal_audit()
 
     def test_my_deal_11(self):
         """财务审核失败后 查看成交的状态？"""
@@ -375,8 +361,8 @@ class TestCase(unittest.TestCase):
         self.appApi.deal_List(transStatus=1)
         self.webApi.detail()
         self.appApi.add_deal(Status=1)
-        self.webApi.deal_auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.deal_audit()
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
         self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
         self.webApi.finance_deal_audit(auditStatue=2, dealAmount='',
                                        remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')

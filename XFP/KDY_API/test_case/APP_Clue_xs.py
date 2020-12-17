@@ -122,7 +122,7 @@ class TestCase(unittest.TestCase):
         self.flowPath.clue_exile_sea()
         # 跟进进行验证
         self.appApi.ClueFollowList()
-        self.assertEqual(self.appText.get('followContent')[:6], '线索流放公海')
+        self.assertEqual(self.appText.get('followContent')[:6], '线索终止跟进')
 
     def test_ChangeClient(self):
         """线索转为客户"""
@@ -146,10 +146,13 @@ class TestCase(unittest.TestCase):
         self.assertEqual(dome-1, self.appText.get('total'))
         # 登陆转移后账号进行查看
         self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
+        self.appApi.GetUserData()
         self.appApi.my_clue_list(keyWord=dome2)
         self.assertEqual(1, self.appText.get('total'))
         self.appApi.ClueFollowList()
         self.assertIn('将线索指派至', self.appText.get('followContent'))
+        self.appApi.Login()
+        self.appApi.GetUserData()
 
     def test_clue_ChangeClient(self):
         """未首电转客户"""
@@ -159,7 +162,7 @@ class TestCase(unittest.TestCase):
         self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
-        if self.appText.get('该线索未首电,不能转为客户!') != self.appText.get('data'):
+        if '该线索未首电,不能转为客户!' != self.appText.get('data'):
             print(self.appText.get('data'))
             self.appApi.ClueFollowList()
             print(self.appText.get('data'))

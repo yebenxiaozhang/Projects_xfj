@@ -111,27 +111,24 @@ class ClientTestCase(unittest.TestCase):
             cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
             cls.webApi.finance_deal_auditList()
 
-        """审核-成交相关-经理"""
-        cls.webApi.deal_auditList()
+        """审核--经理"""
+        cls.webApi.auditList()
         while cls.appText.get('web_total') != 0:
-            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
-            cls.webApi.deal_auditList()
-
-        """审核-成交相关-总监"""
-        cls.webApi.deal_auditList(auditLevel=2)
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
         while cls.appText.get('web_total') != 0:
-            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
-            cls.webApi.deal_auditList(auditLevel=2)
-
-        """残余审核"""
-        cls.webApi.audit_List()
-        while cls.webApi.webText.get('total') != 0:
-            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            cls.webApi.audit_List()
-        cls.webApi.audit_List(auditLevel=2)
-        while cls.webApi.webText.get('total') != 0:
-            cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-            cls.webApi.audit_List()
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
+        # """残余审核"""
+        # cls.webApi.audit_List()
+        # while cls.webApi.webText.get('total') != 0:
+        #     cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+        #     cls.webApi.audit_List()
+        # cls.webApi.audit_List(auditLevel=2)
+        # while cls.webApi.webText.get('total') != 0:
+        #     cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
+        #     cls.webApi.audit_List()
 
         """去除一些客户及线索"""
         cls.appApi.my_clue_list()
@@ -162,15 +159,11 @@ class ClientTestCase(unittest.TestCase):
             print("断言错误，错误原因：%s" % e)
             raise RuntimeError(self.appText.get('ApiXfpUrl'))
 
-    def test_SettingTakeLook(self):
-        """设定带看计划"""
-        self.flowPath.add_visit()
-        self.assertEqual(self.appApi.appText.get('code'), 200)
-
     def test_CompleteSettingTakeLook(self):
         """完成带看计划"""
         try:
             self.flowPath.add_visit()
+            self.assertEqual(self.appApi.appText.get('code'), 200)
             self.appApi.ClientTask(taskType='3')
             if self.appText.get('total') < 1:
                 raise RuntimeError(self.appText.get('ApiXfpUrl'))

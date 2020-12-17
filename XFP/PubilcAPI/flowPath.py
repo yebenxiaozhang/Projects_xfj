@@ -86,8 +86,8 @@ class flowPath:
         if self.appApi.appText.get('total') >= 2:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.Task_Visit_List(appointmentTime=self.flowPathText.get('time'))
-        assert self.appApi.appText.get('visiteStatus'), '1'
-        assert self.appApi.appText.get('visiteStatusStr'), '已完成'
+        assert self.appApi.appText.get('visitStatus') == '3', '状态异常'
+        assert self.appApi.appText.get('visitStatusName') == '已完成', '状态异常'
 
     def advance_over_visit(self):
         """取消带看"""
@@ -99,7 +99,7 @@ class flowPath:
             print('取消带看，任务还存在')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.ClientFollowList()
-        assert self.appApi.appText.get('followContent'), '取消带看'
+        assert (self.appApi.appText.get('followContent'))[:4] == '带看取消', '取消带看无跟进'
 
     def visit_status(self, status):
         """带看状态"""
@@ -139,6 +139,7 @@ class flowPath:
             while self.appApi.appText.get('data') == '该客户已被暂缓!':
                 self.appApi.ClientFollowList()
                 self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+                self.appApi.ClientFollowList()
                 self.appApi.ClientTaskPause()
         except BaseException as e:
             print("断言错误，错误原因：%s" % e)
@@ -147,24 +148,16 @@ class flowPath:
     def apply_status(self, status, vlue=0, keyWord=None):
         dome = self.appApi.appText.get('clueId')
         self.appApi.follow_apply(vlue=vlue, keyWord=keyWord)
-        if status == '进行中':
+        if status == '申请中':
             assert self.appApi.appText.get('auditStatueApp') == 0, '状态异常'
-            assert self.appApi.appText.get('auditStatueStr') == '进行中', '状态异常'
-        elif status == '已取消':
-            assert self.appApi.appText.get('auditStatueApp') == 2, '状态异常'
-            assert self.appApi.appText.get('auditStatueStr') == '已取消', '状态异常'
+            assert self.appApi.appText.get('auditStatueStr') == '申请中', '状态异常'
         elif status == '已同意':
             assert self.appApi.appText.get('auditStatueApp') == 1, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '已同意', '状态异常'
         elif status == '已驳回':
             assert self.appApi.appText.get('auditStatueApp') == 2, '状态异常'
             assert self.appApi.appText.get('auditStatueStr') == '已驳回', '状态异常'
-        elif status == '申请中':
-            assert self.appApi.appText.get('auditStatueApp') == 0, '状态异常'
-            assert self.appApi.appText.get('auditStatueStr') == '申请中', '状态异常'
-        elif status == '审核中':
-            assert self.appApi.appText.get('auditStatueApp') == 3, '状态异常'
-            assert self.appApi.appText.get('auditStatueStr') == '审核中', '状态异常'
+
         assert self.appApi.appText.get('clueId') == dome, '跟进申请-无记录'
     
     def add_deal(self):

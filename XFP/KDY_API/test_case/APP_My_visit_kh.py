@@ -122,21 +122,31 @@ class TestCase(unittest.TestCase):
         cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
+        cls.webApi.auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
+
     # def setUp(self):
     #     pass
 
-    def setUp(self):
-        """残留审核 失败！！！"""
-        self.webApi.audit_List()
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False,
-                                   auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
-            self.webApi.audit_List()
-        self.webApi.audit_List(auditLevel=2)
-        while self.webApi.webText.get('total') != 0:
-            self.webApi.auditApply(isAudit=False,
-                                   auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
-            self.webApi.audit_List()
+    # def setUp(self):
+    #     """残留审核 失败！！！"""
+    #
+    #     self.webApi.audit_List()
+    #     while self.webApi.webText.get('total') != 0:
+    #         self.webApi.auditApply(isAudit=False,
+    #                                auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
+    #         self.webApi.audit_List()
+    #     self.webApi.audit_List(auditLevel=2)
+    #     while self.webApi.webText.get('total') != 0:
+    #         self.webApi.auditApply(isAudit=False,
+    #                                auditRemark='客户流放公海', customerId=self.webText.get('customerId'))
+    #         self.webApi.audit_List()
 
     def test_my_visit_01(self):
         """1、创建带看          进行中                   已取消"""
@@ -167,8 +177,8 @@ class TestCase(unittest.TestCase):
         self.flowPath.add_visit()
         self.flowPath.visit_status(status='队长审核中')
         """2、创建带看-审核成功                 进行中             已取消"""
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核成功
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
         self.flowPath.visit_status(status='已同意')
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
@@ -177,9 +187,9 @@ class TestCase(unittest.TestCase):
         """3、创建带看-审核失败                 已驳回             已驳回"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'),
-                               isAudit=False, auditRemark=int(time.time()))  # 审核失败
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
+
         self.flowPath.visit_status(status='已驳回')
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
@@ -188,8 +198,9 @@ class TestCase(unittest.TestCase):
         """4、审核成功-完成带看                 已完成             已完成"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核成功
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
+
         self.flowPath.accomplish_visit()
         self.flowPath.visit_status(status='已完成')
         self.appApi.client_exile_sea()
@@ -199,8 +210,9 @@ class TestCase(unittest.TestCase):
         """5、审核成功-提前结束带看             已取消             已取消"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核成功
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
+
         self.flowPath.advance_over_visit()
         self.flowPath.visit_status(status='已取消')
         self.appApi.client_exile_sea()
@@ -212,9 +224,9 @@ class TestCase(unittest.TestCase):
         self.flowPath.add_visit()
         self.flowPath.visit_status(status='队长审核中')
         """2、创建带看-一级审核失败    已驳回                     已驳回"""
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False,
-                               auditRemark=int(time.time()))  # 审核失败
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
+
         self.flowPath.visit_status(status='已驳回')
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
@@ -223,12 +235,14 @@ class TestCase(unittest.TestCase):
         """3、创建带看-一级审核成功    审核中                     已取消"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=2)  # 修改配置审核
         self.flowPath.add_visit()
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
+
         self.flowPath.visit_status(status='总监审核中')
         """4、创建带看-二级审核失败    已驳回                     已取消"""
-        self.webApi.audit_List(auditLevel=2, keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'), vlue=2, isAudit=False)  # 审核
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
+        self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
+
         self.flowPath.visit_status(status='已驳回')
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
@@ -237,10 +251,12 @@ class TestCase(unittest.TestCase):
         """5、创建带看-二级审核成功    进行中                     已取消"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=2)  # 修改配置审核
         self.flowPath.add_visit()
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核
-        self.webApi.audit_List(auditLevel=2, keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'), vlue=2)  # 审核
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
+
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
+        self.webApi.audit()
+
         self.flowPath.visit_status(status='已同意')
         self.flowPath.accomplish_visit()
         self.flowPath.visit_status(status='已完成')
@@ -251,10 +267,12 @@ class TestCase(unittest.TestCase):
         """7、审核成功-提前结束带看    已取消                     已取消"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=2)  # 修改配置审核
         self.flowPath.add_visit()
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'))  # 审核
-        self.webApi.audit_List(auditLevel=2, keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'), vlue=2)  # 审核
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
+
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
+        self.webApi.audit()
+
         self.flowPath.advance_over_visit()
         self.flowPath.visit_status(status='已取消')
         self.appApi.client_exile_sea()
@@ -268,8 +286,9 @@ class TestCase(unittest.TestCase):
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.visit_info()
-        self.webApi.audit_List(keyWord=self.appText.get('cluePhone'))  # 审核列表
-        self.webApi.auditApply(customerId=self.appText.get('customerId'), isAudit=False)  # 审核失败
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
+
         self.appApi.VisitFlow1(agencyId=self.appApi.appText.get('DLGS'),
                                receptionName=self.appApi.RandomText(textArr=surname),
                                receptionPhone='1' + str(int(time.time())), attachmentIds='1')
@@ -277,8 +296,14 @@ class TestCase(unittest.TestCase):
 
     def test_my_visit_18(self):
         """3、审核中的带看 ---不可以完成，不可以提前结束，不可以释放公海"""
-        self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
+        self.webApi.Audit_management()  # 修改配置审核
         self.flowPath.add_visit()
+        self.flowPath.accomplish_visit()
+        self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
+        self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
+                                   appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
+                                   seeingConsultant=self.appApi.appText.get('consultantId'),
+                                   appointConsultant=self.appApi.appText.get('consultantId'))
         self.appApi.ClientTask(taskType='3')
         if self.appApi.appText.get('total') < 1:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
@@ -288,6 +313,7 @@ class TestCase(unittest.TestCase):
                                receptionPhone='1' + str(int(time.time())), attachmentIds='1')
         self.assertEqual('带看计划审核中', self.appApi.appText.get('data'))
 
+        self.appApi.visitProject_list()
         self.appApi.add_deal()  # 录入成交
         self.assertNotEqual(200, self.appApi.appText.get('code'))
         self.appApi.client_exile_sea()
@@ -305,5 +331,7 @@ class TestCase(unittest.TestCase):
                                    appointConsultant=self.appApi.appText.get('consultantId'))
         self.assertEqual(301, self.appText.get('code'))
         self.assertEqual('该客户存在未完成带看', self.appApi.appText.get('data'))
+        self.flowPath.accomplish_visit()
+
 
 

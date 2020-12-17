@@ -95,18 +95,39 @@ class appApi:
                          )
         self.appText.set_map('msg', globals()['XfpText']['msg'])
 
-    def Login(self, userName=XfpUser, password=XfpPwd, saasCode=XfpsaasCode):
+    def Login(self, userName=XfpUser, password=XfpPwd, saasCode=XfpsaasCode, authCode=None):
         """登录"""
-        self.PostRequest(url='/api/auth/login',
-                         data={"userName": userName,
-                               'saasCode': saasCode,
-                               # 'deviceId': deviceId,
-                               "password": password},
-                         header=1)
-        if self.appText.get('msg') == '成功':
-            self.appText.set_map('user_token', globals()['XfpText']['data']['token'])
+        if authCode is None:
+            self.PostRequest(url='/api/auth/login',
+                             data={"userName": userName,
+                                   'saasCode': saasCode,
+                                   'deviceId': deviceId,
+                                   # 'deviceId': deviceId,
+                                   "password": password},
+                             header=1)
+        else:
+            self.PostRequest(url='/api/auth/login',
+                             data={"userName": userName,
+                                   'saasCode': saasCode,
+                                   'authCode': authCode,
+                                   "password": password},
+                             header=1)
 
-            self.appText.set_map('userId', globals()['XfpText']['data']['userDetail']['id'])
+        if self.appText.get('msg') == '成功':
+            if (globals()['XfpText']['data']['userDetail']) is not 'None':
+                if authCode is None:
+                    self.appText.set_map('user_token', globals()['XfpText']['data']['token'])
+
+                else:
+                    self.appText.set_map('user_token', globals()['XfpText']['data']['token'])
+                try:
+                    self.appText.set_map('resultStr', globals()['r.text']['data']['resultStr'])
+                except:
+                    pass
+
+            else:
+                self.appText.set_map('userId', globals()['XfpText']['data']['userDetail']['id'])
+
         else:
             self.appText.set_map('data', globals()['XfpText']['data'])
 
@@ -155,23 +176,6 @@ class appApi:
             self.appText.set_map('taskType', dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['taskType'])
             self.appText.set_map('customerId',
                                  dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['customerId'])
-        # if tesk == 1:
-        #     self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['taskVos']))
-        #     if self.appText.get('total') != 0:
-        #         self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['endTime'])
-        #         self.appText.set_map('clueId', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['clueId'])
-        #         self.appText.set_map('taskType', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['taskType'])
-        #         self.appText.set_map('customerId',
-        #                              dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['customerId'])
-        # else:
-        #     self.appText.set_map('total', len(dome[time.strftime("%Y-%m-%d")]['visitVos']))
-        #     if self.appText.get('total') != 0:
-        #         self.appText.set_map('endTime', dome[time.strftime("%Y-%m-%d")]['visitVos'][0]['endTime'])
-        #         self.appText.set_map('clueId', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['clueId'])
-        #         self.appText.set_map('taskType', dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['taskType'])
-        #         self.appText.set_map('customerId',
-        #                              dome[time.strftime("%Y-%m-%d")]['taskVos'][0]['customerId'])
-        # self.appText.set_map('pages', globals()['r.text']['data']['pages'])
 
     def CluePhoneLog(self):
         """线索通话记录"""
@@ -614,7 +618,7 @@ class appApi:
                              'endTime': endTime,
                              'customerId': self.appText.get('customerId'),
                              'consultantId': self.appText.get('consultantId'),
-                             'labelName': self.appText.get('labelName'),
+                             # 'labelName': self.appText.get('labelName'),
                              'contactPurpose': contactPurpose,
                              'saasClueFollow': {
                                  'clueId': self.appText.get('clueId'),
@@ -636,7 +640,7 @@ class appApi:
         self.PostRequest(url='/api/a/clue/exileSea',
                          data={'clueId': self.appText.get('clueId'),
                                'remark': remark,
-                               'labelName': self.appText.get('labelName'),
+                               # 'labelName': self.appText.get('labelName'),
                                'labelId': self.appText.get('ZZGJ')})
         self.appText.set_map('data', globals()['r.text']['data'])
 
@@ -646,11 +650,12 @@ class appApi:
                          data={
                              'customerId': self.appText.get('customerId'),
                              'clueId': self.appText.get('clueId'),
-                             'labelId': self.appText.get('ZZGJ'),
+                             # 'labelId': self.appText.get('ZZGJ'),
                              'consultantId': self.appText.get('consultantId'),
                              'saasClueFollow': {
                                  'customerId': self.appText.get('customerId'),
                                  'followContent': remark,
+                                 'followLabelId': self.appText.get('ZZGJ'),
                                  'clueId': self.appText.get('clueId')
                              }
                          })
@@ -709,8 +714,6 @@ class appApi:
             vlue = vlue + 1
             self.appText.set_map('clueId',
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['clueId'])
-            self.appText.set_map('cluePhone',
-                                 globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['cluePhone'])
             self.appText.set_map('orderNo',
                                  globals()['r.text']['data']['records'][
                                      len(globals()['r.text']['data']['records']) - vlue]['orderNo'])
@@ -873,7 +876,7 @@ class appApi:
                              }
                          })
 
-        # self.appText.set_map('masg')
+        self.appText.set_map('data', globals()['r.text']['data'])
 
     def ClientFormInfo(self):
         """客户需求详情"""
@@ -1103,19 +1106,19 @@ class appApi:
             self.appText.set_map('houseName', globals()['r.text']['data']['records'][0]['houseName'])
             self.appText.set_map('title', globals()['r.text']['data']['records'][0]['title'])
 
-    def CustomerStatisticalInfo(self):
-        """服务统计"""
-        self.PostRequest(url='/api/a/customer/getCustomerStatisticalInfo',
-                         data={
-                             'consultantId': self.appText.get('consultantId')
-                         })
-
-    def ClientStatistics(self):
-        """客户统计"""
-        self.PostRequest(url='/api/a/customer/getCustomerStatistical',
-                         data={
-                             'consultantId': self.appText.get('consultantId')
-                         })
+    # def CustomerStatisticalInfo(self):
+    #     """服务统计"""
+    #     self.PostRequest(url='/api/a/customer/getCustomerStatisticalInfo',
+    #                      data={
+    #                          'consultantId': self.appText.get('consultantId')
+    #                      })
+    #
+    # def ClientStatistics(self):
+    #     """客户统计"""
+    #     self.PostRequest(url='/api/a/customer/getCustomerStatistical',
+    #                      data={
+    #                          'consultantId': self.appText.get('consultantId')
+    #                      })
 
     def follow_apply(self, vlue=0, keyWord=None):
         """跟进申请"""
@@ -1127,7 +1130,7 @@ class appApi:
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if self.appText.get('total') != 0:
             self.appText.set_map('auditStatueStr', globals()['r.text']['data']['records'][vlue]['auditStatueStr'])
-            self.appText.set_map('auditStatueApp', globals()['r.text']['data']['records'][vlue]['auditStatue'])
+            self.appText.set_map('auditStatueApp', globals()['r.text']['data']['records'][vlue]['applyStatus'])
             self.appText.set_map('auditRemark', globals()['r.text']['data']['records'][vlue]['auditRemark'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][vlue]['clueId'])
 
@@ -1387,6 +1390,14 @@ class appApi:
                              globals()['r.text']['data']['my60DealAmountTotal']['dealCount'])
         self.appText.set_map('totalAmount',
                              globals()['r.text']['data']['my60DealAmountTotal']['totalAmount'])
+
+    def generateAuthCode(self):
+        """获取授权码"""
+        self.PostRequest(url='/api/tool/generateAuthCode',
+                         data={
+                             'consultantId': self.appText.get('consultantId')
+                         })
+        self.appText.set_map('code', globals()['r.text']['data']['code'])
 
 
 if __name__ == '__main__':

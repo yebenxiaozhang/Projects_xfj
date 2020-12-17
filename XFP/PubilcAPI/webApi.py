@@ -45,7 +45,6 @@ class webApi:
             print('接口请求过慢大于10秒')
             print(self.webText.get('URL'))
 
-
     def Audit_management(self, suspend=False, suspendLevel=1, clueStop=False, clueStopLevel=1,
                          customerStop=False, customerStopLevel=1, customerVisit=False,
                          customerVisitLevel=1, customerDeal=False, customerDealLevel=1,
@@ -121,7 +120,14 @@ class webApi:
                             "dealPercentageWealth": 10,
                             "dealWealthSwitch": True,
                             "dealPercentageWealthSwitch": False
-                        }
+                        },
+                    "authCodeConfig": {             # 授权码相关
+                        "authCodeSwitch": True,
+                        "authCodeOutTime": 30,      # 授权码时效
+                        "authCodeOutTimeLength": 6,     # 授权码长度
+                        "authCodeLoginOutTime": 30
+                }
+
                 }
             self.PostRequest(url='/api/b/systeminfo/updateSysConfig',
                              data={
@@ -424,9 +430,10 @@ class webApi:
         if len(globals()['r.text']['data']['records']) != 0:
             self.webText.set_map('consultantId', globals()['r.text']['data']['records'][vlue]['consultantId'])
 
-    def add_clue_admin(self, clueNickName):
+    def add_clue_admin(self, clueNickName, cluePhone=None):
         """总部添加线索"""
-        cluePhone = '1' + str(int(time.time()))
+        if cluePhone is None:
+            cluePhone = '1' + str(int(time.time()))
 
         data = {
                 "clueAddtype": 2,
@@ -687,7 +694,7 @@ class webApi:
         if len(globals()['r.text']['data']['clueFollowList']) != 0:
             self.appText.set_map('remark', globals()['r.text']['data']['remark'])
 
-    def deal_auditList(self, auditLevel=1, phoneNum=None):
+    def auditList(self, auditLevel=1, phoneNum=None):
         """成交审核列表"""
         self.PostRequest(url='/api/b/auditApply/auditList',
                          data={
@@ -697,9 +704,9 @@ class webApi:
                          })
         if len(globals()['r.text']['data']['records']) != 0:
             self.appText.set_map('auditId', globals()['r.text']['data']['records'][0]['auditId'])
-        self.appText.set_map('web_total', len(globals()['r.text']['data']['records']))
+        self.appText.set_map('web_total', globals()['r.text']['data']['total'])
 
-    def deal_audit(self, auditStatue=1, auditRemark=None):
+    def audit(self, auditStatue=1, auditRemark=None):
         """成交审核"""
         if auditStatue == 1:
             auditRemark = None
@@ -791,6 +798,85 @@ class webApi:
                              'applyStatus': applyStatus,
                              'remark': remark
                          })
+
+    def DeptUserListPage(self, deviceNo=None, deviceName=None):
+        """设备列表"""
+        self.PostRequest(url='/api/b/device/getDeptUserListPage',
+                         data={
+                             'deviceNo': deviceNo,
+                             'deviceName': deviceName
+                         })
+        self.appText.set_map('web_total', globals()['r.text']['data']['total'])
+        if self.appText.get('web_total') != 0:
+            self.appText.set_map('deviceNo', globals()['r.text']['data']['records'][0]['deviceNo'])
+            self.appText.set_map('deviceName', globals()['r.text']['data']['records'][0]['deviceName'])
+            self.appText.set_map('deviceRemark', globals()['r.text']['data']['records'][0]['deviceRemark'])
+            if len(globals()['r.text']['data']['records'][0]['deviceBindingList']) != 0:
+                userId = []
+                a = 0
+                while a != len(globals()['r.text']['data']['records'][0]['deviceBindingList']):
+                    userId = userId + \
+                             [globals()['r.text']['data']['records'][0]['deviceBindingList'][a]['userId']]
+                    a = a + 1
+                self.appText.set_map('userId', userId)
+            else:
+                self.appText.set_map('userId', None)
+
+    def addDeviceInfo(self,
+                      isUpdate=False,
+                      deviceName='设备名称',
+                      deviceNo='设备编号',
+                      deviceRemark=None):
+        """添加设备"""
+        self.PostRequest(url='/api/b/device/addOrUpdateDeviceInfo',
+                         data={
+                             'disabled': isUpdate,
+                             'deviceName': deviceName,
+                             'deviceNo': deviceNo,
+                             'deviceRemark': deviceRemark,
+                             'deviceType': 1,
+                             'isUpdate': isUpdate,
+                             'type': 1
+                         })
+        self.appText.set_map('data', globals()['r.text']['data'])
+
+    def DelDeviceInfo(self):
+        """删除设备"""
+        self.PostRequest(url='/api/b/device/delDeviceInfo',
+                         data={
+                            "type": 1,
+                            "userIds": self.appText.get('userId'),
+                            "userIdsStr": self.appText.get('userId'),
+                            "deviceNo": self.appText.get('deviceNo'),
+                            "deviceType": "1",
+                            "deviceName": self.appText.get('deviceName'),
+                            "deviceRemark": self.appText.get('deviceRemark'),
+                         })
+
+    def DeviceBinding(self, userId=None):
+        """设备绑定"""
+        if userId is None:
+            userId = [self.appText.get('userId')]
+        self.PostRequest(url='/api/b/device/addDeviceBinding',
+                         data={
+                                "type": 2,
+                                "userIds": userId,
+                                "userIdsStr": userId,
+                                "deviceNo": self.appText.get('deviceNo'),
+                                "deviceType": "1",
+                                "deviceName": self.appText.get('deviceName'),
+                                "deviceRemark": self.appText.get('deviceRemark'),
+
+                            })
+
+    def UserIdList(self, keyWord=None):
+        """用户列表"""
+        self.PostRequest(url='/api/b/consultant/list',
+                         data={
+                              'keyWord': keyWord
+                         })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('userId', globals()['r.text']['data']['records'][0]['userId'])
 
 
 if __name__ == '__main__':

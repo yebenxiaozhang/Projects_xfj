@@ -173,5 +173,15 @@ class TestCase(unittest.TestCase):
             self.webApi.goldApply_addGoldApply()
             self.assertEqual(self.appText.get('data'), '该线索已索赔，详情可查看索赔记录!')
 
+    def test_adminRepetitionAllocationClue(self):
+        """总部重复分派线索"""
+        self.appApi.Login()
+        self.webApi.clue_list(sourceId=self.appText.get('XSLY_admin'), myClue='N')
+        self.appApi.ClueInfo()
+        self.appApi.Login(userName='admin', saasCode='admin')
+        self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname),
+                                   cluePhone=self.appText.get('cluePhone'))
+        self.assertEqual(self.appText.get('data'), '该线索已存在')
+
 
 

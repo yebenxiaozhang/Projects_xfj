@@ -36,6 +36,15 @@ class TestCase(unittest.TestCase):
         cls.flow = flowPath()
         cls.flowPath = cls.flow
         cls.appText = GlobalMap()
+        cls.webApi.DeptUserListPage(deviceNo=deviceId)
+        cls.webApi.UserIdList(keyWord=XfpUser1)
+        dome = cls.appText.get('userId')
+        # cls.webApi.UserIdList(keyWord=XfpUser11)
+        # dome1 = cls.appText.get('userId')
+        cls.webApi.UserIdList(keyWord=XfpUser)
+        dome2 = cls.appText.get('userId')
+        userId = [dome, dome2]
+        cls.webApi.DeviceBinding(userId=userId)
         """线索来源"""
         cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
                                newlabelName='百度小程序')
@@ -112,16 +121,14 @@ class TestCase(unittest.TestCase):
             cls.webApi.finance_deal_auditList()
 
         """审核-成交相关-经理"""
-        cls.webApi.deal_auditList()
+        cls.webApi.auditList()
         while cls.appText.get('web_total') != 0:
-            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
-            cls.webApi.deal_auditList()
-
-        """审核-成交相关-总监"""
-        cls.webApi.deal_auditList(auditLevel=2)
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
         while cls.appText.get('web_total') != 0:
-            cls.webApi.deal_audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
-            cls.webApi.deal_auditList(auditLevel=2)
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
 
         """残余审核"""
         cls.webApi.audit_List()
