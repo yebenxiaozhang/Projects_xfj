@@ -1,11 +1,12 @@
 """客第壹-相关"""
-# ApiXfpUrl = 'http://xfpapi.ykb100.com'
-# ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
-# XfpUser = '13062200301'
-# XfpPwd = '12345678'
-# XfpsaasCode = '000009'
-# XfpUser1 = '13062200304'
-# XfpPwd1 = '12345678'
+ApiXfpUrl = 'http://xfpapi.ykb100.com'
+ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
+XfpUser = '13062200301'
+XfpPwd = '12345678'
+XfpsaasCode = '000009'
+XfpUser1 = '13062200304'
+XfpUser11 = '13062200311'
+XfpPwd1 = '12345678'
 
 
 # ApiXfpUrl = 'http://xfp.xfj100.com'
@@ -17,15 +18,13 @@
 # XfpPwd1 = '12345678'
 
 
-ApiXfpUrl = 'http://10.6.5.94:8381'
-ApiXfpUrl1 = 'http://10.6.5.52/xfp_api'
-XfpUser = '13062200301'
-XfpPwd = '12345678'
-XfpsaasCode = '000009'
-# XfpsaasCode = '000012'
-XfpUser1 = '13062200304'
-XfpPwd1 = '12345678'
-XfpUser11 = '13062200311'
+# ApiXfpUrl = 'http://192.168.10.96:8381'
+# ApiXfpUrl1 = 'http://192.168.10.52/xfp_api'
+# XfpUser = '13062200301'
+# XfpPwd = '12345678'
+# XfpsaasCode = '000009'
+# XfpUser1 = '13062200304'
+# XfpPwd1 = '12345678'
 
 # 设备ID
 deviceId = 'c0693e5b2156d89e'

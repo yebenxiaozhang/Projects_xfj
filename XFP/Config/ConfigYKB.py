@@ -5,6 +5,7 @@ XfpUser = '13062200301'
 XfpPwd = '12345678'
 XfpsaasCode = '000009'
 XfpUser1 = '13062200304'
+XfpUser11 = '13062200311'
 XfpPwd1 = '12345678'
 
 
