@@ -43,6 +43,8 @@ class TestCase(unittest.TestCase):
     def test_Device_01(self):
         """添加设备进行登录"""
         self.webApi.DeptUserListPage(deviceNo=deviceId)
+        self.webApi.configList(keyWord='check_device_switch')
+        self.webApi.configSave(configValue=1)
         while self.appText.get('web_total') != 0:
             """删除设备"""
             self.webApi.DelDeviceInfo()
@@ -62,6 +64,7 @@ class TestCase(unittest.TestCase):
         self.webApi.DeviceBinding()
         self.appApi.Login(XfpUser11)
         self.assertEqual(self.appText.get('msg'), '成功')
+        self.webApi.configSave(configValue=0)
 
     def test_Device_02(self):
         """添加默认设备人员"""

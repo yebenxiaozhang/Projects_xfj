@@ -878,6 +878,31 @@ class webApi:
         if len(globals()['r.text']['data']['records']) != 0:
             self.appText.set_map('userId', globals()['r.text']['data']['records'][0]['userId'])
 
+    def configList(self, keyWord=None):
+        """配置列表"""
+        self.PostRequest(url='/api/b/config/list',
+                         data={
+                             "configKey": None,
+                             "configKeyName": None,
+                             "configValue": None,
+                             "keyWord": keyWord,
+                         })
+        if len(globals()['r.text']['data']['records']) == 1:
+            self.appText.set_map('configKey', globals()['r.text']['data']['records'][0]['configKey'])
+            self.appText.set_map('configKeyName', globals()['r.text']['data']['records'][0]['configKeyName'])
+            self.appText.set_map('configid', globals()['r.text']['data']['records'][0]['id'])
+
+    def configSave(self, configValue=0):
+        """配置管理"""
+        self.PostRequest(url='/api/b/config/save',
+                         data={
+                             "configKey": self.appText.get('configKey'),
+                             "configKeyName": self.appText.get('configKeyName'),
+                             "configValue": configValue,
+                             "id": self.appText.get('configid'),
+                             "isDeleted": 0,
+                         })
+
 
 if __name__ == '__main__':
     a = webApi()
