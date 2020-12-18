@@ -49,7 +49,7 @@ def latest_report(report_dir):
 
 
 if __name__ == '__main__':
-    report_dir = './report'
+    report_dir = './report_xs'
     test_dir = './test_case'
 
     all_case = unittest.defaultTestLoader.discover(test_dir, pattern='*_xs.py')

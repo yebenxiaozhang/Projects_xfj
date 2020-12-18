@@ -31,6 +31,14 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.webApi.auditList()
+        while cls.appApi.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
+        while cls.appApi.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
 
     def test_AuthorizationCode_1(self):
         """1、不输入授权码                                登录失败"""

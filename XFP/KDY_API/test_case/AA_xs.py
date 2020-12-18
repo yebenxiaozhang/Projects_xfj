@@ -33,6 +33,7 @@ class TestCase(unittest.TestCase):
         cls.webApi = cls.request
         cls.appApi.GetUserData()
         cls.webApi.Audit_management()
+
         cls.webApi.DeptUserListPage(deviceNo=deviceId)
         cls.webApi.UserIdList(keyWord=XfpUser1)
         dome = cls.appText.get('userId')

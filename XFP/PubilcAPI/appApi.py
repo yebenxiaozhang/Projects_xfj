@@ -710,7 +710,7 @@ class appApi:
                              'keyWord': keyWord,
                          })
 
-        if len(globals()['r.text']['data']['records']) != 0:
+        if globals()['r.text']['data']['total'] != 0:
             vlue = vlue + 1
             self.appText.set_map('clueId',
                                  globals()['r.text']['data']['records'][len(globals()['r.text']['data']['records']) - vlue]['clueId'])

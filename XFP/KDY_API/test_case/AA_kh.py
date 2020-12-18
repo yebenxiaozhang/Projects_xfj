@@ -121,16 +121,6 @@ class TestCase(unittest.TestCase):
             cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
             cls.webApi.auditList(auditLevel=2)
 
-        # """残余审核"""
-        # cls.webApi.audit_List()
-        # while cls.webApi.webText.get('total') != 0:
-        #     cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-        #     cls.webApi.audit_List()
-        # cls.webApi.audit_List(auditLevel=2)
-        # while cls.webApi.webText.get('total') != 0:
-        #     cls.webApi.auditApply(isAudit=False, auditRemark='客户流放公海')
-        #     cls.webApi.audit_List()
-
         """去除一些客户及线索"""
         cls.appApi.my_clue_list()
         while cls.appText.get('total') >= 5:

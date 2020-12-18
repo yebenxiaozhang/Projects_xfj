@@ -38,10 +38,35 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
-        # cls.appApi.ping_admin()
+        cls.webApi.auditList()
+        while cls.appApi.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
+        while cls.appApi.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
+        cls.do_request = appApi()
+        cls.appApi = cls.do_request
+        cls.appApi.Login(authCode=1)
+
         cls.flow = flowPath()
         cls.flowPath = cls.flow
         cls.appText = GlobalMap()
+        cls.request = webApi()
+        cls.webApi = cls.request
+        cls.appApi.GetUserData()
+        cls.webApi.Audit_management()
+
+        cls.webApi.DeptUserListPage(deviceNo=deviceId)
+        cls.webApi.UserIdList(keyWord=XfpUser1)
+        dome = cls.appText.get('userId')
+        cls.webApi.UserIdList(keyWord=XfpUser11)
+        dome1 = cls.appText.get('userId')
+        cls.webApi.UserIdList(keyWord=XfpUser)
+        dome2 = cls.appText.get('userId')
+        userId = [dome, dome1, dome2]
+        cls.webApi.DeviceBinding(userId=userId)
         """线索来源"""
         cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
                                newlabelName='百度小程序')
@@ -90,8 +115,26 @@ class TestCase(unittest.TestCase):
                                newlabelName='问答分类一')
         cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
         cls.webApi.consultant_allocition(isAppoint=1)
+        # 财富值类型
         cls.appApi.GetLabelList(labelNo='CFZLX', labelName='首电及时率', saasCode='admin')
         cls.appText.set_map('SDJSL', cls.appText.get('remark'))
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
+        cls.appText.set_map('PTSH', cls.appText.get('remark'))
+        cls.webApi.get_group()
+        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        cls.appApi.GetLabelList(labelNo='XSSPYY', labelName='电话空号', saasCode='admin')
+        cls.appText.set_map('DHWK', cls.appText.get('labelId'))
+
+        """去除一些客户及线索"""
+        cls.appApi.my_clue_list()
+        while cls.appText.get('total') >= 2:
+            cls.flowPath.clue_exile_sea()
+            cls.appApi.my_clue_list()
+
+        cls.appApi.ClientList()
+        while cls.appText.get('total') >= 2:
+            cls.appApi.client_exile_sea()
+            cls.appApi.ClientList()
 
     def test_wealth_01(self):
         """1、拨打时间在超时前---增加财富值(上传时间再超时后)"""
@@ -142,6 +185,8 @@ class TestCase(unittest.TestCase):
 
     def test_wealth_03(self):
         """3、超时首电-----------扣除财富值"""
+        self.appApi.Login()
+        self.appApi.GetUserData()
         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
                              sourceId=self.appApi.appText.get('XSLY'),
                              keyWords=self.appApi.appText.get('XSBQ'))
@@ -183,9 +228,9 @@ class TestCase(unittest.TestCase):
         self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
                              sourceId=self.appApi.appText.get('XSLY'),
                              keyWords=self.appApi.appText.get('XSBQ'))
-        time.sleep(30)
         self.appApi.my_clue_list()  # 线索列表
         self.appApi.ClueFollowList()
+        time.sleep(20)
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
                                         endTime=time.strftime("%Y-%m-%d"),
@@ -212,23 +257,23 @@ class TestCase(unittest.TestCase):
             print(self.appText.get('orderNo'))
             raise RuntimeError('首电及时奖励为0 及时跟进 奖励应该为0')
 
-    def test_wealth_07(self):
-        """首电及时奖励为0 30秒后跟进"""
-        self.webApi.Audit_management(firstCallDayWealth=0)
-        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
-                             sourceId=self.appApi.appText.get('XSLY'),
-                             keyWords=self.appApi.appText.get('XSBQ'))
-        self.appApi.my_clue_list()  # 线索列表
-        self.appApi.ClueFollowList()
-        time.sleep(30)
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
-                                        endTime=time.strftime("%Y-%m-%d"),
-                                        wealthType=self.appText.get('SDJSL'),
-                                        orderNo=self.appText.get('orderNo'))
-        if self.appText.get('vlue') != 0:
-            print(self.appText.get('orderNo'))
-            raise RuntimeError('首电及时奖励为0 超时前跟进 应该为0或者空')
+    # def test_wealth_07(self):
+    #     """首电及时奖励为0 30秒后跟进"""
+    #     self.webApi.Audit_management(firstCallDayWealth=0)
+    #     self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname),
+    #                          sourceId=self.appApi.appText.get('XSLY'),
+    #                          keyWords=self.appApi.appText.get('XSBQ'))
+    #     self.appApi.my_clue_list()  # 线索列表
+    #     self.appApi.ClueFollowList()
+    #     time.sleep(35)
+    #     self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+    #     self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+    #                                     endTime=time.strftime("%Y-%m-%d"),
+    #                                     wealthType=self.appText.get('SDJSL'),
+    #                                     orderNo=self.appText.get('orderNo'))
+    #     if self.appText.get('vlue') != 0:
+    #         print(self.appText.get('orderNo'))
+    #         raise RuntimeError('首电及时奖励为0 超时前跟进 应该为0或者空')
 
     def test_wealth_08(self):
         """首电及时奖励为0 超时跟进"""

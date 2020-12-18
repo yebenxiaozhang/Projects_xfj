@@ -1,9 +1,9 @@
-
 from XFP.PubilcAPI.webApi import *
 
 
 class flowPath:
     """"""
+
     def __init__(self, *args, **kwargs):
         super(flowPath, self).__init__(*args, **kwargs)
         self.XfpRequest = appApi()
@@ -16,7 +16,7 @@ class flowPath:
 
     def client_list_non_null(self):
         """客户列表--非空"""
-        self.appApi.ClientList()                # 客户列表
+        self.appApi.ClientList()  # 客户列表
         if self.appApi.appText.get('total') == 0:
             self.clue_non_null()
             try:
@@ -53,8 +53,10 @@ class flowPath:
                     print('领取线索失败？')
         self.appApi.ClueInfo()
 
-    def add_visit(self, dome=time.strftime("%Y-%m-%d %H:%M:%S")):
+    def add_visit(self, dome=None):
         """创建带看"""
+        if dome is None:
+            dome = time.strftime("%Y-%m-%d %H:%M:%S")
         self.client_list_non_null()
         self.flowPathText.set_map('time', dome)
         self.appApi.ClientTask(taskType='3')
@@ -86,7 +88,6 @@ class flowPath:
         if self.appApi.appText.get('total') >= 2:
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
         self.appApi.Task_Visit_List(appointmentTime=self.flowPathText.get('time'))
-        assert self.appApi.appText.get('visitStatus') == '3', '状态异常'
         assert self.appApi.appText.get('visitStatusName') == '已完成', '状态异常'
 
     def advance_over_visit(self):
@@ -159,7 +160,7 @@ class flowPath:
             assert self.appApi.appText.get('auditStatueStr') == '已驳回', '状态异常'
 
         assert self.appApi.appText.get('clueId') == dome, '跟进申请-无记录'
-    
+
     def add_deal(self):
         """录入成交"""
         try:
@@ -253,9 +254,9 @@ class flowPath:
             assert globals()['r.text'][dome1]['isFirst'] == '0', '新增线索是未首电'
             time.sleep(1)
         except BaseException as e:
-                print("错误，错误原因：%s" % e)
-                raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-    
+            print("错误，错误原因：%s" % e)
+            raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+
     def get_label(self, labelNo, labelName, newlabelName):
         """查询标签"""
         self.appApi.GetLabelList(labelNo=labelNo, labelName=newlabelName)
