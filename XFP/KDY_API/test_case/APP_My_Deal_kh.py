@@ -4,7 +4,7 @@
 # @File    : My_Deal_casc.py
 
 """我的成交-相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 """
 无审核-正常流程：·····现状态················· 流放公海状态
@@ -63,23 +63,47 @@ class TestCase(unittest.TestCase):
         cls.flowPath = cls.flow
         cls.appText = GlobalMap()
 
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
+        cls.webApi.auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
+
+        """去除一些客户及线索"""
+        cls.appApi.my_clue_list()
+        while cls.appText.get('total') >= 5:
+            cls.flowPath.clue_exile_sea()
+            cls.appApi.my_clue_list()
+
+        cls.appApi.ClientList()
+        while cls.appText.get('total') >= 5:
+            cls.appApi.client_exile_sea()
+            cls.appApi.ClientList()
+
         cls.flowPath.client_list_non_null()
         cls.flowPath.add_visit()
         cls.flowPath.accomplish_visit()
         cls.appApi.visitProject_list()
 
-        cls.webApi.auditList()
-        while cls.appApi.appText.get('web_total') != 0:
-            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
-            cls.webApi.auditList()
-        cls.webApi.auditList(auditLevel=2)
-        while cls.appApi.appText.get('web_total') != 0:
-            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
-            cls.webApi.auditList(auditLevel=2)
-
     def test_my_deal_01(self):
         """1、录入成交          已确认                    已确认"""
+        """1- 客户录入成交不影响首页待办"""
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
+        self.appApi.ClientList()
         self.appApi.add_deal()
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
         self.appApi.deal_List()
         self.webApi.detail()
         self.flowPath.deal_status(status=0, keyWord=self.appText.get('dealPhone'))
