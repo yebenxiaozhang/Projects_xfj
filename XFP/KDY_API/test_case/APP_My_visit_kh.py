@@ -64,21 +64,25 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.appText = GlobalMap()
+
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
         cls.webApi.auditList()
-        while cls.appApi.appText.get('web_total') != 0:
+        while cls.appText.get('web_total') != 0:
             cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
             cls.webApi.auditList()
         cls.webApi.auditList(auditLevel=2)
-        while cls.appApi.appText.get('web_total') != 0:
+        while cls.appText.get('web_total') != 0:
             cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
             cls.webApi.auditList(auditLevel=2)
-        cls.do_request = appApi()
-        cls.appApi = cls.do_request
-        cls.appApi.Login()
-        cls.appApi.GetUserData()
-        cls.request = webApi()
-        cls.webApi = cls.request
-        cls.webApi.Audit_management()
 
     def test_my_visit_01(self):
         """1、创建带看          进行中                   已取消"""
