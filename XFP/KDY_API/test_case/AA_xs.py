@@ -34,15 +34,6 @@ class TestCase(unittest.TestCase):
         cls.appApi.GetUserData()
         cls.webApi.Audit_management()
 
-        cls.webApi.DeptUserListPage(deviceNo=deviceId)
-        cls.webApi.UserIdList(keyWord=XfpUser1)
-        dome = cls.appText.get('userId')
-        cls.webApi.UserIdList(keyWord=XfpUser11)
-        dome1 = cls.appText.get('userId')
-        cls.webApi.UserIdList(keyWord=XfpUser)
-        dome2 = cls.appText.get('userId')
-        userId = [dome, dome1, dome2]
-        cls.webApi.DeviceBinding(userId=userId)
         """线索来源"""
         cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
                                newlabelName='百度小程序')
@@ -141,6 +132,18 @@ class TestCase(unittest.TestCase):
             self.webApi.add_house_questions()
             self.appApi.HouseQA()
 
+    def test_config_05(self):
+        self.appApi.Login(userName=XfpUser1)
+        self.appApi.GetUserData()
 
+        self.appApi.my_clue_list()
+        while self.appText.get('total') >= 1:
+            self.flowPath.clue_exile_sea()
+            self.appApi.my_clue_list()
+
+        self.appApi.ClientList()
+        while self.appText.get('total') >= 1:
+            self.appApi.client_exile_sea()
+            self.appApi.ClientList()
 
 
