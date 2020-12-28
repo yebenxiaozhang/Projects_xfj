@@ -4,8 +4,8 @@
 # @File    : XfpApi.py
 import requests
 import json
-from XFP.GlobalMap import GlobalMap
-from XFP.Config.Config import *
+from GlobalMap import GlobalMap
+from Config.Config import *
 import unittest
 import time
 import random
@@ -156,7 +156,7 @@ class appApi:
                              "isStop": 0,
                              "endTime": time.strftime("%Y-%m-%d"),
                              'isWorkSchedule': True,
-                             "overtime": 0,
+                             "overtime": None,
                              'keyWord': keyWord,
                              'visitNo': visitNo
                          })

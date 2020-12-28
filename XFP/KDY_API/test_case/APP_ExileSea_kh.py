@@ -1,5 +1,5 @@
 """客户终止跟进-跟进申请"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 """
 无审核-正常流程：·······现状态··············· 操作流放公海
@@ -54,6 +54,14 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appApi.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
         cls.webApi.auditList()
         while cls.appApi.appText.get('web_total') != 0:
             cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
@@ -62,6 +70,17 @@ class TestCase(unittest.TestCase):
         while cls.appApi.appText.get('web_total') != 0:
             cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
             cls.webApi.auditList(auditLevel=2)
+
+        """去除一些客户及线索"""
+        cls.appApi.my_clue_list()
+        while cls.appText.get('total') >= 5:
+            cls.flowPath.clue_exile_sea()
+            cls.appApi.my_clue_list()
+
+        cls.appApi.ClientList()
+        while cls.appText.get('total') >= 5:
+            cls.appApi.client_exile_sea()
+            cls.appApi.ClientList()
 
     def test_ExileSea_01(self):
         """10、客户终止跟进审核中 ---不允许创建带看，不允许录成交，
@@ -152,6 +171,12 @@ class TestCase(unittest.TestCase):
         """5、客户无效终止-待审核                 申请中"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
+        self.appApi.ClientFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
+        """首页待办-客户释放公海-审核中"""
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
+        self.appApi.ClientList()
         self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
 
@@ -159,6 +184,10 @@ class TestCase(unittest.TestCase):
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
+
+        """首页待办-客户释放公海-审核失败"""
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
 
     def test_ExileSea_06(self):
         """7、客户无效终止-一级审核成功           审核中"""
@@ -182,11 +211,21 @@ class TestCase(unittest.TestCase):
         """9、客户无效终止-二级审核成功           已同意"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(customerStop=True, customerStopLevel=2)  # 修改配置审核
+        """首页待办-客户流放公海-审核中"""
+        self.appApi.ClientFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
+
+        self.appApi.ClientList()
         self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
 
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
+
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
 
         self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
 
@@ -194,6 +233,9 @@ class TestCase(unittest.TestCase):
         self.webApi.audit()
 
         self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
+
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome - 1, self.appText.get('total'))
 
     def follow_front(self):
         """跟进前"""

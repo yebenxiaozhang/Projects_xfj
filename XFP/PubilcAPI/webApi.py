@@ -3,8 +3,7 @@
 # @Author  : 潘师傅
 # @File    : xfp_web_api.py
 # -*- coding: utf-8 -*-
-
-from XFP.PubilcAPI.appApi import *
+from PubilcAPI.appApi import *
 import random
 import math
 

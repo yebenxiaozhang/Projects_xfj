@@ -3,9 +3,8 @@ ApiXfpUrl = 'http://xfpapi.ykb100.com'
 ApiXfpUrl1 = 'http://xfpapiweb.ykb100.com'
 XfpUser = '13062200301'
 XfpPwd = '12345678'
-XfpsaasCode = '000012'
+XfpsaasCode = '000009'
 XfpUser1 = '13062200304'
-XfpUser11 = '13062200311'
 XfpPwd1 = '12345678'
 
 
@@ -16,18 +15,19 @@ XfpPwd1 = '12345678'
 # XfpsaasCode = 'test'
 # XfpUser1 = '19859080301'
 # XfpPwd1 = '12345678'
-
-
-# ApiXfpUrl = 'http://192.168.10.96:8381'
-# ApiXfpUrl1 = 'http://192.168.10.52/xfp_api'
+#
+#
+# ApiXfpUrl = 'http://10.6.5.94:8381'
+# ApiXfpUrl1 = 'http://10.6.5.52/xfp_api'
 # XfpUser = '13062200301'
 # XfpPwd = '12345678'
 # XfpsaasCode = '000009'
+# # XfpsaasCode = '000012'
 # XfpUser1 = '13062200304'
 # XfpPwd1 = '12345678'
 
 # 设备ID
-deviceId = '8643960424482917'
+deviceId = 'e20bc4b0'
 
 surname = ['赵', '钱', '孙', '李', '周', '吴', '郑', '王', '冯', '陈', '褚', '卫', '蒋', '沈', '韩',
            '杨', '朱', '秦', '尤', '许', '何', '吕', '施', '张', '孔', '曹', '严', '华', '金', '魏',
@@ -38,4 +38,4 @@ surname = ['赵', '钱', '孙', '李', '周', '吴', '郑', '王', '冯', '陈',
            '元', '卜', '顾', '孟', '平', '黄', '和', '穆', '萧', '尹', '姚', '邵', '湛', '汪', '祁',
            '毛', '禹', '狄', '米', '贝', '明', '臧', '计', '伏', '成', '戴', '谈', '宋', '茅', '庞']
 
-PassWord = "nighqgkwmdkrbgic"
+PassWord = "tujkfawbxbifbhbg"

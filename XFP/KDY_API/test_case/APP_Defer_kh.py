@@ -1,5 +1,5 @@
 """跟进申请-相关（暂缓跟进）"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 """
 无审核-正常流程：·······现状态··············· 操作流放公海
@@ -53,6 +53,22 @@ class TestCase(unittest.TestCase):
         cls.webApi = cls.request
         cls.webApi.Audit_management()
 
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appApi.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
+        cls.webApi.auditList()
+        while cls.appApi.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
+        while cls.appApi.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
+
     def test_Defer_01(self):
         """10、客户暂缓审核中---不允许创建带看，不允许录成交，不允许流放公海（无论是否开启审核，都不允许操作）"""
         self.flowPath.client_list_non_null()
@@ -87,14 +103,18 @@ class TestCase(unittest.TestCase):
         self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
         dome = self.appText.get('total')
         """B-1 客户暂缓--无审核--跟进不变"""
-        self.follow_front()
-        self.flowPath.suspend_follow()
+        self.appApi.GetUserAgenda()
+        zxs_01_db = self.appText.get('total')
+        self.appApi.ClientList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
+        self.appApi.ClientTaskPause()
         self.appApi.ClientTask(taskType=2)  # 待办
         self.assertEqual(time.strftime("%Y-%m-%d"), self.appApi.appText.get('endTime')[:10])
         self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
         if self.appText.get('total') != dome + 1:
             raise RuntimeError("无审核的情况下 客户申请暂缓没有多加一个跟进")
-        self.follow_later()
+        self.appApi.GetUserAgenda()
+        self.assertEqual(zxs_01_db, self.appText.get('total'))
 
     def test_Defer_03(self):
         """2、客户申请暂缓跟进-待审核       申请中"""
@@ -104,7 +124,12 @@ class TestCase(unittest.TestCase):
         """    B-2 客户申请暂缓--审核中--跟进不变    """
         self.follow_front()
         self.appApi.ClientList()
-        self.flowPath.suspend_follow()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
+        """暂缓失败后进行查看任务待办是否有新增"""
+        self.appApi.GetUserAgenda()
+        zxs_01_db = self.appText.get('total')
+        self.appApi.ClientList()
+        self.appApi.ClientTaskPause()
         self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
         self.follow_later()
         self.appApi.ClientList()
@@ -115,20 +140,44 @@ class TestCase(unittest.TestCase):
 
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + ' 审核失败', self.appApi.appText.get('auditRemark'))
+
+        # 验证暂缓失败后是否有新增
+        self.appApi.GetUserAgenda()
+        self.assertEqual(zxs_01_db, self.appText.get('total'))
+
+        self.appApi.ClientList()
         self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'), vlue=1)
+
+        """首页待办-审核失败后进行流放公海- 待办减少"""
+        self.appApi.GetUserAgenda()
+        self.assertEqual(zxs_01_db - 1, self.appText.get('totol'))
 
     def test_Defer_04(self):
         """4、客户申请暂缓跟进-审核成功     已同意                 已同意"""
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
-        self.flowPath.suspend_follow()
+        self.appApi.ClientFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
+        # 暂缓前进行检查任务待办数目
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
+        self.appApi.ClientList()
+        self.appApi.ClientTaskPause()
+
+        """暂缓审核中进行"""
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
 
+        # 审核通过过进行验证
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
         self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
+        """首页待办-暂缓成功后  进行流放公海"""
         self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'), vlue=1)
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome - 1, self.appText.get('total'))
 
     def test_Defer_05(self):
         """ 5、客户申请暂缓跟进-待审核              申请中            已取消"""

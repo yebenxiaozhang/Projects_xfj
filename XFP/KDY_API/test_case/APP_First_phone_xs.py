@@ -4,7 +4,7 @@
 # @File    : First_phone_casc.py
 
 """首电-相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 import requests
 """
 首电：
@@ -48,6 +48,86 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.do_request = appApi()
+        cls.appApi = cls.do_request
+        cls.appApi.Login(authCode=1)
+
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.appText = GlobalMap()
+        cls.request = webApi()
+        cls.webApi = cls.request
+        cls.appApi.GetUserData()
+        cls.webApi.Audit_management()
+
+        """线索来源"""
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='百度小程序')
+        cls.appText.set_map('XSLY', cls.appText.get('labelId'))
+
+        """线索来源_幸福派总部"""
+        cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
+                               newlabelName='幸福派总部')
+        cls.appText.set_map('XSLY_admin', cls.appText.get('labelId'))
+        """线索标签"""
+        cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        if cls.appText.get('total') == 0:
+            cls.appApi.AddUserLabel()
+            cls.appApi.GetUserLabelList(userLabelType='线索标签')
+        cls.appText.set_map('XSBQ', cls.appText.get('labelData'))
+        """终止跟进"""
+        cls.flowPath.get_label(labelNo='SZGJYY', labelName='终止跟进原因',
+                               newlabelName='客户已成交')
+        cls.appText.set_map('ZZGJ', cls.appText.get('labelId'))
+        """客户意向等级"""
+        cls.appApi.GetLabelList(labelNo='KHYXDJ')                       # 查询购房意向loanSituation
+        cls.appText.set_map('KHYXDJ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='ZJZZ')                         # 查询资金资质
+        cls.appText.set_map('ZJZZ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='GFMD')                         # 查询购房目的
+        cls.appText.set_map('GFMD', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='WYSX')                         # 查询物业属性
+        cls.appText.set_map('WYSX', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='GFZZ')                         # 查询购房资质
+        cls.appText.set_map('GFZZ', cls.appText.get('labelId'))
+        cls.appApi.GetLabelList(labelNo='SFSTF')                        # 查询是否首套
+        cls.appText.set_map('SFSTF', cls.appText.get('labelId'))
+        cls.appApi.GetMatchingArea()                                    # 查询匹配区域
+        cls.appApi.GetMatchingAreaHouse()                               # 匹配楼盘
+        cls.appApi.GetLabelList(labelNo='QTKHXQ')                       # 查询客户需求
+        cls.appText.set_map('QTKHXQ', cls.appText.get('labelId'))
+        cls.appApi.ConsultantList()                                     # 咨询师列表
+
+        cls.flowPath.get_label(labelNo='XXFL', labelName='信息分类',
+                               newlabelName='信息分类一')
+        cls.appText.set_map('XXFL', cls.appText.get('labelId'))         # 信息分类
+        cls.flowPath.get_label(labelNo='DLGS', labelName='代理公司',
+                               newlabelName='代理公司一')
+        cls.appText.set_map('DLGS', cls.appText.get('labelId'))         # 代理公司
+        cls.flowPath.get_label(labelNo='WDFL', labelName='问答分类',
+                               newlabelName='问答分类一')
+        cls.appText.set_map('WDFL', cls.appText.get('labelId'))         # 问答分类
+        cls.webApi.consultant_allocition(isAppoint=1)
+        # 财富值类型
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='首电及时率', saasCode='admin')
+        cls.appText.set_map('SDJSL', cls.appText.get('remark'))
+        cls.appApi.GetLabelList(labelNo='CFZLX', labelName='平台上户', saasCode='admin')
+        cls.appText.set_map('PTSH', cls.appText.get('remark'))
+        cls.webApi.get_group()
+        cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
+        cls.appApi.GetLabelList(labelNo='XSSPYY', labelName='电话空号', saasCode='admin')
+        cls.appText.set_map('DHWK', cls.appText.get('labelId'))
+
+        """去除一些客户及线索"""
+        cls.appApi.my_clue_list()
+        while cls.appText.get('total') >= 5:
+            cls.flowPath.clue_exile_sea()
+            cls.appApi.my_clue_list()
+
+        cls.appApi.ClientList()
+        while cls.appText.get('total') >= 5:
+            cls.appApi.client_exile_sea()
+            cls.appApi.ClientList()
 
     def test_first_phone_01(self):
         """8、首电不算跟进"""
@@ -105,7 +185,17 @@ class TestCase(unittest.TestCase):
 
     def test_first_phone_02(self):
         """5、线索转客户要将通话也一并转移"""
+        """1、直接添加线索  首页待办是否新增"""
+        self.appApi.TodayClue(isFirst=0)
+        dome = self.appText.get('Total')
+
         self.flowPath.add_new_clue()
+
+        # 验证首页待办是否新增
+        self.appApi.TodayClue(isFirst=0)
+        self.assertNotEqual(dome, self.appText.get('Total'))
+        self.assertEqual(dome + 1, self.appText.get('Total'))
+
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
@@ -198,9 +288,18 @@ class TestCase(unittest.TestCase):
 
     def test_first_phone_08(self):
         """4、他人打该线索"""
+        """1、新增线索（未首电）客户待办 不会+ 1"""
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
         self.flowPath.first_phone_non_null()
+        # 验证新增线索 待办是否有添加
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), wait_time=1200, is_me=2,
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
+        """2、首电过后 客户待办会加 + 1"""
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome + 1, self.appText.get('total'))
         self.appApi.TodayClue(isFirst=1)
         dome1 = 0
         globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
