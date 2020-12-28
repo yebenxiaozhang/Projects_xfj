@@ -1,5 +1,5 @@
 """财富值-相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 """
 1、拨打时间在超时前---增加财富值(上传时间再超时后)
 2、正常首电-----------增加财富值

@@ -4,7 +4,7 @@
 # @File    : My_Wealth_casc.py
 
 """客户-财富值相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 """
 带看相关
     1、准时完成带看        增加财富值
