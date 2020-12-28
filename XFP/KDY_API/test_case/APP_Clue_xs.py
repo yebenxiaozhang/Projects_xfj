@@ -4,7 +4,8 @@
 # @File    : Client_case.py
 
 """线索相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
+
 # 通过总部分配的线索不允许修改来源
 
 
@@ -46,19 +47,30 @@ class TestCase(unittest.TestCase):
             cls.webApi.auditList(auditLevel=2)
 
     def test_FollowClue(self):
-        """跟进线索"""
+        """1、跟进线索"""
         self.flowPath.clue_non_null()
         self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         time.sleep(1)
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        """2、查看线索跟进后的跟进日志"""
         self.appApi.ClueFollowList()
-        try:
-            self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
-            """查看今日上户是否已首电"""
-        except BaseException as e:
-            print("断言错误，错误原因：%s" % e)
-            self.appApi.ClueFollowList(value=1)
-            self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
+        self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
+        """3、线索跟进（下次跟进日期为明日）"""
+        # 先查看今日待办有多少 | 查看财富值今日多少
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        orderNo=self.appText.get('orderNo'))
+        vlue = self.appText.get('vlue')
+        tomorrow = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+        self.appApi.ClueFollowSave(taskEndTime=tomorrow)
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome - 1, self.appText.get('total'))
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        orderNo=self.appText.get('orderNo'))
+        self.assertEqual(vlue + 15, self.appText.get('vlue'))
 
     def test_AlterClueMessage(self):
         """修改线索信息"""
@@ -79,20 +91,29 @@ class TestCase(unittest.TestCase):
         self.assertEqual(self.appText.get('followContent')[:6], '线索终止跟进')
 
     def test_ChangeClient(self):
-        """线索转为客户"""
+        """1、线索转为客户"""
         self.flowPath.clue_non_null()
         self.appApi.ClueFollowList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         self.appApi.ClueInfo()
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
+        self.appApi.my_clue_list()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
         self.assertEqual(200, self.appText.get('code'))
-        # 转化为客户后，在首页进行验证
+        # 转化为客户后，任务是否有新增
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
 
     def test_ClueShift(self):
         """线索转移"""
         self.flowPath.clue_non_null()
         dome2 = self.appText.get('cluePhone')
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+        self.appApi.GetUserAgenda()
+        dome3 = self.appText.get('total')
         self.appApi.my_clue_list()         # 转移后查看自己的列表
         dome = self.appText.get('total')
         self.appApi.ClueChange()        # 线索转移
@@ -107,11 +128,22 @@ class TestCase(unittest.TestCase):
         self.assertIn('将线索指派至', self.appText.get('followContent'))
         self.appApi.Login()
         self.appApi.GetUserData()
+        """转移过后查看自己的待办是否有新增"""
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome3 - 1, self.appText.get('total'))
 
     def test_clue_ChangeClient(self):
-        """未首电转客户"""
+        """1、未首电转客户"""
+        """2、从公海领取-待办列表是否有新增"""
+        self.appApi.TodayClue(isFirst=0)
+        dome = self.appText.get('Total')
         self.appApi.SeaList()  # 公海列表
         self.appApi.clue_Assigned()  # 领取线索
+        # 验证从公海领取 待首电是否有新增
+        self.appApi.TodayClue(isFirst=0)
+        self.assertNotEqual(dome, self.appText.get('Total'))
+        self.assertEqual(dome + 1, self.appText.get('Total'))
+
         self.appApi.my_clue_list()
         self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
@@ -122,13 +154,23 @@ class TestCase(unittest.TestCase):
             print(self.appText.get('data'))
             raise RuntimeError('该线索未首电,不能转为客户!')
 
+        self.appApi.ExileSea()
+        self.assertNotEqual(200, self.appText.get('code'))
+        self.assertEqual('该线索未首电,不能终止跟进!', self.appText.get('data'))
+
     def test_admin_clue(self):
         """通过总部分配的线索不允许修改来源"""
         if ApiXfpUrl == 'http://xfp.xfj100.com':
             pass
         else:
+            """总站分配待首电数量是否新增"""
+            self.appApi.TodayClue(isFirst=0)
+            dome = self.appText.get('Total')
             self.appApi.Login(userName='admin', saasCode='admin', authCode=0)
             self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
+            if self.webText.get('code') != 200:
+                self.webApi.addGoldDetailInfo()
+                self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
             self.appApi.Login()
             self.appApi.my_clue_list()
             self.appApi.ClueInfo()
@@ -137,3 +179,16 @@ class TestCase(unittest.TestCase):
                                  sourceId=self.appText.get('XSLY'))
             if self.appText.get('code') == 200:
                 raise RuntimeError('总部分配过来的线索,线索来源不能修改')
+            # 检验从总站分配过来的线索是否添加待办
+            self.appApi.TodayClue(isFirst=0)
+            self.assertNotEqual(dome, self.appText.get('Total'))
+            self.assertEqual(dome + 1, self.appText.get('Total'))
+            dome = self.appText.get('Total')
+            """未首电进行转移"""
+            self.appApi.ClueChange()  # 线索转移
+            self.appApi.TodayClue(isFirst=0)
+            self.assertNotEqual(dome, self.appText.get('Total'))
+            self.assertEqual(dome - 1, self.appText.get('Total'))
+
+
+
