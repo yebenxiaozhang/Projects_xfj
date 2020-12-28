@@ -309,7 +309,7 @@ class TestCase(unittest.TestCase):
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=1200, is_me=2,
                               call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.appApi.CluePhoneLog()
-        self.assertEqual(0, self.appText.get('isFirst'))
+        self.assertEqual(1, self.appText.get('isFirst'))
 
     def test_first_phone_09(self):
         """6、未首电不允许转客户--公海领取"""
