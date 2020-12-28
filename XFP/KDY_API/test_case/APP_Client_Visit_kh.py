@@ -1,5 +1,5 @@
 """带看-相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 """
 新增：
