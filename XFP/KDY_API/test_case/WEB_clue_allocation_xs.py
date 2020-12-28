@@ -1,5 +1,5 @@
 """后台-线索分配"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 """
     1、幸福币不足，分配失败
     2、无咨询师接受分配，会在待分配列表
