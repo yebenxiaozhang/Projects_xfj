@@ -1,5 +1,5 @@
 """后台-带看成交统计"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 
 class TestCase(unittest.TestCase):

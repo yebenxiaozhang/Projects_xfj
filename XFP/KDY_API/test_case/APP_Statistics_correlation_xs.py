@@ -4,7 +4,7 @@
 # @File    : Statistics_correlation_casc.py
 
 """客第壹——统计相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 """
 首电及时率: 例上户时间为：08:00:00    一分钟超时  超时的时间为08:01:00

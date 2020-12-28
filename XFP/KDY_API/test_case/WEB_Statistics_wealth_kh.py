@@ -1,5 +1,5 @@
 """后台-财富值统计"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 
 class TestCase(unittest.TestCase):

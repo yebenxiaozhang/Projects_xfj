@@ -1,5 +1,5 @@
 """后台-咨询师工作统计"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 
 class TestCase(unittest.TestCase):

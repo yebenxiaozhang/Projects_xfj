@@ -1,5 +1,5 @@
 """后台-授权码"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 """
 授权码：(只考虑是否正常登录，不考虑时效)
     1、不输入授权码                                登录失败

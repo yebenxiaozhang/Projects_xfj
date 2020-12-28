@@ -4,7 +4,7 @@
 # @File    : User_casc.py
 
 """用户相关"""
-from XFP.PubilcAPI.appApi import *
+from PubilcAPI.appApi import *
 
 
 class UserTestCase(unittest.TestCase):

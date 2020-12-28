@@ -1,5 +1,5 @@
 """设备管理-相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 """
 设备管理：

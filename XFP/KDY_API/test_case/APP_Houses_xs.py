@@ -3,7 +3,7 @@
 # @Author  : 潘师傅
 # @File    : Houses_casc.py
 
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 """楼盘相关"""
 
 
