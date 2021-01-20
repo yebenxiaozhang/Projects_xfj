@@ -237,12 +237,15 @@ class TestCase(unittest.TestCase):
         self.appApi.ClueFollowList()
         self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
         self.appApi.getConsultantCount()
-        if GJ_vlue == -10:
-            if self.appText.get('followRatio') >= dome:
-                print('查看线索规定时间跟进 超过1小时      跟进及时率下降')
+        if dome == self.appText.get('followRatio') and float(dome) == 1:
+            pass
         else:
-            if self.appText.get('followRatio') <= dome:
-                print('查看线索规定时间跟进 未超过1小时      跟进及时率上降')
+            if GJ_vlue == -10:
+                if self.appText.get('followRatio') >= dome:
+                    print('查看线索规定时间跟进 超过1小时      跟进及时率下降')
+            else:
+                if self.appText.get('followRatio') <= dome:
+                    print('查看线索规定时间跟进 未超过1小时      跟进及时率上降')
         self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
                                         endTime=time.strftime("%Y-%m-%d"),
                                         orderNo=self.appText.get('orderNo'))
