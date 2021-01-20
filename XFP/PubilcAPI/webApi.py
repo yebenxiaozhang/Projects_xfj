@@ -409,7 +409,8 @@ class webApi:
         if self.webText.get('total') != 0:
             self.webText.set_map('r.text', globals()['r.text'])
 
-    def clue_list(self, myClue='Y', rderNo=None, vlue=0, consultantId=None, sourceId=None):
+    def clue_list(self, myClue='Y', rderNo=None, vlue=0, consultantId=None, sourceId=None,
+                  followStatus=None):
         """线索列表"""
         self.PostRequest(url='/api/b/clue/list',
                          data={
@@ -417,6 +418,7 @@ class webApi:
                              'isWork': True,
                              'orderNo': rderNo,
                              'consultantId': consultantId,
+                             'followStatus': followStatus,   # 3 无效释放 2 有效转化 1 跟进中 0 未指派
                              'sourceId': sourceId,
                              'startTime': self.appText.get('start_date'),
                              'endTime': self.appText.get('end_date'),
@@ -963,15 +965,16 @@ class webApi:
                 self.appText.set_map('goldClueCount',
                                      globals()['r.text']['data']['records'][dome]['goldClueCount'])
 
-    def clue_adminList(self, endTime=None, startTime=None, isArtificial=None, saasCodeSys=XfpsaasCode):
+    def clue_adminList(self, endTime=None, startTime=None, isInvalid=None, saasCodeSys=XfpsaasCode,
+                       keyWord=None):
         """总部-线索列表"""
         self.PostRequest(url='/api/b/clue/adminList',
                          data={
                              'endTime': endTime,
                              'isDistribution': None,
-                             'keyWord': None,
+                             'keyWord': keyWord,
                              'startTime': startTime,
-                             'isArtificial': isArtificial       # 1 有效
+                             'isInvalid': isInvalid       # 1 有效 2 无效
                          }, saasCode='admin', saasCodeSys=saasCodeSys)
         self.appText.set_map('web_total', globals()['r.text']['data']['total'])
 
