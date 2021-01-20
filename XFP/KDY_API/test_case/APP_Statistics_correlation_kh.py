@@ -76,8 +76,16 @@ class TestCase(unittest.TestCase):
             cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
             cls.webApi.auditList(auditLevel=2)
 
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
+        cls.appText = GlobalMap()
+        cls.flowPath.get_label(labelNo='CJX', labelName='成交项目',
+                               newlabelName='认购')
+        cls.appText.set_map('CJX', cls.appText.get('labelId'))
+
     def test_client_visit_rate_01(self):
         """1、创建带看，                 -邀约率不变"""
+        self.flowPath.client_list_non_null()
         self.appApi.getConsultantCount()
         dome = self.appApi.appText.get('visitRatio')
         self.flowPath.add_visit()
@@ -110,9 +118,11 @@ class TestCase(unittest.TestCase):
         """1、录入成交（需要审核）         -成交率不变"""
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=1)
         self.flowPath.client_list_non_null()
-        self.flowPath.add_visit()
-        self.flowPath.accomplish_visit()
         self.appApi.visitProject_list()
+        if self.appText.get('web_total') == 0:
+            self.flowPath.add_visit()
+            self.flowPath.accomplish_visit()
+            self.appApi.visitProject_list()
 
         self.appApi.getConsultantCount()
         dome = self.appApi.appText.get('dealRatio')
@@ -126,14 +136,6 @@ class TestCase(unittest.TestCase):
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
 
-        """财务审核还没通过"""
-        self.appApi.getConsultantCount()
-        if self.appApi.appText.get('dealRatio') != dome:
-            raise RuntimeError('录入成交财务还没审核 带看成交率不变')
-
-        """财务审核通过后成交率提高"""
-        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-        self.webApi.finance_deal_audit()
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('dealRatio') <= dome:
             raise RuntimeError('2、审核成功                     -成交率提高')
@@ -160,61 +162,54 @@ class TestCase(unittest.TestCase):
 
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2,
-                               auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+                          auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
         self.appApi.getConsultantCount()
         if self.appApi.appText.get('dealRatio') != dome:
             print('3、审核失败                     -成交率不变')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
     def test_follow_rete_02(self):
-        """ 2、客户跟进
-                - 查看客户规定时间跟进 超过6小时      跟进及时率下降
-                - 查看客户规定时间跟进 未过6小时      跟进及时率增加
-                - 无客户-新增客户      -跟进          跟进及时率增加"""
-        self.appApi.ClientList()
-        if self.appText.get('total') != 0:
-            self.appApi.getConsultantCount()
-            dome = self.appText.get('followRatio')
-            self.appApi.ClientTask(taskType='2')
-            self.appApi.time_difference()
-            if int(self.appText.get('vlue')) >= 1:
-                """查看客户规定时间跟进 超过6小时      跟进及时率下降"""
-                self.appApi.ClientFollowList()
-                self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-                time.sleep(1)
-                self.appApi.getConsultantCount()
-                if float(dome) == 1:
-                    pass
-                else:
-                    if self.appText.get('followRatio') != dome:
-                        print('查看客户规定时间跟进 超过6小时      跟进及时率下降')
-                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
-            else:
-                self.appApi.ClientFollowList()
-                self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-                time.sleep(1)
-                self.appApi.getConsultantCount()
-                if float(dome) == 1:
-                    pass
-                else:
-                    if self.appText.get('followRatio') < dome:
-                        print('- 查看客户规定时间跟进 未过1小时      跟进及时率增加')
-                        raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+        """
+            1、跟进及时率-客户
+            2、写入跟进后 查看跟进列表是否有新增
+            3、写入跟进后 财富值前后的变化
+        """
+        self.flowPath.client_list_non_null()        # 客户列表不能为空
+        self.appApi.getConsultantCount()            # 查看本月概况
+        dome = self.appText.get('followRatio')
+        self.appApi.ClientTask(taskType=2)          # 获取任务待办截止时间
+
+        self.appApi.time_difference()
+        if int(self.appText.get('vlue')) > 1:       # 判断时间是否超时
+            GJ_vlue = -10
         else:
-            """-无客户-新增客户      -跟进          跟进及时率增加"""
-            self.flowPath.client_list_non_null()
-            self.appApi.getConsultantCount()
-            dome = self.appText.get('followRatio')
-            self.appApi.ClientFollowList()
-            self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
-            time.sleep(1)
-            self.appApi.getConsultantCount()
-            if float(dome) == 1:
-                pass
-            else:
-                if self.appText.get('followRatio') < dome:
-                    print('- 无客户-新增客户      -跟进          跟进及时率增加')
-                    raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+            GJ_vlue = 15
+
+        """财富值跟进前后对比"""
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        orderNo=self.appText.get('orderNo'))
+        vlue = self.appText.get('vlue')
+        self.appApi.ClientFollowList()
+        if self.appText.get('taskId') is None:
+            self.appApi.ClientTask(taskType=2)  # 获取任务待办截止时间
+        self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        time.sleep(1)
+        """跟进后 查看跟进列表是否有新增"""
+        self.appApi.ClientFollowList()
+        self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
+        self.appApi.getConsultantCount()
+        if GJ_vlue == -10:
+            if self.appText.get('followRatio') >= dome:
+                print('查看线索规定时间跟进 超过1小时      跟进及时率下降')
+        else:
+            if self.appText.get('followRatio') <= dome:
+                print('查看线索规定时间跟进 未超过1小时      跟进及时率上降')
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        orderNo=self.appText.get('orderNo'))
+        self.assertEqual(vlue + GJ_vlue, self.appText.get('vlue'))
+
 
 
 

@@ -20,6 +20,7 @@ from PubilcAPI.flowPath import *
  注意事项：
   10、客户暂缓审核中---不允许创建带看，不允许录成交，不允许流放公海（无论是否开启审核，都不允许操作） 
   11、暂停后再次申请暂停
+  12、有带看申请暂缓，带看还会存在
 
 """
 
@@ -106,6 +107,9 @@ class TestCase(unittest.TestCase):
         self.appApi.GetUserAgenda()
         zxs_01_db = self.appText.get('total')
         self.appApi.ClientList()
+        self.appApi.ClientFollowList()
+        if self.appText.get('taskId') is None:
+            self.appApi.ClientTask(taskType=2)  # 获取任务待办截止时间
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
         self.appApi.ClientTaskPause()
         self.appApi.ClientTask(taskType=2)  # 待办
@@ -115,6 +119,27 @@ class TestCase(unittest.TestCase):
             raise RuntimeError("无审核的情况下 客户申请暂缓没有多加一个跟进")
         self.appApi.GetUserAgenda()
         self.assertEqual(zxs_01_db, self.appText.get('total'))
+
+        """暂缓过后进行客户转移"""
+        # 登录咨询师04 查看任务待办
+        self.appApi.Login(userName=XfpUser1)
+        self.appApi.GetUserData()
+        self.appApi.GetUserAgenda()
+        zxs_04_db = self.appText.get('total')
+        # 登录咨询师01 进行转移
+        self.appApi.Login()
+        self.appApi.GetUserData()
+        self.appApi.ClientList()
+        self.appApi.client_change()
+        self.appApi.GetUserAgenda()
+        self.assertEqual(zxs_01_db - 1, self.appText.get('total'))
+        # 登录咨询师04 查看待办是否新增
+        self.appApi.Login(userName=XfpUser1)
+        self.appApi.GetUserData()
+        self.appApi.GetUserAgenda()
+        self.assertEqual(zxs_04_db + 1, self.appText.get('total'))
+        self.appApi.Login()
+        self.appApi.GetUserData()
 
     def test_Defer_03(self):
         """2、客户申请暂缓跟进-待审核       申请中"""
@@ -151,7 +176,7 @@ class TestCase(unittest.TestCase):
 
         """首页待办-审核失败后进行流放公海- 待办减少"""
         self.appApi.GetUserAgenda()
-        self.assertEqual(zxs_01_db - 1, self.appText.get('totol'))
+        self.assertEqual(zxs_01_db - 1, self.appText.get('total'))
 
     def test_Defer_04(self):
         """4、客户申请暂缓跟进-审核成功     已同意                 已同意"""
@@ -237,8 +262,27 @@ class TestCase(unittest.TestCase):
 
         self.appApi.ClientFollowList()
         self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        """12、有带看申请暂缓，带看还会存在"""
+        self.webApi.Audit_management()  # 修改配置审核
+        self.appApi.ClientTask()
+        if self.appText.get('total') != 2:
+            self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
+                                       appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
+                                       seeingConsultant=self.appText.get('consultantId'),
+                                       appointConsultant=self.appText.get('consultantId'))
+            self.appApi.ClientTask()
+        dome = self.appText.get('total')
+        self.appApi.GetUserAgenda()
+        dome1 = self.appText.get('total')
+        self.appApi.ClientList()
         self.appApi.ClientTaskPause()
         self.assertEqual(200, self.appApi.appText.get('code'))
+        self.appApi.ClientTask()
+        if self.appText.get('total') != dome:
+            raise RuntimeError('申请暂缓后 会将待办（带看 | 跟进）移除')
+        self.appApi.GetUserAgenda()
+        if self.appText.get('total') != dome1:
+            raise RuntimeError('申请暂缓后 会将首页待办（带看 | 跟进）移除')
 
     def follow_front(self):
         """跟进前"""

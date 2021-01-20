@@ -142,15 +142,15 @@ class appApi:
         # else:
         #     pass
 
-    def GetUserAgenda(self, taskType=None, keyWord=None, clueId=None, visitNo=True, tesk=1):
+    def GetUserAgenda(self, keyWord=None, visitNo=True, tesk=1):
         """获取用户待办"""
         self.PostRequest(url='/api/a/consultant/getConsultantWorkSchedule',
                          data={
                              'consultantId': self.appText.get('consultantId'),
                              "deviceId": deviceId,
-                             "taskType": taskType,  # 0 超时1 线索 2 联系 3带看
+                             # "taskType": taskType,  # 0 超时1 线索 2 联系 3带看
                              "isCompleted": 0,
-                             'clueId': clueId,
+                             # 'clueId': clueId,
                              'consultantIds': [self.appText.get('consultantId')],
                              'day': 7,
                              "isStop": 0,
@@ -240,15 +240,15 @@ class appApi:
                              'userLabelId': self.appText.get('userLabelId')
                          })
 
-    def GetTodayDo(self):
-        """今日待办"""
+    def ClueTask(self):
+        """线索待办"""
         self.PostRequest(url='/api/a/clue/task/list',
                          data={"consultantId": self.appText.get('consultantId'),
                                # "clueId": self.appText.get('clueId'),
                                "isCompleted": 0,
                                "isStop": 0})
         # assert '线索跟进', globals()['r.text']['data']['records'][0]['taskTitle']
-        self.appText.set_map('endTimeStr', globals()['r.text']['data']['records'][0]['endTimeStr'])
+        self.appText.set_map('endTime', globals()['r.text']['data']['records'][0]['endTime'])
 
     def ClaimClue(self):
         """认领线索"""
@@ -349,6 +349,7 @@ class appApi:
         self.appText.set_map('receptionTime', globals()['r.text']['data']['receptionTime'])
         self.appText.set_map('createdTime', globals()['r.text']['data']['createdTime'])
         self.appText.set_map('isFirst', globals()['r.text']['data']['isFirst'])
+        self.appText.set_map('orderNo',globals()['r.text']['data']['orderNo'])
 
     def ClueSave(self, Status=1,  # 1新增 其他修改
                  cluePhone=None,
@@ -672,17 +673,19 @@ class appApi:
     def SeaList(self,
                 seaType=None,  # 1表示线索 2 表示客户
                 sourceId=None,  # 取流放公海的原因
+                isTrans=0,
                 keyWord=None):
         """公海列表"""
         self.PostRequest(url='/api/a/clue/sea/getSeaClueList',
                          data={'keyWord': keyWord,
                                'seaType': seaType,
+                               'isTrans': isTrans,
                                'sourceId': sourceId})
         self.appText.set_map('total', globals()['r.text']['data']['total'])
         if globals()['r.text']['data']['total'] != 0:
             self.appText.set_map('clueNickName', globals()['r.text']['data']['records'][0]['clueNickName'])
-            self.appText.set_map('cluePhone', globals()['r.text']['data']['records'][0]['cluePhone'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
+            self.appText.set_map('isTrans', globals()['r.text']['data']['records'][0]['isTrans'])
 
     def clue_Assigned(self):
         """领取线索"""
@@ -904,6 +907,7 @@ class appApi:
             self.appText.set_map('customerId', globals()['r.text']['data']['records'][vlue]['customerId'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][vlue]['clueId'])
             self.appText.set_map('taskCount', globals()['r.text']['data']['records'][vlue]['taskCount'])
+            self.appText.set_map('orderNo', globals()['r.text']['data']['records'][vlue]['orderNo'])
 
     def ClientCallLog(self):
         """客户通话记录"""
@@ -1036,12 +1040,13 @@ class appApi:
             self.appText.set_map('YJXJJ', globals()['r.text']['data'][0]['houseBusinessInfo']['reward'])
             self.appText.set_map('JSTJ', globals()['r.text']['data'][0]['houseBusinessInfo']['settlementConditions'])
 
-    def deal_List(self, transStatus=None, ApplyStatus=None, keyWord=None):
+    def deal_List(self, transStatus=None, ApplyStatus=None, keyWord=None, transProgressStatus=None):
         """成交列表"""
         self.PostRequest(url='/api/a/trans/list',
                          data={
                              'consultantId': self.appText.get('consultantId'),
                              'transApplyStatus': ApplyStatus,
+                             'transProgressStatus': transProgressStatus,        # 成交项 1 认购 2 网签
                              'keyWord': keyWord
                          })
         self.appText.set_map('total', globals()['r.text']['data']['total'])
@@ -1060,6 +1065,7 @@ class appApi:
 
             self.appText.set_map('transId', globals()['r.text']['data']['records'][dome]['transId'])
             self.appText.set_map('customerId', globals()['r.text']['data']['records'][dome]['customerId'])
+            self.appText.set_map('transOrderNo', globals()['r.text']['data']['records'][dome]['transOrderNo'])
 
     def deal_Info(self):
         """成交详情"""
@@ -1267,7 +1273,7 @@ class appApi:
         self.appText.set_map('newClueCount', globals()['r.text']['data']['newClueCount'])       # 上户总数
         self.appText.set_map('visitCount', globals()['r.text']['data']['visitCount'])           # 带看总数
         self.appText.set_map('dealCount', globals()['r.text']['data']['dealCount'])             # 成交总数
-        self.appText.set_map('seaClueCount', globals()['r.text']['data']['seaClueCount'])       # 成交总数
+        self.appText.set_map('seaClueCount', globals()['r.text']['data']['seaClueCount'])       # 释放公海总数
 
     def time_add(self, second):
         if int(self.appText.get('createdTime')[-2:]) + second > 60:
@@ -1398,6 +1404,37 @@ class appApi:
                              'consultantId': self.appText.get('consultantId')
                          })
         self.appText.set_map('code', globals()['r.text']['data']['code'])
+
+    def ConsultantAuth(self,
+                       consultantRealName='真实姓名',
+                       consultantIdCard='身份证号码',
+                       consultantIdCardImg1=None,
+                       consultantIdCardImg2=None):
+        """申请认证审核"""
+        self.PostRequest(url='/api/a/consultantAuth/addConsultantAuthInfo',
+                         data={
+                             'consultantId': self.appText.get('consultantId'),
+                             'consultantIdCard': consultantIdCard,
+                             'consultantIdCardImg1': consultantIdCardImg1,
+                             'consultantIdCardImg2': consultantIdCardImg2,
+                             'consultantRealName': consultantRealName,
+                         })
+
+    def getConsultantAuthInfo(self):
+        """个人认证详情"""
+        self.PostRequest(url='/api/a/consultantAuth/getConsultantAuthInfo',
+                         data={
+                             'consultantId': self.appText.get('consultantId')
+
+                         })
+
+    def updateConsultantOnline(self, isOnline=1):
+        """咨询师在线/离线"""
+        self.PostRequest(url='/api/a/consultant/updateConsultantOnline',
+                         data={
+                             'isOnline': isOnline,      # 1在线  0 离线
+                             'consultantId': self.appText.get('consultantId')
+                         })
 
 
 if __name__ == '__main__':

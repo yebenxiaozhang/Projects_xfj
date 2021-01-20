@@ -258,17 +258,17 @@ class flowPath:
             print("错误，错误原因：%s" % e)
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
 
-    def get_label(self, labelNo, labelName, newlabelName):
+    def get_label(self, labelNo, labelName, newlabelName, saasCode=XfpsaasCode):
         """查询标签"""
-        self.appApi.GetLabelList(labelNo=labelNo, labelName=newlabelName)
+        self.appApi.GetLabelList(labelNo=labelNo, labelName=newlabelName, saasCode=saasCode)
         if self.appApi.appText.get('data') == []:
-            self.webApi.add_label(labelName=labelName, labelId=0, pid=0)
-            self.appApi.GetLabelList(labelNo=labelNo, labelName=newlabelName)
+            self.webApi.add_label(labelName=labelName, labelId=0, pid=0, saasCode=saasCode)
+            self.appApi.GetLabelList(labelNo=labelNo, labelName=newlabelName, saasCode=saasCode)
         if self.appApi.appText.get('labelId') is not None:
             pass  # 存在标签---不创建
         else:
             self.webApi.add_label(labelName=newlabelName, labelId=self.appApi.appText.get('LabelId'),
-                                  pid=self.appApi.appText.get('LabelId'))
+                                  pid=self.appApi.appText.get('LabelId'), saasCode=saasCode)
 
 
 

@@ -5,7 +5,7 @@ import yagmail
 import os
 import sys
 sys.path.append(r'D:\\PycharmProjects\\XFP\\')
-from XFP.Config.Config import *
+from Config.Config import *
 mima = 'nighqgkwmdkrbgic'
 from selenium import webdriver
 

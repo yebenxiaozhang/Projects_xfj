@@ -43,7 +43,7 @@ class TestCase(unittest.TestCase):
 
         """线索来源_幸福派总部"""
         cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
-                               newlabelName='幸福派总部')
+                               newlabelName='幸福派总部', saasCode='admin')
         cls.appText.set_map('XSLY_admin', cls.appText.get('labelId'))
         """线索标签"""
         cls.appApi.GetUserLabelList(userLabelType='线索标签')

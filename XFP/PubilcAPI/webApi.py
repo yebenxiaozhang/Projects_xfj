@@ -15,11 +15,25 @@ class webApi:
         self.appText = GlobalMap()
         self.webText = GlobalMap()
 
-    def PostRequest(self, url, data, saasCode=XfpsaasCode):
+    def PostRequest(self, url, data, saasCode=XfpsaasCode, saasCodeSys=None, page=None):
         """post请求"""
-        data1 = {"page": {},
-                 "saasCode": saasCode,
-                 "saasCodeSys": saasCode}
+        if saasCodeSys is None:
+            saasCodeSys = saasCode
+
+        if page is None:
+            page = {}
+
+        if saasCodeSys == 1:
+            data1 = {
+                     "saasCode": saasCode}
+        elif saasCodeSys == 0:
+            data1 = {"page": page,
+                     "saasCode": saasCode,
+                     "saasCodeSys": None}
+        else:
+            data1 = {"page": page,
+                     "saasCode": saasCode,
+                     "saasCodeSys": saasCodeSys}
         self.XfpRequest.Merge(data1, data)
         r = requests.post(url=(ApiXfpUrl + url),
                           data=(json.dumps(data,
@@ -178,14 +192,15 @@ class webApi:
     #                          'auditRemark': auditRemark,
     #                      })
 
-    def add_label(self, labelName, labelId, pid):
+    def add_label(self, labelName, labelId, pid, saasCode=XfpsaasCode):
         """新增标签"""
         self.PostRequest(url='/api/b/systembase/saveLabel',
                          data={
                              'labelId': labelId,
                              'pid': pid,                # 添加大标签 这个填0
                              'labelName': labelName
-                         })
+                         },
+                         saasCode=saasCode)
 
     def get_all_label(self, labelNo='', labelName=None):
         """查询所有的标签"""
@@ -545,14 +560,30 @@ class webApi:
         if len(globals()['r.text']['data']) != 0:
             self.webText.set_map('departmentId', globals()['r.text']['data'][0]['departmentId'])
 
-    def deal_list(self, transType=1):
+    def deal_list(self, transType=None, transApplyStatus=1, transTime=None):
         """成交列表"""
+        if transTime == '认购':
+            startTime = 'startTransBuyDate'
+            endTime = 'endTransBuyDate'
+        elif transTime == '网签':
+            startTime = 'startTransContractDate'
+            endTime = 'endTransContractDate'
+        else:
+            startTime = 'startCreatedTime'
+            endTime = 'endCreatedTime'
         self.PostRequest(url='/api/b/trans/list',
                          data={
-                             'consultantId': self.appText.get('consultantId'),
-                             'endTime': self.appText.get('end_date') + ' 23:59:59',
-                             'startTime': self.appText.get('start_date') + ' 00:00:00',
-                             'transApplyStatus': transType
+                             'belongConsultantId': self.appText.get('consultantId'),
+                             "app": False,
+                             f"{endTime}": self.appText.get('end_date') + ' 23:59:59',
+                             f"{startTime}": self.appText.get('start_date') + ' 00:00:00',
+                             'transProgressStatus': transType,  # 成交项    1 认购 2 网签
+                             'transApplyStatus': transApplyStatus,  # 审核状态  1 审核通过
+                             # "app": False,
+                             # "belongConsultantId": self.appText.get('consultantId'),
+                             # "transApplyStatus": "1",
+                             # "startTransBuyDate": "2021-01-01 00:00:00",
+                             # "endTransBuyDate": "2021-01-31 23:59:59"
                          })
         self.webText.set_map('web_total', globals()['r.text']['data']['total'])
         if self.webText.get('web_total') != 0:
@@ -901,6 +932,86 @@ class webApi:
                              "id": self.appText.get('configid'),
                              "isDeleted": 0,
                          })
+
+    def ConsultantAuthList(self):
+        """待实名认证-列表"""
+        self.PostRequest(url='/api/b/consultantAuth/getConsultantAuthList',
+                         data={
+
+                         },
+                         saasCode='admin')
+
+    def GoldDetailCountList(self, endTime=None, startTime=None):
+        """储值单位统计"""
+        self.PostRequest(url='/api/b/goldDetail/getGoldDetailCountList',
+                         data={
+                             'endTime': endTime,
+                             'startTime': startTime,
+                         }, saasCode='admin', saasCodeSys=XfpsaasCode)
+
+        if len(globals()['r.text']['data']['records']) != 0:
+            dome = 0
+            while str(globals()['r.text']['data']['records'][dome]['saasCode']) != XfpsaasCode:
+                dome = dome + 1
+                if dome == len(globals()['r.text']['data']['records']):
+                    break
+            if globals()['r.text']['data']['records'][dome]['saasCode'] == XfpsaasCode:
+                self.appText.set_map('goldClueCount',
+                                     globals()['r.text']['data']['records'][dome]['goldClueCount'])
+
+    def clue_adminList(self, endTime=None, startTime=None, isArtificial=None, saasCodeSys=XfpsaasCode):
+        """总部-线索列表"""
+        self.PostRequest(url='/api/b/clue/adminList',
+                         data={
+                             'endTime': endTime,
+                             'isDistribution': None,
+                             'keyWord': None,
+                             'startTime': startTime,
+                             'isArtificial': isArtificial       # 1 有效
+                         }, saasCode='admin', saasCodeSys=saasCodeSys)
+        self.appText.set_map('web_total', globals()['r.text']['data']['total'])
+
+    def admin_report_clue(self):
+        """线索消耗及消耗统计"""
+        self.PostRequest(url='/api/b/report/clue',
+                         data={
+                             "statisticsDate": self.appText.get('start_date'),
+                             'typeCode': 'admin'
+                         },
+                         saasCode='admin')
+        """新增"""
+        self.appText.set_map('monthNewNum',
+                             globals()['r.text']['data']['clueReportVos']
+                             [len(globals()['r.text']['data']['clueReportVos']) - 1]['monthNewNum'])
+        """有效"""
+        self.appText.set_map('monthValidNum',
+                             globals()['r.text']['data']['clueReportVos']
+                             [len(globals()['r.text']['data']['clueReportVos']) - 1]['monthValidNum'])
+
+    def ConsultantCountList(self):
+        """工作台-关键指标--队长"""
+        self.PostRequest(url='/api/b/consultant/getConsultantCountList',
+                         data={
+                             'departmentId': self.appText.get('departmentId'),
+                             'startTime': self.appText.get('start_date'),
+                             'endTime': self.appText.get('end_date')
+                         })
+        if len(globals()['r.text']['data']) != 0:
+            vlue = 0
+            while globals()['r.text']['data'][vlue]['consultantName'] != '咨询师01':
+                vlue = vlue + 1
+                if len(globals()['r.text']['data']) == vlue:
+                    break
+            dome = json.loads(json.dumps(globals()['r.text']['data'][vlue]))
+            self.appText.set_map('web_newClueCount', dome['newClueCount'])       # 上户批数
+            self.appText.set_map('web_seaClueCounth', dome['seaClueCount'])      # 释放公海批数
+            self.appText.set_map('web_firstCallRatio', dome['firstCallRatio'])   # 首电及时率
+            self.appText.set_map('web_followRatio', dome['followRatio'])         # 跟进及时率
+            self.appText.set_map('web_visitCount', dome['visitCount'])           # 带看总数
+            self.appText.set_map('web_visitRatio', dome['visitRatio'])           # 上户邀约率
+            self.appText.set_map('web_dealCount', dome['dealCount'])             # 成交总数
+            self.appText.set_map('web_dealRatio', dome['dealRatio'])             # 带看成交率
+            self.appText.set_map('web_transactionSum', dome['transactionSum'])   # 成交业绩
 
 
 if __name__ == '__main__':

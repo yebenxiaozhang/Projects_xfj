@@ -4,6 +4,7 @@ from PubilcAPI.flowPath import *
     1、幸福币不足，分配失败
     2、无咨询师接受分配，会在待分配列表
     3、上户时间：分站分配时间
+    4、通过总部分配的线索不允许修改来源
 """
 
 
@@ -102,5 +103,38 @@ class TestCase(unittest.TestCase):
                                    cluePhone=self.appText.get('cluePhone'))
         self.assertEqual(self.webText.get('code'), 403)
 
+    def test_001(self):
+        """无论线索来源于总部 还是自由都不允许再次指派（包括线索是否释放公海）"""
 
+    def test_admin_clue(self):
+        """通过总部分配的线索不允许修改来源"""
+        if ApiXfpUrl == 'http://xfp.xfj100.com':
+            pass
+        else:
+            """总站分配待首电数量是否新增"""
+            self.appApi.TodayClue(isFirst=0)
+            dome = self.appText.get('Total')
+            self.appApi.Login(userName='admin', saasCode='admin', authCode=0)
+            self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
+            if self.webText.get('code') != 200:
+                self.webApi.addGoldDetailInfo()
+                self.webApi.add_clue_admin(clueNickName=self.appApi.RandomText(textArr=surname))
+            self.appApi.Login()
+            self.appApi.my_clue_list()
+            self.appApi.ClueInfo()
+            self.appApi.ClueSave(Status=2,
+                                 clueNickName=self.appApi.RandomText(textArr=surname),
+                                 sourceId=self.appText.get('XSLY'))
+            if self.appText.get('code') == 200:
+                raise RuntimeError('总部分配过来的线索,线索来源不能修改')
+            # 检验从总站分配过来的线索是否添加待办
+            self.appApi.TodayClue(isFirst=0)
+            self.assertNotEqual(dome, self.appText.get('Total'))
+            self.assertEqual(dome + 1, self.appText.get('Total'))
+            dome = self.appText.get('Total')
+            """未首电进行转移"""
+            self.appApi.ClueChange()  # 线索转移
+            self.appApi.TodayClue(isFirst=0)
+            self.assertNotEqual(dome, self.appText.get('Total'))
+            self.assertEqual(dome - 1, self.appText.get('Total'))
 

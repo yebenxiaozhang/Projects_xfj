@@ -1,5 +1,5 @@
 """标签-相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 
 class TestCase(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestCase(unittest.TestCase):
 
         """线索来源_幸福派总部"""
         cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
-                               newlabelName='幸福派总部')
+                               newlabelName='幸福派总部', saasCode='admin')
         cls.appText.set_map('XSLY_admin', cls.appText.get('labelId'))
         """线索标签"""
         cls.appApi.GetUserLabelList(userLabelType='线索标签')
@@ -102,6 +102,22 @@ class TestCase(unittest.TestCase):
         while cls.appText.get('total') >= 5:
             cls.appApi.client_exile_sea()
             cls.appApi.ClientList()
+
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
+        cls.webApi.auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
 
     def test_config_01(self):
         """项目大于3个"""

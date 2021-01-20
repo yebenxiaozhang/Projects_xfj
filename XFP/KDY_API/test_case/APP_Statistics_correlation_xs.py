@@ -75,7 +75,7 @@ class TestCase(unittest.TestCase):
         while cls.appApi.appText.get('web_total') != 0:
             cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
             cls.webApi.auditList(auditLevel=2)
-        
+
     def test_first_phone_TimelinessRate_01(self):
         """1、在08:00:00-08:01:00 拨打再超时之前上传录音    -首电及时"""
         self.flowPath.add_new_clue()
@@ -104,7 +104,7 @@ class TestCase(unittest.TestCase):
         self.appApi.getConsultantCount()
         dome = self.appApi.appText.get('firstCallRatio')
         dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
-        time.sleep(60)
+        time.sleep(120)
         self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=12000,
                               call_time=dome1)
         self.appApi.getConsultantCount()
@@ -147,6 +147,7 @@ class TestCase(unittest.TestCase):
     def test_first_phone_TimelinessRate_05(self):
         """5、在08:01:00拨打                                -首电超时"""
         self.flowPath.add_new_clue()
+        dome2 = self.appText.get('cluePhone')
         self.appApi.getConsultantCount()
         time.sleep(2)
         self.appApi.time_add(second=60)
@@ -159,6 +160,27 @@ class TestCase(unittest.TestCase):
         else:
             print('5、在08:01:00拨打                                -首电超时')
             raise RuntimeError(self.appApi.appText.get('ApiXfpUrl'))
+
+        """线索转移"""
+        self.appApi.GetUserAgenda()
+        dome3 = self.appText.get('total')
+        self.appApi.my_clue_list()         # 转移后查看自己的列表
+        dome = self.appText.get('total')
+        self.appApi.ClueChange()        # 线索转移
+        self.appApi.my_clue_list()         # 转移后查看自己的列表
+        self.assertEqual(dome-1, self.appText.get('total'))
+        # 登陆转移后账号进行查看
+        self.appApi.Login(userName=XfpUser1, password=XfpPwd1)
+        self.appApi.GetUserData()
+        self.appApi.my_clue_list(keyWord=dome2)
+        self.assertEqual(1, self.appText.get('total'))
+        self.appApi.ClueFollowList()
+        self.assertIn('将线索指派至', self.appText.get('followContent'))
+        self.appApi.Login()
+        self.appApi.GetUserData()
+        """转移过后查看自己的待办是否有新增"""
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome3 - 1, self.appText.get('total'))
 
     def test_first_phone_TimelinessRate_06(self):
         """5、在08:01:00拨打                                -首电超时"""
@@ -175,53 +197,67 @@ class TestCase(unittest.TestCase):
 
     def test_follow_rate_01(self):
         """
-            1、线索跟进
-                - 查看线索规定时间跟进 超过6小时      跟进及时率下降
-                - 查看线索规定时间跟进 未过6小时      跟进及时率增加
-                - 无线索-新增线索      -跟进          跟进及时率增加
+            1、跟进及时率-线索
+            2、写入跟进后 查看跟进列表是否有新增
+            3、写入跟进后 财富值前后的变化
         """
-        self.appApi.my_clue_list()
-        if self.appText.get('total') != 0:
-            self.appApi.getConsultantCount()
-            dome = self.appText.get('followRatio')
-            self.appApi.GetUserAgenda()
-            self.appApi.time_difference()
-            if int(self.appText.get('vlue')) > 1:
-                """查看线索规定时间跟进 超过1小时      跟进及时率下降"""
-                self.appApi.ClueFollowList()
-                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-                time.sleep(1)
-                self.appApi.getConsultantCount()
-                if float(dome) == 1:
-                    pass
-                else:
-                    if self.appText.get('followRatio') != dome:
-                        print('查看线索规定时间跟进 超过1小时      跟进及时率下降')
-            else:
-                self.appApi.ClueFollowList()
-                self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-                time.sleep(1)
-                self.appApi.getConsultantCount()
-                if float(dome) == 1:
-                    pass
-                else:
-                    if self.appText.get('followRatio') <= dome:
-                        print('- 查看线索规定时间跟进 未过6小时      跟进及时率增加')
+        self.flowPath.clue_non_null()               # 线索列表不能为空
+        """修改线索信息"""
+        globals()['cluePhone'] = self.appText.get('cluePhone')
+        self.appApi.ClueSave(Status=2,
+                             clueNickName=self.appApi.RandomText(textArr=surname),
+                             sourceId=self.appText.get('sourceId'), keyWords=self.appText.get('XSBQ'))
+        self.appApi.ClueInfo()
+        self.assertNotEqual(globals()['cluePhone'], self.appText.get('cluePhone'))
 
+        self.appApi.getConsultantCount()            # 查看本月概况
+        dome = self.appText.get('followRatio')
+        self.appApi.ClueTask()                      # 获取任务待办截止时间
+
+        self.appApi.time_difference()
+        if int(self.appText.get('vlue')) > 1:       # 判断时间是否超时
+            GJ_vlue = -10
         else:
-            """- 无线索-新增线索      -跟进          跟进及时率增加"""
-            self.flowPath.add_new_clue()
-            self.appApi.getConsultantCount()
-            dome = self.appText.get('followRatio')
-            self.appApi.ClueFollowList()
-            self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
-            time.sleep(1)
-            self.appApi.getConsultantCount()
-            if float(dome) == 1:
-                pass
-            else:
-                if self.appText.get('followRatio') <= dome:
-                    print('- 无线索-新增线索      -跟进          跟进及时率增加')
+            GJ_vlue = 15
+
+        """财富值跟进前后对比"""
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        orderNo=self.appText.get('orderNo'))
+        vlue = self.appText.get('vlue')
+        self.appApi.ClueFollowList()
+        # if self.appText.get('followContent') == '首电记录':
+        #     self.appApi.ClueFollowList()
+        #     self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        #     time.sleep(1)
+        #     self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        time.sleep(1)
+        """跟进后 查看跟进列表是否有新增"""
+        self.appApi.ClueFollowList()
+        self.assertEqual('python-线索/客户跟进，本次沟通记录', self.appText.get('followContent'))
+        self.appApi.getConsultantCount()
+        if GJ_vlue == -10:
+            if self.appText.get('followRatio') >= dome:
+                print('查看线索规定时间跟进 超过1小时      跟进及时率下降')
+        else:
+            if self.appText.get('followRatio') <= dome:
+                print('查看线索规定时间跟进 未超过1小时      跟进及时率上降')
+        self.appApi.getWealthDetailList(startTime=time.strftime("%Y-%m-%d"),
+                                        endTime=time.strftime("%Y-%m-%d"),
+                                        orderNo=self.appText.get('orderNo'))
+        self.assertEqual(vlue + GJ_vlue, self.appText.get('vlue'))
+
+        """线索转客户"""
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
+        self.appApi.my_clue_list()
+        self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
+                                   loanSituation='这个是贷款情况')
+
+        """转化完成后，任务是否有新增"""
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
 
 
 

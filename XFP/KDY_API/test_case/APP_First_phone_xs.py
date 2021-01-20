@@ -239,11 +239,30 @@ class TestCase(unittest.TestCase):
         self.assertEqual('该线索未首电,不能转为客户!', self.appText.get('data'))
 
     def test_first_phone_10(self):
-        """6、未首电不允许转客户--新线索转客户"""
-        self.appApi.ClueSave(clueNickName=self.appApi.RandomText(textArr=surname))
+        """1、未首电转客户"""
+        """2、从公海领取-待办列表是否有新增"""
+        self.appApi.TodayClue(isFirst=0)
+        dome = self.appText.get('Total')
+        self.appApi.SeaList()  # 公海列表
+        self.appApi.clue_Assigned()  # 领取线索
+        # 验证从公海领取 待首电是否有新增
+        self.appApi.TodayClue(isFirst=0)
+        self.assertNotEqual(dome, self.appText.get('Total'))
+        self.assertEqual(dome + 1, self.appText.get('Total'))
+
+        self.appApi.my_clue_list()
+        self.appApi.ClueInfo()
         self.appApi.ClientEntering(callName=self.appApi.RandomText(textArr=surname),
                                    loanSituation='这个是贷款情况')
-        self.assertEqual('该线索未首电,不能转为客户!', self.appText.get('data'))
+        if '该线索未首电,不能转为客户!' != self.appText.get('data'):
+            print(self.appText.get('data'))
+            self.appApi.ClueFollowList()
+            print(self.appText.get('data'))
+            raise RuntimeError('该线索未首电,不能转为客户!')
+
+        self.appApi.ExileSea()
+        self.assertNotEqual(200, self.appText.get('code'))
+        self.assertEqual('该线索未首电,不能终止跟进!', self.appText.get('data'))
 
     def test_first_phone_11(self):
         """7、线索转移后B---有首电"""

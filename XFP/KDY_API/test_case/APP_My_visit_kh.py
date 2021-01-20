@@ -146,6 +146,9 @@ class TestCase(unittest.TestCase):
         self.flowPath.add_visit()
         self.flowPath.advance_over_visit()
         self.flowPath.visit_status(status='已取消')
+        """取消带看后 -是否有一条跟进"""
+        self.appApi.ClientFollowList()
+        self.assertEqual('取消带看', self.appText.get('followContent')[-4:])
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
 
@@ -210,6 +213,7 @@ class TestCase(unittest.TestCase):
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
 
+        """完成带看计划  客户待办会减少"""
         self.flowPath.accomplish_visit()
         self.flowPath.visit_status(status='已完成')
         self.appApi.client_exile_sea()

@@ -45,6 +45,7 @@ class TestCase(unittest.TestCase):
         self.webApi.DeptUserListPage(deviceNo=deviceId)
         self.webApi.configList(keyWord='check_device_switch')
         self.webApi.configSave(configValue=1)
+        self.webApi.DeptUserListPage(deviceNo=deviceId)
         while self.appText.get('web_total') != 0:
             """删除设备"""
             self.webApi.DelDeviceInfo()
@@ -55,28 +56,34 @@ class TestCase(unittest.TestCase):
         self.webApi.addDeviceInfo(deviceName='设备', deviceNo=deviceId)
         self.assertEqual('设备已存在,请勿重复添加!', self.appText.get('data'))
         """尝试登录"""
-        self.appApi.Login(userName=XfpUser11)
+        self.appApi.Login(userName='13062200320')
         self.assertEqual('用户暂无设备授权,登录失败!', self.appText.get('resultStr'))
         """绑定设备"""
-        self.appApi.Login(authCode=1)
+        self.appApi.Login(userName='13332978000', authCode=1)
         self.webApi.DeptUserListPage(deviceNo=deviceId)
-        self.webApi.UserIdList(keyWord=XfpUser11)
+        self.webApi.UserIdList(keyWord='13062200320')
         self.webApi.DeviceBinding()
-        self.appApi.Login(XfpUser11)
+        self.appApi.Login(userName='13062200320')
         self.assertEqual(self.appText.get('msg'), '成功')
         self.webApi.configSave(configValue=0)
 
     def test_Device_02(self):
         """添加默认设备人员"""
-        self.appApi.Login(authCode=1)
+        self.appApi.Login(authCode=1, userName='13332978000')
         self.webApi.DeptUserListPage(deviceNo=deviceId)
         self.webApi.UserIdList(keyWord=XfpUser1)
         dome = self.appText.get('userId')
-        self.webApi.UserIdList(keyWord=XfpUser11)
+        self.webApi.UserIdList(keyWord='13062200320')
         dome1 = self.appText.get('userId')
         self.webApi.UserIdList(keyWord=XfpUser)
         dome2 = self.appText.get('userId')
         userId = [dome, dome1, dome2]
         self.webApi.DeviceBinding(userId=userId)
 
-
+    def test_Device_03(self):
+        """恢复默认 将设备进行删除"""
+        self.webApi.DeptUserListPage(deviceNo=deviceId)
+        while self.appText.get('web_total') != 0:
+            """删除设备"""
+            self.webApi.DelDeviceInfo()
+            self.webApi.DeptUserListPage(deviceNo=deviceId)

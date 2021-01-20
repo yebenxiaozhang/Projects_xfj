@@ -4,7 +4,7 @@
 # @File    : Follow_apply_casc.py
 
 """跟进申请-相关"""
-from XFP.PubilcAPI.flowPath import *
+from PubilcAPI.flowPath import *
 
 """
 无审核-正常流程：·······现状态··············· 操作流放公海

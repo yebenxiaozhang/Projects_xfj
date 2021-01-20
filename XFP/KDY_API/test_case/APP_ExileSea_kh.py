@@ -54,6 +54,8 @@ class TestCase(unittest.TestCase):
         cls.request = webApi()
         cls.webApi = cls.request
         cls.webApi.Audit_management()
+        cls.flow = flowPath()
+        cls.flowPath = cls.flow
 
         """审核-成交相关-财务"""
         cls.webApi.finance_deal_auditList()
@@ -70,17 +72,6 @@ class TestCase(unittest.TestCase):
         while cls.appApi.appText.get('web_total') != 0:
             cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
             cls.webApi.auditList(auditLevel=2)
-
-        """去除一些客户及线索"""
-        cls.appApi.my_clue_list()
-        while cls.appText.get('total') >= 5:
-            cls.flowPath.clue_exile_sea()
-            cls.appApi.my_clue_list()
-
-        cls.appApi.ClientList()
-        while cls.appText.get('total') >= 5:
-            cls.appApi.client_exile_sea()
-            cls.appApi.ClientList()
 
     def test_ExileSea_01(self):
         """10、客户终止跟进审核中 ---不允许创建带看，不允许录成交，
@@ -113,21 +104,32 @@ class TestCase(unittest.TestCase):
     def test_ExileSea_02(self):
         """1、客户无效终止        已同意"""
         self.webApi.Audit_management()
-        """    C-1 客户释放公海--无审核--跟进减少"""
-        self.client_front()
+        """客户释放公海--无审核--跟进减少"""
+        """客户释放公海--客户待办--会清空"""
+        self.flowPath.client_list_non_null()
+        self.appApi.ClientFollowList()
+        self.appApi.ClueFollowSave(followType='客户', taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
+        self.appApi.ClientTask()
+        kh_db = self.appText.get('total')
         self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
         dome = self.appText.get('total')
-        self.follow_front()
+        self.appApi.GetUserAgenda()
+        sy_db = self.appText.get('total')
         self.appApi.ClientList()
         self.appApi.client_exile_sea()
         """11、无审核跟进内容为：线索终止跟进"""
         self.appApi.ClueFollowList()
         self.assertEqual(self.appText.get('followContent'),
                          '客户终止跟进</br>原因:客户已成交</br>备注:python-客户释放公海')
-        self.follow_later(vlue=-1)
         self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
         if dome + 1 != self.appText.get('total'):
             raise RuntimeError("无审核的情况下 客户终止会没有添加一个跟进申请")
+        self.appApi.ClientTask()
+        if 0 != self.appText.get('total'):
+            raise RuntimeError("无效终止后，客户待办应该为空")
+        self.appApi.GetUserAgenda()
+        if sy_db - kh_db != self.appText.get('total'):
+            raise RuntimeError("无效终止后，首页待办应该减少")
 
     def test_ExileSea_03(self):
         """2、客户无效终止-待审核           申请中"""

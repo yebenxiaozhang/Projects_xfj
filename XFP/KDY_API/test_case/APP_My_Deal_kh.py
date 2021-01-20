@@ -91,9 +91,10 @@ class TestCase(unittest.TestCase):
             cls.appApi.ClientList()
 
         cls.flowPath.client_list_non_null()
-        cls.flowPath.add_visit()
-        cls.flowPath.accomplish_visit()
-        cls.appApi.visitProject_list()
+        if cls.appText.get('web_total') == 0:
+            cls.flowPath.add_visit()
+            cls.flowPath.accomplish_visit()
+            cls.appApi.visitProject_list()
 
     def test_my_deal_01(self):
         """1、录入成交          已确认                    已确认"""
@@ -104,12 +105,16 @@ class TestCase(unittest.TestCase):
         self.appApi.add_deal()
         self.appApi.GetUserAgenda()
         self.assertEqual(dome, self.appText.get('total'))
-        self.appApi.deal_List()
+        self.appApi.deal_List(keyWord=self.appText.get('dealPhone'))
+        """成交列表查询是否有成交单号"""
+        if self.appText.get('transOrderNo') is None:
+            print('新建成交没有成交单号')
         self.webApi.detail()
-        self.flowPath.deal_status(status=0, keyWord=self.appText.get('dealPhone'))
-        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-        self.webApi.finance_deal_audit()
         self.flowPath.deal_status(status=1, keyWord=self.appText.get('dealPhone'))
+        """成交项目为网签 才需要财务进行审核"""
+        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+        if self.appText.get('web_total') != 0:
+            raise RuntimeError('成交项目为网签 才需要财务进行审核')
 
     def test_my_deal_02(self):
         """1、录入成交-待审核          审核中"""
@@ -133,10 +138,10 @@ class TestCase(unittest.TestCase):
         self.appApi.add_deal(Status=1)
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
-        self.flowPath.deal_status(status=0, keyWord=self.appText.get('dealPhone'))
-        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-        self.webApi.finance_deal_audit()
         self.flowPath.deal_status(status=1, keyWord=self.appText.get('dealPhone'))
+        # self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+        # self.webApi.finance_deal_audit()
+        # self.flowPath.deal_status(status=1, keyWord=self.appText.get('dealPhone'))
 
     def test_my_deal_04(self):
         """1、录入成交-待审核          申请中"""
@@ -157,27 +162,22 @@ class TestCase(unittest.TestCase):
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=2)
         # self.appApi.deal_List(transStatus=1)
         # self.webApi.detail()
+        # self.appApi.ClueInfo()
         self.appApi.add_deal(Status=1)
 
         self.appApi.Login(userName='13062200302')
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=1)
 
-        self.flowPath.deal_status(status=0, keyWord=self.appText.get('dealPhone'))
-
         """4、录入成交-二级审核成功    已确认                         已确认"""
         self.appApi.Login(userName='13062200303')
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
         self.webApi.audit(auditStatue=1)
 
-        """财务审核"""
-        self.appApi.Login(userName='13062200310')
-        self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-        self.webApi.finance_deal_audit()
-        self.flowPath.deal_status(status=1, keyWord=self.appText.get('dealPhone'))
+        """查看审核人是否一一对应"""
         self.appApi.transProgress()
         self.assertIn('总监', self.appText.get('directorAuditDesc'))
-        self.assertIn('财务', self.appText.get('financialAuditDesc'))
+        # self.assertIn('财务', self.appText.get('financialAuditDesc'))
         self.assertIn('经理', self.appText.get('managerAuditDesc'))
 
     def test_my_deal_06(self):
@@ -202,7 +202,6 @@ class TestCase(unittest.TestCase):
         # self.appApi.deal_List(transStatus=1)
         # self.webApi.detail()
         self.appApi.add_deal(Status=1)
-        dome1 = self.appApi.appText.get('dealPhone')
 
         # 流放公海  创建带看 暂缓跟进 客户转移 不可以删除
         self.appApi.client_exile_sea()
@@ -224,17 +223,19 @@ class TestCase(unittest.TestCase):
         self.appApi.add_deal(Status=2)
         self.assertEqual('已申请客户成交,正在审核中!', self.appApi.appText.get('data'))
 
-        """审核及财务审核"""
+        """审核及"""
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
-        self.webApi.finance_deal_auditList(keyWord=dome1)
-        self.webApi.finance_deal_audit()
 
     def test_my_deal_08(self):
         """2、修改成交后（如设置审核）  ---需重新审核"""
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=1)
         # self.appApi.deal_List(transStatus=1)
         # self.webApi.detail()
+        """成交项为网签"""
+        self.flowPath.get_label(labelNo='CJX', labelName='成交项目',
+                                newlabelName='网签')
+        self.appText.set_map('CJX', self.appText.get('labelId'))
         self.appApi.add_deal(Status=1)
         self.flowPath.deal_status(status=0, keyWord=self.appText.get('dealPhone'))
         dome = self.appApi.appText.get('clueId')
@@ -261,7 +262,8 @@ class TestCase(unittest.TestCase):
     def test_my_deal_11(self):
         """财务审核失败后 查看成交的状态？"""
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=1)
-        self.appApi.deal_List(transStatus=1)
+        self.appApi.deal_List(transStatus=1, transProgressStatus=2)
+        self.appApi.ClueInfo()
         self.webApi.detail()
         self.appApi.add_deal(Status=1)
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
@@ -280,17 +282,39 @@ class TestCase(unittest.TestCase):
 
         """60天成交总套数对比"""
         if self.appText.get('dealCount') != self.webText.get('web_transactionCount'):
-            raise RuntimeError('60天成交总套数与带看成交统计的不一致')
+            print('我的成交60天成交总套数与带看成交统计的不一致')
 
         """60天成交业绩"""
         if self.appText.get('totalAmount') != self.webText.get('web_transactionResults'):
-            raise RuntimeError('60天成交业绩与带看成交统计的不一致')
+            print('我的成交60天成交业绩与带看成交统计的不一致')
 
         """还原日期"""
         self.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
     def test_my_deal_13(self):
-        """查看成交进度审核人"""
+        """公海不显示已经成交的客户"""
+        self.webApi.Audit_management()
+        self.appApi.ClientList()
+        self.appApi.deal_List(keyWord=self.appText.get('orderNo'))
+        if self.appText.get('total') == 0:
+            self.appApi.visitProject_list()
+            if self.appText.get('web_total') == 0:
+                self.flowPath.add_visit()
+                self.flowPath.accomplish_visit()
+                self.appApi.visitProject_list()
+            self.appApi.add_deal()
+            self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
+            self.webApi.finance_deal_audit()
+        self.appApi.client_info()
+        self.appApi.client_exile_sea()
+        self.appApi.SeaList(keyWord=self.appText.get('cluePhone'), isTrans=2)  # 公海列表
+        if self.appText.get('total') != 0:
+            raise RuntimeError('公海不显示已经成交的客户')
+
+        # 验证返回字段 是否为 ture
+        self.appApi.SeaList(keyWord=self.appText.get('cluePhone'))  # 公海列表
+        if self.appText.get('isTrans') is 'ture':
+            raise RuntimeError('公海列表已成交的客户返回值isTrans=True')
 
 
 
