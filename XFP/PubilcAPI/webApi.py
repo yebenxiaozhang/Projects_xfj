@@ -947,7 +947,11 @@ class webApi:
                          data={
                              'endTime': endTime,
                              'startTime': startTime,
-                         }, saasCode='admin', saasCodeSys=XfpsaasCode)
+                         }, saasCode='admin', saasCodeSys=XfpsaasCode,
+                         page={
+                            'size': '100',
+                            'current': '1'
+                        })
 
         if len(globals()['r.text']['data']['records']) != 0:
             dome = 0

@@ -75,16 +75,20 @@ class TestCase(unittest.TestCase):
     def test_follow_apply_01(self):
         """1、线索无效终止        已同意"""
         """    A-1 线索释放公海--无审核--跟进减少"""
-        self.clue_front()
+        self.flowPath.clue_non_null()
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
         self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
         dome1 = self.appText.get('total')
-        self.follow_front()
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
         self.appApi.ExileSea()
         """11、无审核跟进内容为：线索终止跟进"""
         self.appApi.ClueFollowList()
         self.assertEqual(self.appText.get('followContent'),
                          '线索终止跟进</br>原因:客户已成交</br>备注:python-线索释放公海')
-        self.follow_later(vlue=-1)
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome - 1, self.appText.get('total'))
         self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
         if dome1 + 1 != self.appText.get('total'):
             raise RuntimeError("无审核的情况下 线索终止没有多加一条跟进申请")
@@ -93,35 +97,47 @@ class TestCase(unittest.TestCase):
         """2、线索无效终止-待审核           申请中"""
         self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
         """    A-2 线索释放公海--审核中--跟进不变    """
-        self.clue_front()
-        self.follow_front()
+        self.flowPath.clue_non_null()
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
         self.appApi.ExileSea()
         self.appApi.ClueFollowList()
         self.assertEqual(self.appText.get('followContent'),
                          '申请线索终止跟进</br>原因:客户已成交</br>备注:python-线索释放公海')
         self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
 
-        self.follow_later()
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
         """3、线索无效终止-审核失败         已驳回"""
         """    A-3 线索释放公海--审核失败--跟进不变"""
-        dome = time.strftime("%Y-%m-%d %H:%M:%S")
+        dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
-        self.webApi.audit(auditStatue=2, auditRemark=dome + ' 审核失败')
+        self.webApi.audit(auditStatue=2, auditRemark=dome1 + ' 审核失败')
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
-        self.assertEqual(dome + ' 审核失败', self.appApi.appText.get('auditRemark'))
-        self.follow_later()
+        self.assertEqual(dome1 + ' 审核失败', self.appApi.appText.get('auditRemark'))
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome, self.appText.get('total'))
 
     def test_follow_apply_03(self):
         """4、线索无效终止-审核成功         已同意"""
         self.webApi.Audit_management(clueStop=True, clueStopLevel=1)
         """    A-4 线索释放公海--审核成功--跟进减少"""
-        self.clue_front()
-        self.follow_front()
+        self.flowPath.clue_non_null()
+        self.appApi.ClueFollowList()
+        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
+
+        self.appApi.GetUserAgenda()
+        dome = self.appText.get('total')
+
         self.appApi.ExileSea()
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
         self.flowPath.apply_status(status='已同意')
-        self.follow_later(vlue=-1)
+        self.appApi.GetUserAgenda()
+        self.assertEqual(dome - 1, self.appText.get('total'))
 
     def test_follow_apply_04(self):
         """5、线索无效终止-待审核                  申请中"""
@@ -175,28 +191,4 @@ class TestCase(unittest.TestCase):
         self.assertEqual('已申请线索终止,正在审核中!', self.appApi.appText.get('data'))
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
-
-    def follow_front(self):
-        """跟进前"""
-        self.appApi.GetUserAgenda()
-        globals()['dome'] = self.appText.get('total')
-
-    def follow_later(self, vlue=0):
-        """跟进后"""
-        self.appApi.GetUserAgenda()
-        if vlue == 0:
-            self.assertEqual(globals()['dome'], self.appText.get('total'))
-        else:
-            self.assertNotEqual(globals()['dome'], self.appText.get('total'))
-            if vlue == -1:
-                self.assertEqual(globals()['dome'] - 1, self.appText.get('total'))
-            else:
-                self.assertEqual(globals()['dome'] + 1, self.appText.get('total'))
-
-    def clue_front(self):
-        """线索前"""
-        self.flowPath.clue_non_null()
-        self.appApi.my_clue_list()
-        self.appApi.ClueFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"))
 

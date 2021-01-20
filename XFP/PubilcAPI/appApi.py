@@ -244,7 +244,7 @@ class appApi:
         """线索待办"""
         self.PostRequest(url='/api/a/clue/task/list',
                          data={"consultantId": self.appText.get('consultantId'),
-                               # "clueId": self.appText.get('clueId'),
+                               "clueId": self.appText.get('clueId'),
                                "isCompleted": 0,
                                "isStop": 0})
         # assert '线索跟进', globals()['r.text']['data']['records'][0]['taskTitle']
