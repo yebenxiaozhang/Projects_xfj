@@ -91,6 +91,7 @@ class TestCase(unittest.TestCase):
             cls.appApi.ClientList()
 
         cls.flowPath.client_list_non_null()
+        cls.appApi.visitProject_list()
         if cls.appText.get('web_total') == 0:
             cls.flowPath.add_visit()
             cls.flowPath.accomplish_visit()

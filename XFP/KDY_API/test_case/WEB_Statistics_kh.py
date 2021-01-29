@@ -31,7 +31,7 @@ class TestCase(unittest.TestCase):
         cls.webApi = cls.request
         cls.webApi.Audit_management()
 
-    def test_statistics_1(self):
+    def test_statistics_01(self):
         """带看成交统计"""
         self.webApi.visit_deal_statistics()
         """上户数量对比"""
@@ -67,6 +67,21 @@ class TestCase(unittest.TestCase):
         self.webApi.deal_list(transType=2, transTime='网签')             # 后台查看已完成成交次数
         if self.webText.get('web_total') != self.webText.get('web_subscribeConvertSigning'):
             print('带看成交统计中网签套数与后台成交套数不一致')
+
+        """带看成交统计与成交结算底部统计进行比较"""
+        self.webApi.TransactionSettlementStatistical()
+        if self.appText.get('rgCount') != self.webText.get('web_transactionCount'):
+            print('带看成交统计与成交结算底部统计进行比较---认购套数--审核通过的')
+
+        if self.appText.get('wqCount') != self.webText.get('web_subscribeConvertSigning'):
+            print('带看成交统计与成交结算底部统计进行比较---网签套数--审核通过的')
+
+        # self.webApi.deal_list(transType=3, transTime='认购')  # 后台查看已完成成交次数
+        # if self.appText.get('hkCount') != self.webText.get('web_total'):
+        #     print('带看成交统计与成交结算底部统计进行比较---回款套数--审核通过的')
+
+        if self.appText.get('verificationResults') != self.webText.get('web_transactionResults'):
+            print('带看成交统计与成交结算底部统计进行比较---审核业绩--审核通过的')
 
         """业绩对比"""
         dome = self.webText.get('web_transactionResults')

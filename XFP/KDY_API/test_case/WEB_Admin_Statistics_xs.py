@@ -27,7 +27,7 @@ class TestCase(unittest.TestCase):
         cls.appApi = cls.do_request
         cls.appApi.Login(userName='admin', saasCode='admin', authCode=0)
         if ApiXfpUrl == 'http://xfp.xfj100.com':
-            print('正式站不跑')
+            raise RuntimeError('正式站不跑')
 
     def test_Statistics_01(self):
         """储值单位统计（幸福币管理）与全部线索（线索管理）进行比较"""

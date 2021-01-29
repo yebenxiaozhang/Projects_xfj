@@ -96,10 +96,11 @@ class VisitTestCase(unittest.TestCase):
             dome2.append(self.appText.get('consultantId'))
             self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
                                        appointmentTime=globals()['dome'],
-                                       seeingConsultant=(str(dome2))[1:-1],
+                                       seeingConsultant=((str(dome2))[1:-1]).replace(' ', '').replace("\n", ""),
                                        appointConsultant=self.webText.get('consultantId'))
             if dome1 + 1 == dome or dome1 >= 3:
                 self.assertNotEqual(200, self.appApi.appText.get('code'))
+                break
             else:
                 self.assertEqual(200, self.appApi.appText.get('code'))
             dome1 = dome1 + 1

@@ -592,6 +592,7 @@ class webApi:
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
             self.appText.set_map('transId', globals()['r.text']['data']['records'][0]['transId'])
             self.appText.set_map('customerId', globals()['r.text']['data']['records'][0]['customerId'])
+            self.appText.set_map('CJDH', globals()['r.text']['data']['records'][0]['transOrderNo'])
 
     def visit_list(self):
         """带看列表"""
@@ -1020,7 +1021,218 @@ class webApi:
             self.appText.set_map('web_dealRatio', dome['dealRatio'])             # 带看成交率
             self.appText.set_map('web_transactionSum', dome['transactionSum'])   # 成交业绩
 
+    def TransactionSettlementStatistical(self):
+        """结算列表---底部统计"""
+        self.PostRequest(url='/api/b/transactionSettlement/getTransactionSettlementStatistical',
+                         data={
+                             'startTime': self.appText.get('start_date'),
+                             'endTime': self.appText.get('end_date')
+                         })
+        self.appText.set_map('amountToBeCollected', globals()['r.text']['data']['amountToBeCollected'])  # 待回款金额
+        self.appText.set_map('debtCollectionSchedule', globals()['r.text']['data']['debtCollectionSchedule'])  # 回款进度
+        self.appText.set_map('hkCount', globals()['r.text']['data']['hkCount'])     # 回款套数
+        self.appText.set_map('paidCommission', globals()['r.text']['data']['paidCommission'])
+        self.appText.set_map('paidWealth', globals()['r.text']['data']['paidWealth'])
+        self.appText.set_map('printedInvoiceAmount', globals()['r.text']['data']['printedInvoiceAmount'])
+        self.appText.set_map('receivableAmount', globals()['r.text']['data']['receivableAmount'])   # 回款金额
+        self.appText.set_map('rgCount', globals()['r.text']['data']['rgCount'])     # 认购套数
+        self.appText.set_map('verificationResults',
+                             globals()['r.text']['data']['verificationResults'])  # 核定业绩
+        self.appText.set_map('wcCount', globals()['r.text']['data']['wcCount'])     #
+        self.appText.set_map('wqCount', globals()['r.text']['data']['wqCount'])     # 网签套数
+
+    def TransactionSettlementList(self):
+        """结算列表-"""
+        self.PostRequest(url='/api/b/transactionSettlement/getTransactionSettlementList',
+                         data={
+                             'startTime': self.appText.get('start_date'),
+                             'endTime': self.appText.get('end_date')
+                         })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('transOrderNo', globals()['r.text']['data']['records'][0]['transOrderNo'])
+            self.appText.set_map('transId', globals()['r.text']['data']['records'][0]['transId'])
+            self.appText.set_map('transYeji', globals()['r.text']['data']['records'][0]['transYeji'])
+            self.appText.set_map('CJDH', globals()['r.text']['data']['records'][0]['transOrderNo'])
+
+    def TransactionSettlementStatisticalInfo(self):
+        """结算详情"""
+        self.PostRequest(url='/api/b/transactionSettlement/getTransactionSettlementStatisticalInfo',
+                         data={
+                             'transId': self.appText.get('transId')
+                         })
+        self.appText.set_map('amountToBeCollected',
+                             globals()['r.text']['data']['amountToBeCollected'])  # 待收金额
+        self.appText.set_map('debtCollectionSchedule',
+                             globals()['r.text']['data']['debtCollectionSchedule'])  # 回款进度
+        self.appText.set_map('paidCommission',
+                             globals()['r.text']['data']['paidCommission'])     # 发放佣金
+        self.appText.set_map('receivableAmount',
+                             globals()['r.text']['data']['receivableAmount'])     # 回款金额
+        self.appText.set_map('paidWealth', globals()['r.text']['data']['paidWealth'])     # 财富值
+        self.appText.set_map('printedInvoiceAmount',
+                             globals()['r.text']['data']['printedInvoiceAmount'])     # 已开票金额
+
+    def TransReturnList(self, returnType=1):
+        """回款 | 开票 记录"""
+        self.PostRequest(url='/api/b/transactionSettlement/getTransReturnList',
+                         data={
+                             'transId': self.appText.get('transId'),
+                             'returnType': returnType  # 1回款 2开票
+                         }, page={
+                                'size': '100',
+                                'current': '1'
+                            })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('web_total', len(globals()['r.text']['data']['records']))
+            self.appText.set_map('returnMoney', globals()['r.text']['data']['records'][0]['returnMoney'])
+            a = 0
+            vlue = 0
+            while a != self.appText.get('web_total'):
+                vlue = vlue + int(globals()['r.text']['data']['records'][a]['returnMoney'])
+                a = a + 1
+            self.appText.set_map('vlue', vlue)
+        else:
+            self.appText.set_map('vlue', 0)
+
+    def WealthDetailList(self):
+        """授予财富值记录"""
+        self.PostRequest(url='/api/b/transactionSettlement/getWealthDetailList',
+                         data={
+                             'transId': self.appText.get('transId'),
+                             'wealthType': self.appText.get('CJFF'),
+                             'wealthTypeRelId': self.appText.get('transId')
+                         }, page={
+                                'size': '100',
+                                'current': '1'
+                            })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('web_total', len(globals()['r.text']['data']['records']))
+            self.appText.set_map('wealthValue', globals()['r.text']['data']['records'][0]['wealthValue'])
+            a = 0
+            vlue = 0
+            while a != self.appText.get('web_total'):
+                vlue = vlue + int(globals()['r.text']['data']['records'][a]['wealthValue'])
+                a = a + 1
+            self.appText.set_map('vlue', vlue)
+        else:
+            self.appText.set_map('wealthValue', 0)
+
+    def addOrUpdateReceivableRecords(self, attachmentIds=1798, returnType=1,
+                                     returnRemark='备注' + time.strftime("%Y-%m-%d %H:%M:%S")):
+        """添加回款 | 开票记录 记录"""
+        returnMoney = random.randint(20, 10000)
+        self.appText.set_map('returnMoney', returnMoney)
+        self.PostRequest(url='/api/b/transactionSettlement/addOrUpdateReceivableRecords',
+                         data={
+                             'returnNo': '1' + str(int(time.time())),
+                             'returnMoney': returnMoney,
+                             'returnRemark': returnRemark,
+                             'returnType': returnType,  # 1回款 2开票
+                             'transId': self.appText.get('transId'),
+                             'attachmentIds': attachmentIds
+                         })
+        self.appText.set_map('returnMoney', returnMoney)
+
+    def awardedWealthDetail(self):
+        """授予财富值"""
+        wealthValue = random.randint(20, 100)
+        self.PostRequest(url='/api/b/transactionSettlement/awardedWealthDetail',
+                         data={
+                             'consultantId': self.appText.get('consultantId'),
+                             'wealthTypeRelId': self.appText.get('transId'),
+                             'wealthType': self.appText.get('CJFF'),
+                             'wealthRemark': time.strftime("%Y-%m-%d %H:%M:%S") + ' 授予财富值',
+                             'wealthValue': wealthValue
+                         })
+        self.appText.set_map('wealthValue', wealthValue)
+
+    def TransReturnStatistical(self, returnType=1):
+        """查询回款 开票总和与进度 """
+        self.PostRequest(url='/api/b/transactionSettlement/getTransReturnStatistical',
+                         data={
+                             'returnType': returnType,  # 1 回款 2 开票
+                             'transId': self.appText.get('transId')
+                         })
+        self.appText.set_map('forReceivable', globals()['r.text']['data']['forReceivable'])  # 待开票 | 待回款
+        self.appText.set_map('percentage', globals()['r.text']['data']['percentage'])       # 进度
+        self.appText.set_map('returnMoney', globals()['r.text']['data']['returnMoney'])     # 总额
+
+    def paymentRequest(self):
+        """新建发佣申请"""
+        paymentAmount = random.randint(2, 20)
+        self.PostRequest(url='/api/b/payment/request',
+                         data={
+                             'paymentDetailFormList': [{
+                                 'consultantId': self.appText.get('consultantId'),
+                                 'paymentAmount': paymentAmount,
+                             }],
+                             'paymentTypeId': self.appText.get('YJLX'),
+                             'transId': self.appText.get('transId'),
+                         }, saasCodeSys=1)
+        self.appText.set_map('paymentAmount', paymentAmount)
+
+    def paymentRegister(self):
+        """付款登记"""
+        self.PostRequest(url='/api/b/payment/register',
+                         data={
+                                "payeeBank": "烟台市华润银行",
+                                "payeeBankAccount": "4437897883729183387",
+                                "payeeLegalName": "苏先生",
+                                "payeeName": "烟台幸福云灵活用工邮箱公司",
+                                "paymentAmount": self.appText.get('paymentAmount'),
+                                "paymentBank": "烟台市华润银行",
+                                "paymentBankAccount": "4437897883729183387",
+                                "paymentId": None,
+                                "paymentName": "烟台幸福云灵活用工邮箱公司",
+                                "paymentNo": "凭证号" + time.strftime("%Y-%m-%d %H:%M:%S"),
+                                "paymentRemark": time.strftime("%Y-%m-%d %H:%M:%S") + "付款登记",
+                                "requestId": self.appText.get('requestId'),
+                            })
+
+    def requestList(self, paymentStatus=0, keyWord=None):
+        """付款登记列表"""
+        self.PostRequest(url='/api/b/payment/request/list',
+                         data={
+                             'keyWord': keyWord,
+                             'paymentStatus': paymentStatus,
+                         })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('requestId', globals()['r.text']['data']['records'][0]['requestId'])
+
+    def requestAudit(self):
+        """付款审核"""
+        self.PostRequest(url='/api/b/payment/request/audit',
+                         data={
+                             'auditIdList': [self.appText.get('requestId')],
+                             'auditStatue': 1,
+                             'auditRemark': None    # 审核备注
+
+                         }, saasCode='admin', saasCodeSys=1)
+
+    def paymentList(self):
+        """结算详情--佣金订单"""
+        self.PostRequest(url='/api/b/payment/info/list',
+                         data={
+                             'transId': self.appText.get('transId'),
+                             'advanceStatus': [1, 2, 3, 4]
+                         }, page={
+                                'size': '100',
+                                'current': '1'
+                            })
+        if len(globals()['r.text']['data']['records']) != 0:
+            dome = len(globals()['r.text']['data']['records'])
+            self.appText.set_map('paymentAmount', globals()['r.text']['data']['records'][0]['paymentAmount'])
+            a = 0
+            vlue = 0
+            while a != dome:
+                vlue = vlue + int(globals()['r.text']['data']['records'][a]['paymentAmount'])
+                a = a + 1
+            self.appText.set_map('vlue', vlue)
+
 
 if __name__ == '__main__':
     a = webApi()
+
+
+
 

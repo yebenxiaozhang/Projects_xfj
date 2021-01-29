@@ -1,12 +1,15 @@
-"""标签-相关"""
+"""后台-成交结算"""
 from PubilcAPI.flowPath import *
-
 """
+结算列表：
+    1、底部统计-验证数据准确性---->WEB_Statistics_kh.py test_statistics_1
+    
+
 """
 
 
 class TestCase(unittest.TestCase):
-    """客第壹——初始化"""
+    """客第壹——成交结算"""
 
     def __init__(self, *args, **kwargs):
         super(TestCase, self).__init__(*args, **kwargs)
@@ -16,9 +19,6 @@ class TestCase(unittest.TestCase):
         self.xfp_app = appApi()
         self.appApi = self.xfp_app
 
-        self.flow = flowPath()
-        self.flowPath = self.flow
-
         self.appText = GlobalMap()
         self.webText = GlobalMap()
 
@@ -26,6 +26,16 @@ class TestCase(unittest.TestCase):
     def setUpClass(cls):
         """登录幸福派 只执行一次
         登录幸福派 获取ID"""
+        cls.do_request = appApi()
+        cls.appApi = cls.do_request
+        cls.appApi.Login()
+        cls.appApi.GetUserData()
+        cls.request = webApi()
+        cls.webApi = cls.request
+        cls.webApi.Audit_management()
+        if ApiXfpUrl == 'http://xfp.xfj100.com':
+            raise RuntimeError('正式站不跑')
+
         cls.do_request = appApi()
         cls.appApi = cls.do_request
         cls.appApi.Login()
@@ -59,6 +69,10 @@ class TestCase(unittest.TestCase):
         cls.flowPath.get_label(labelNo='CJX', labelName='成交项目',
                                newlabelName='认购')
         cls.appText.set_map('CJX', cls.appText.get('labelId'))
+        """发佣类型"""
+        cls.flowPath.get_label(labelNo='YJLX', labelName='佣金类型',
+                               newlabelName='认购网签')
+        cls.appText.set_map('YJLX', cls.appText.get('labelId'))
         """出行方式"""
         cls.flowPath.get_label(labelNo='CXFS', labelName='出行方式',
                                newlabelName='自驾')
@@ -129,54 +143,118 @@ class TestCase(unittest.TestCase):
             cls.flowPath.clue_exile_sea()
             cls.appApi.my_clue_list()
 
+        """审核-成交相关-财务"""
+        cls.webApi.finance_deal_auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.finance_deal_audit(auditStatue=2, remark=time.strftime("%Y-%m-%d %H:%M:%S") + '审核不通过')
+            cls.webApi.finance_deal_auditList()
+
+        """审核-成交相关-经理"""
+        cls.webApi.auditList()
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList()
+        cls.webApi.auditList(auditLevel=2)
+        while cls.appText.get('web_total') != 0:
+            cls.webApi.audit(auditStatue=2, auditRemark=' 审核失败')
+            cls.webApi.auditList(auditLevel=2)
+
+        """去除一些客户及线索"""
+        cls.appApi.my_clue_list()
+        while cls.appText.get('total') >= 5:
+            cls.flowPath.clue_exile_sea()
+            cls.appApi.my_clue_list()
+
         cls.appApi.ClientList()
         while cls.appText.get('total') >= 5:
             cls.appApi.client_exile_sea()
             cls.appApi.ClientList()
 
-    def test_config_01(self):
-        """项目大于3个"""
-        self.appApi.AllBuildingUpdate()
-        while self.appText.get('total') < 3:
-            dome = time.strftime("%Y-%m-%d %H:%M:%S")
-            self.webApi.add_house(houseName=dome)
-            self.appApi.AllBuildingUpdate()
+    def test_DealAccount_001(self):
+        """结算列表-添加回款信息"""
+        self.webApi.TransactionSettlementList()
 
-    def test_config_02(self):
-        """资料信息"""
-        self.appApi.Information()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
-            self.appApi.Information()
+        """添加回款记录"""
+        self.webApi.addOrUpdateReceivableRecords()
+        dome = self.appText.get('returnMoney')
+        self.webApi.TransReturnList()
+        if dome != self.appText.get('returnMoney'):
+            print('结算----添加回款记录与回款记录单次金额不一致')
+        self.webApi.TransactionSettlementStatisticalInfo()
+        if self.appText.get('receivableAmount') != self.appText.get('vlue'):
+            print('结算----回款金额与回款记录列表总额不一致')
 
-    def test_config_03(self):
-        """商务信息"""
-        self.appApi.BusinessInformation()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_business_information()
-            self.appApi.BusinessInformation()
-        self.webApi.getHouseBusinessList()
+        """回款进度  待收金额 -- 详情"""
+        if float(self.appText.get('debtCollectionSchedule')) != \
+                round(self.appText.get('receivableAmount') / self.appText.get('transYeji'), 2):
+            print('结算详情---回款进度计算错误')
+        if self.appText.get('amountToBeCollected') != \
+                self.appText.get('transYeji') - self.appText.get('receivableAmount'):
+            print('结算详情---待收金额计算错误')
 
-    def test_config_04(self):
-        """楼盘问答"""
-        self.appApi.HouseQA()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_questions()
-            self.appApi.HouseQA()
+        """回款进度  待收金额 -- 合计"""
+        self.webApi.TransReturnStatistical()
+        if self.appText.get('debtCollectionSchedule') != self.appText.get('percentage'):
+            print('结算详情--回款进度计算与底部合计计算不一致')
+        if self.appText.get('vlue') != self.appText.get('returnMoney'):
+            print('结算详情--回款总额计算与底部合计计算不一致')
+        if self.appText.get('amountToBeCollected') != self.appText.get('forReceivable'):
+            print('结算详情--待回款总额计算与底部合计计算不一致')
 
-    def test_config_05(self):
-        self.appApi.Login(userName=XfpUser1)
-        self.appApi.GetUserData()
+        """添加开票记录"""
+        self.webApi.addOrUpdateReceivableRecords(returnType=2)
+        dome = self.appText.get('returnMoney')
+        self.webApi.TransReturnList(returnType=2)
+        if dome != self.appText.get('returnMoney'):
+            print('结算详情----添加开票记录与开票记录单次金额不一致')
+        self.webApi.TransactionSettlementStatisticalInfo()
+        if self.appText.get('printedInvoiceAmount') != self.appText.get('vlue'):
+            print('结算详情---开票金额与开票记录列表总额不一致')
 
-        self.appApi.my_clue_list()
-        while self.appText.get('total') >= 1:
-            self.flowPath.clue_exile_sea()
-            self.appApi.my_clue_list()
+        """开票进度  待收金额 -- 合计"""
+        self.webApi.TransReturnStatistical(returnType=2)
+        if round(self.appText.get('vlue') / self.appText.get('transYeji'), 2) != \
+                float(self.appText.get('percentage')):
+            print('结算详情--开票进度计算与底部合计计算不一致')
+        if self.appText.get('vlue') != self.appText.get('returnMoney'):
+            print('结算详情--开票总额计算与底部合计计算不一致')
+        if self.appText.get('transYeji') - self.appText.get('vlue') != \
+                self.appText.get('forReceivable'):
+            print('结算详情--待开票总额计算与底部合计计算不一致')
 
-        self.appApi.ClientList()
-        while self.appText.get('total') >= 1:
-            self.appApi.client_exile_sea()
-            self.appApi.ClientList()
+        """添加授予财富值"""
+        self.webApi.awardedWealthDetail()
+        dome = self.appText.get('wealthValue')
+        self.webApi.WealthDetailList()
+        if dome != self.appText.get('wealthValue'):
+            print('结算----授予财富值与授予财富值记录单次金额不一致')
+        self.webApi.TransactionSettlementStatisticalInfo()
+        if self.appText.get('paidWealth') != self.appText.get('vlue'):
+            print('结算----授予财富值与授予财富值列表总额不一致')
+
+        if ApiXfpUrl == 'http://xfp.xfj100.com':
+            raise RuntimeError('正式站不跑')
+        else:
+            """发佣"""
+            # 新建发佣申请并且审核通过
+            self.webApi.TransactionSettlementStatisticalInfo()
+            dome = self.appText.get('paidCommission')
+            self.webApi.paymentRequest()
+            self.webApi.requestList(keyWord=self.appText.get('CJDH'))
+            self.webApi.paymentRegister()
+            self.webApi.requestAudit()
+            self.webApi.TransactionSettlementStatisticalInfo()
+            if dome + self.appText.get('paymentAmount') != self.appText.get('paidCommission'):
+                print('发放佣金新加后没有在结算详情里面进行添加')
+
+            """发佣列表总和比较"""
+            self.webApi.paymentList()
+            self.webApi.TransactionSettlementStatisticalInfo()
+            if self.appText.get('paidCommission') != self.appText.get('vlue'):
+                print('发佣列表总和比较与详情比较两个值不一样')
+
+
+
 
 
 

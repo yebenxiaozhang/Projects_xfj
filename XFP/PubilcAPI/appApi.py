@@ -936,8 +936,9 @@ class appApi:
                         transHouseBuilding='2', transHouseUnit='1-1',
                         transOwnerName='潘师傅', transRemark='python-签约', transReservedTellphone='17600000000',
                         transTotalPrice='998888.56',isDeleted=None,
-                        transYeji='88.88',
                         attachmentIds='12'):
+
+        transYeji = random.randint(30000, 100000)
         """成交录入"""
         if Status == 0:
             transId = 0
@@ -969,6 +970,8 @@ class appApi:
                         transTotalPrice='998888.56',isDeleted=None,
                         transYeji='88.88',
                         attachmentIds='13'):
+        transYeji = random.randint(20000, 100000)
+        transTotalPrice = random.randint(200000, 20000000)
         """成交录入"""
         if Status == 0:
             transId = None
