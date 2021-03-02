@@ -47,7 +47,7 @@ class TestCase(unittest.TestCase):
         """线索及消耗统计与全部线索进行比较---当月新增"""
         self.webApi.clue_adminList(startTime=self.appText.get('start_date'),
                                    endTime=self.appText.get('end_date'),
-                                   saasCodeSys=0, isInvalid=1)
+                                   saasCodeSys=0, isInvalid=None)
         self.webApi.admin_report_clue()
         self.assertEqual(self.appText.get('monthNewNum'), self.appText.get('web_total'))
 

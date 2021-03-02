@@ -1284,7 +1284,7 @@ class webApi:
                          saasCode='admin', saasCodeSys=0,
                          page={
                             "current": 1,
-                            "size": 10,
+                            "size": 999,
                             "total": 0
                          })
         self.appText.set_map('total', len(globals()['r.text']['data']['records']))

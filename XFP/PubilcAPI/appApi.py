@@ -290,7 +290,7 @@ class appApi:
                        taskRemark='python-线索/客户跟进，下次沟通记录'):
         """线索/客户跟进录入"""
         if followType == '线索':
-            followType = '1'
+            followType = 1
             taskType = '1'
             self.appText.set_map('customerId', 'null')
             taskId = 'taskId'
@@ -301,6 +301,7 @@ class appApi:
         self.PostRequest(url='/api/a/clue/saveFollow',
                          data={
                              'clueId': self.appText.get('clueId'),
+                             'attachmentIds': None,
                              'followContent': followContent,
                              'customerId': self.appText.get('customerId'),
                              'followType': followType,
