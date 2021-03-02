@@ -177,10 +177,12 @@ class appApi:
             self.appText.set_map('customerId',
                                  dome[time.strftime("%Y-%m-%d")]['taskVos'][dome1]['customerId'])
 
-    def CluePhoneLog(self):
+    def CluePhoneLog(self, clueId=None):
+        if clueId is None:
+            clueId = self.appText.get('clueId')
         """线索通话记录"""
         self.PostRequest(url='/api/a/clue/phonelog/list',
-                         data={'clueId': self.appText.get('clueId')})
+                         data={'clueId': clueId})
         self.appText.set_map('total', len(globals()['r.text']['data']['records']))
         if self.appText.get('total') != 0:
             self.appText.set_map('isFlagCallStr', globals()['r.text']['data']['records'][0]['isFlagCallStr'])   # 是否主叫
@@ -248,7 +250,10 @@ class appApi:
                                "isCompleted": 0,
                                "isStop": 0})
         # assert '线索跟进', globals()['r.text']['data']['records'][0]['taskTitle']
-        self.appText.set_map('endTime', globals()['r.text']['data']['records'][0]['endTime'])
+        self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('endTime', globals()['r.text']['data']['records'][0]['endTime'])
+            self.appText.set_map('taskRemark', globals()['r.text']['data']['records'][0]['taskRemark'])
 
     def ClaimClue(self):
         """认领线索"""
@@ -789,7 +794,8 @@ class appApi:
                     self.appText.set_map('labelNo', globals()['r.text']['data'][0]['children'][a]['labelNo'])
                     self.appText.set_map('remark', globals()['r.text']['data'][0]['children'][a]['remark'])
                 else:
-                    self.appText.set_map('labelId', globals()['r.text']['data'][0]['children'][0]['labelId'])
+                    dome = random.randint(0, len(globals()['r.text']['data'][0]['children']) - 1)
+                    self.appText.set_map('labelId', globals()['r.text']['data'][0]['children'][dome]['labelId'])
             except:
                 self.appText.set_map('labelId', None)
                 self.appText.set_map('labelName', None)
@@ -1033,15 +1039,19 @@ class appApi:
             self.appText.set_map('visitProjectId', globals()['r.text']['data'][0]['visitProjectId'])
             dome = 0
             dome1 = 1
-            while globals()['r.text']['data'][0]['houseBusinessInfo']['residentInfo'][dome:dome1] != '+':
-                dome = dome1
-                dome1 = dome1 + 1
-            self.appText.set_map('DLGS', globals()['r.text']['data'][0]['houseBusinessInfo']['agencyId'])
-            self.appText.set_map('BBGZ', globals()['r.text']['data'][0]['houseBusinessInfo']['reportingRules'])
-            self.appText.set_map('JDRXM', globals()['r.text']['data'][0]['houseBusinessInfo']['residentInfo'][0:dome])
-            self.appText.set_map('JDRDH', globals()['r.text']['data'][0]['houseBusinessInfo']['residentInfo'][dome1:])
-            self.appText.set_map('YJXJJ', globals()['r.text']['data'][0]['houseBusinessInfo']['reward'])
-            self.appText.set_map('JSTJ', globals()['r.text']['data'][0]['houseBusinessInfo']['settlementConditions'])
+            if globals()['r.text']['data'][0]['houseBusinessInfo'] != None:
+                while globals()['r.text']['data'][0]['houseBusinessInfo']['residentInfo'][dome:dome1] != '+':
+                    dome = dome1
+                    dome1 = dome1 + 1
+                self.appText.set_map('DLGS', globals()['r.text']['data'][0]['houseBusinessInfo']['agencyId'])
+                self.appText.set_map('BBGZ', globals()['r.text']['data'][0]['houseBusinessInfo']['reportingRules'])
+                self.appText.set_map('JDRXM', globals()['r.text']['data'][0]['houseBusinessInfo']
+                                              ['residentInfo'][0:dome])
+                self.appText.set_map('JDRDH', globals()['r.text']['data'][0]['houseBusinessInfo']
+                                              ['residentInfo'][dome1:])
+                self.appText.set_map('YJXJJ', globals()['r.text']['data'][0]['houseBusinessInfo']['reward'])
+                self.appText.set_map('JSTJ', globals()['r.text']['data'][0]
+                ['houseBusinessInfo']['settlementConditions'])
 
     def deal_List(self, transStatus=None, ApplyStatus=None, keyWord=None, transProgressStatus=None):
         """成交列表"""
@@ -1215,6 +1225,7 @@ class appApi:
         if len(globals()['r.text']['data']['records']) != 0:
             self.appText.set_map('total', len(globals()['r.text']['data']['records']))
             self.appText.set_map('records', globals()['r.text']['data']['records'])
+            self.appText.set_map('vlue1', int(globals()['r.text']['data']['records'][0]['wealthValue']))
             a = 0
             vlue = 0
             while a != self.appText.get('total'):

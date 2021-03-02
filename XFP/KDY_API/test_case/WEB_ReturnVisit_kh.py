@@ -1,12 +1,28 @@
-"""标签-相关"""
+"""客第壹总站-回访"""
 from PubilcAPI.flowPath import *
-
 """
+回访：
+    无审核：
+        完成带看--->创建待回访任务         
+                ！！！ APP_My_visit_kh.py-->test_my_visit_02
+        录入成交--->创建待回访任务         
+                ！！！ APP_My_Deal_kh.py-->test_my_deal_01
+    有审核：
+        审核失败、取消带看--->不创建回访任务
+                ！！！ APP_My_visit_kh.py-->test_my_visit_06
+                ！！！ APP_My_visit_kh.py-->test_my_visit_03
+        审核成功--->创建回访任务
+                ！！！ APP_My_visit_kh.py-->test_my_visit_07
+        成交审核失败--->不创建回访任务
+        审核成功、审核失败的再次提交--->创建待回访任务    
+    
+    回访带看--------取消带看回访
+    回访成交--------取消成交回访
 """
 
 
 class TestCase(unittest.TestCase):
-    """客第壹——初始化"""
+    """客第壹后台——带看成交统计"""
 
     def __init__(self, *args, **kwargs):
         super(TestCase, self).__init__(*args, **kwargs)
@@ -139,50 +155,61 @@ class TestCase(unittest.TestCase):
             cls.appApi.client_exile_sea()
             cls.appApi.ClientList()
 
-    def test_config_01(self):
-        """项目大于3个"""
-        self.appApi.AllBuildingUpdate()
-        while self.appText.get('total') < 3:
-            dome = time.strftime("%Y-%m-%d %H:%M:%S")
-            self.webApi.add_house(houseName=dome)
-            self.appApi.AllBuildingUpdate()
-
-    def test_config_02(self):
-        """资料信息"""
-        self.appApi.Information()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_data(data='楼盘内容'+ time.strftime("%Y-%m-%d %H:%M:%S"))
-            self.appApi.Information()
-
-    def test_config_03(self):
-        """商务信息"""
-        self.appApi.BusinessInformation()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_business_information()
-            self.appApi.BusinessInformation()
-        self.webApi.getHouseBusinessList()
-
-    def test_config_04(self):
-        """楼盘问答"""
-        self.appApi.HouseQA()
-        while self.appText.get('total') < 1:
-            self.webApi.add_house_questions()
-            self.appApi.HouseQA()
-
-    def test_config_05(self):
-        self.appApi.Login(userName=XfpUser1)
-        self.appApi.GetUserData()
-
-        self.appApi.my_clue_list()
-        while self.appText.get('total') >= 1:
-            self.flowPath.clue_exile_sea()
-            self.appApi.my_clue_list()
-
+    def test_ReturnVisit_001(self):
+        """
+        录入成交-审核失败不创建回访记录
+        将原来审核失败的记录重新申请 则创建回访记录
+        :return:
+        """
+        self.flowPath.client_list_non_null()
+        self.appApi.visitProject_list()
+        if self.appText.get('web_total') == 0:
+            self.flowPath.add_visit()
+            self.flowPath.accomplish_visit()
+            self.appApi.visitProject_list()
+        self.webApi.Audit_management(customerDeal=True, customerDealLevel=1)
         self.appApi.ClientList()
-        while self.appText.get('total') >= 1:
-            self.appApi.client_exile_sea()
-            self.appApi.ClientList()
+        self.webApi.repayTaskList(repayType=2)
+        repay = self.appText.get('total')
+        self.appApi.add_deal()
+        self.webApi.repayTaskList(repayType=2)
+        self.assertEqual(self.appText.get('total'), repay)
 
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 成交审核不通过')
 
+        self.webApi.repayTaskList(repayType=2)
+        self.assertEqual(self.appText.get('total'), repay)
 
+        self.appApi.deal_List(ApplyStatus=2)
+        self.webApi.detail()
+        self.appApi.add_deal(Status=1)
+
+        self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
+        self.webApi.audit()
+
+        self.webApi.repayTaskList(repayType=2)
+        self.assertNotEqual(self.appText.get('total'), repay)
+
+    def test_ReturnVisit_002(self):
+        """
+            回访带看--------取消带看回访
+            回访成交--------取消成交回访
+        :return:
+        """
+        a = 0
+        while a != 4:
+            if a < 2:
+                self.webApi.repayTaskList()
+            if a > 1:
+                self.webApi.repayTaskList(repayType=2)
+            dome = self.appText.get('total')
+            if self.appText.get('total') != 0:
+                if a == 0 or a == 2:
+                    self.webApi.repayTask()         # 取消回访
+                else:
+                    self.webApi.repayTaskCancel()   # 回访
+                self.webApi.repayTaskList()
+                self.assertNotEqual(dome, self.appText.get('total'))
+            a = a + 1
 

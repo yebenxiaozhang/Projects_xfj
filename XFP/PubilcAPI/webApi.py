@@ -61,7 +61,8 @@ class webApi:
     def Audit_management(self, suspend=False, suspendLevel=1, clueStop=False, clueStopLevel=1,
                          customerStop=False, customerStopLevel=1, customerVisit=False,
                          customerVisitLevel=1, customerDeal=False, customerDealLevel=1,
-                         firstCallDaySwitch=True, firstCallDayWealth=10, notFirstCallDayWealth=5):
+                         firstCallDaySwitch=True, firstCallDayWealth=10, notFirstCallDayWealth=5,
+                         wealthDetailSwitch=False):
         """审核管理"""
         try:
             configValue = {
@@ -94,7 +95,9 @@ class webApi:
                             "customerVisitSwitch": customerVisit,       # 客户带看计划
                             "customerVisitLevel": customerVisitLevel,
                             "customerDealSwitch": customerDeal,         # 客户成交审核
-                            "customerDealLevel": customerDealLevel
+                            "customerDealLevel": customerDealLevel,
+                            "wealthDetailSwitch": wealthDetailSwitch,   # 财务总监审核
+                            "wealthDetailLevel": 0
                         },
                     "wealthDetailConfig": {
                             "addConsultantWealth": 30000,
@@ -135,7 +138,7 @@ class webApi:
                             "dealPercentageWealthSwitch": False
                         },
                     "authCodeConfig": {             # 授权码相关
-                        "authCodeSwitch": True,
+                        "authCodeSwitch": False,
                         "authCodeOutTime": 30,      # 授权码时效
                         "authCodeOutTimeLength": 6,     # 授权码长度
                         "authCodeLoginOutTime": 30
@@ -1229,9 +1232,89 @@ class webApi:
                 a = a + 1
             self.appText.set_map('vlue', vlue)
 
+    def consultantWealthChange(self, Type=1):
+        """授予财富值"""
+        if Type == 1:
+            Type = 'add'
+        else:
+            Type = 'del'
+        consultantWealth = random.randint(10, 100)
+        self.PostRequest(url='/api/b/wealth/consultantWealthChange',
+                         data={
+                             'type': Type,
+                             'consultantWealth': consultantWealth,
+                             'consultantId': self.appText.get('consultantId'),
+                             'wealthRemark': time.strftime("%Y-%m-%d %H:%M:%S")
+                         })
+        self.appText.set_map('vlue', consultantWealth)
+
+    def getWealthAuditList(self, keyWord=None, auditStatus=0):
+        """财务总监审核列表"""
+        self.PostRequest(url='/api/b/wealthAudit/getWealthAuditList',
+                         data={
+                             'keyWord': keyWord,
+                             'auditStatus': auditStatus,
+                         })
+        if len(globals()['r.text']['data']['records']) != 0:
+            self.appText.set_map('auditId', globals()['r.text']['data']['records'][0]['auditId'])
+        self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+
+    def wealthAudit(self, auditType=True):
+        if auditType == True:
+            auditRemark = None
+        else:
+            auditRemark = time.strftime("%Y-%m-%d %H:%M:%S")
+        """授予财富值审核"""
+        self.PostRequest(url='/api/b/wealthAudit/wealthAudit',
+                         data={
+                            'auditId': self.appText.get('auditId'),
+                            'auditType': auditType,
+                            'auditRemark': auditRemark,
+                         })
+
+    def repayTaskList(self, keyWord=None, repayStatusList=1, repayType=1):
+        """待回访"""
+        self.PostRequest(url='/api/b/repayTask/list',
+                         data={
+                             'keyWord': keyWord,
+                             'repayStatusList': [repayStatusList],      # 1 待回访
+                             'repayType': repayType             # 1 带看 2 成交
+
+                         },
+                         saasCode='admin', saasCodeSys=0,
+                         page={
+                            "current": 1,
+                            "size": 10,
+                            "total": 0
+                         })
+        self.appText.set_map('total', len(globals()['r.text']['data']['records']))
+        if self.appText.get('total') != 0:
+            self.appText.set_map('taskId', globals()['r.text']['data']['records'][0]['taskId'])
+
+    def repayTask(self):
+        """回访"""
+        repayMode = random.randint(1, 2)
+        repayLevel = random.randint(1, 4)
+        self.PostRequest(url='/api/b/repayTask/repay',
+                         data={
+                             'repayContent': time.strftime("%Y-%m-%d %H:%M:%S") + '回访',
+                             'repayLevel': repayLevel,   # 1 非常满意    2 满意    3 不满意   4 非常不满意
+                             'repayMode': repayMode,    # 1 电话回访 2 短信回访
+                             'taskId': self.appText.get('taskId'),
+                         }, saasCode='admin', saasCodeSys=1)
+
+    def repayTaskCancel(self):
+        """取消回访"""
+        self.PostRequest(url='/api/b/repayTask/cancel',
+                         data={
+                             'cancelLabel': self.appText.get('QXHF'),
+                             'taskId': self.appText.get('taskId')
+                         }, saasCode='admin', saasCodeSys=1)
+
 
 if __name__ == '__main__':
     a = webApi()
+
 
 
 

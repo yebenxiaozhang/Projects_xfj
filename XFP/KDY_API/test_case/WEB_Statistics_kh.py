@@ -31,7 +31,7 @@ class TestCase(unittest.TestCase):
         cls.webApi = cls.request
         cls.webApi.Audit_management()
 
-    def test_statistics_01(self):
+    def test_Statistics_01(self):
         """带看成交统计"""
         self.webApi.visit_deal_statistics()
         """上户数量对比"""

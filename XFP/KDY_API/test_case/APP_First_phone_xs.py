@@ -212,6 +212,8 @@ class TestCase(unittest.TestCase):
         self.appApi.GetUserAgenda()
         dome = self.appText.get('total')
         self.flowPath.first_phone_non_null()
+
+        dome2 = self.appText.get('clueId')
         # 验证新增线索 待办是否有添加
         self.appApi.GetUserAgenda()
         self.assertEqual(dome, self.appText.get('total'))
@@ -223,12 +225,12 @@ class TestCase(unittest.TestCase):
         self.appApi.TodayClue(isFirst=1)
         dome1 = 0
         globals()['r.text'] = json.loads(json.dumps(self.appText.get('records')))
-        while globals()['r.text'][dome1]['clueId'] != self.appText.get('clueId'):
+        while globals()['r.text'][dome1]['clueId'] != dome2:
             dome1 = dome1 + 1
         self.assertEqual('1', globals()['r.text'][dome1]['isFirst'])
-        self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=1200, is_me=2,
-                              call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
-        self.appApi.CluePhoneLog()
+        # self.appApi.phone_log(callee_num=self.appText.get('cluePhone'), talk_time=1200, is_me=2,
+        #                       call_time=time.strftime("%Y-%m-%d %H:%M:%S"))
+        self.appApi.CluePhoneLog(clueId=dome2)
         self.assertEqual(1, self.appText.get('isFirst'))
 
     def test_first_phone_09(self):

@@ -82,6 +82,7 @@ class TestCase(unittest.TestCase):
         dome1 = self.appText.get('total')
         self.appApi.GetUserAgenda()
         dome = self.appText.get('total')
+        self.appApi.my_clue_list(keyWord=self.appText.get('cluePhone'))
         self.appApi.ExileSea()
         """11、无审核跟进内容为：线索终止跟进"""
         self.appApi.ClueFollowList()
@@ -103,6 +104,7 @@ class TestCase(unittest.TestCase):
 
         self.appApi.GetUserAgenda()
         dome = self.appText.get('total')
+        self.appApi.my_clue_list(keyWord=self.appText.get('cluePhone'))
         self.appApi.ExileSea()
         self.appApi.ClueFollowList()
         self.assertEqual(self.appText.get('followContent'),
@@ -131,6 +133,7 @@ class TestCase(unittest.TestCase):
 
         self.appApi.GetUserAgenda()
         dome = self.appText.get('total')
+        self.appApi.my_clue_list(keyWord=self.appText.get('cluePhone'))
 
         self.appApi.ExileSea()
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))

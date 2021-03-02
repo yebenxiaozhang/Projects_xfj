@@ -103,7 +103,15 @@ class TestCase(unittest.TestCase):
         self.appApi.GetUserAgenda()
         dome = self.appText.get('total')
         self.appApi.ClientList()
+        """录入成交，不需要审核 会创建回访"""
+        self.webApi.repayTaskList(repayType=2)
+        repay = self.appText.get('total')
         self.appApi.add_deal()
+
+        self.webApi.repayTaskList(repayType=2)
+        if self.appText.get('total') == repay:
+            print('录入成交，不需要审核 会创建回访')
+
         self.appApi.GetUserAgenda()
         self.assertEqual(dome, self.appText.get('total'))
         self.appApi.deal_List(keyWord=self.appText.get('dealPhone'))

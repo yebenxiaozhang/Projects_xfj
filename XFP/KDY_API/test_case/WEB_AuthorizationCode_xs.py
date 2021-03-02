@@ -26,7 +26,7 @@ class TestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.do_request = appApi()
         cls.appApi = cls.do_request
-        cls.appApi.Login(userName=XfpUser11)
+        cls.appApi.Login(userName='13062200311')
         cls.appApi.GetUserData()
         cls.request = webApi()
         cls.webApi = cls.request
@@ -35,22 +35,22 @@ class TestCase(unittest.TestCase):
     def test_AuthorizationCode_1(self):
         """1、不输入授权码                                登录失败"""
         self.appApi.generateAuthCode()
-        self.appApi.Login(userName=XfpUser11, authCode='')
+        self.appApi.Login(userName='13062200311', authCode='')
         self.assertEqual('请输入授权码!', self.appText.get('resultStr'))
 
     def test_AuthorizationCode_2(self):
         """2、输入授权码（失效前）                        登录成功"""
-        self.appApi.Login(userName=XfpUser11)
+        self.appApi.Login(userName='13062200311')
         self.appApi.generateAuthCode()
-        self.appApi.Login(userName=XfpUser11, authCode=self.appText.get('code'))
+        self.appApi.Login(userName='13062200311', authCode=self.appText.get('code'))
         self.assertEqual('授权码验证成功!', self.appText.get('resultStr'))
 
     def test_AuthorizationCode_4(self):
         """4、输入授权码（已失效）   登录失败"""
-        self.appApi.Login(userName=XfpUser11)
+        self.appApi.Login(userName='13062200311')
         self.appApi.generateAuthCode()
         time.sleep(30)
-        self.appApi.Login(userName=XfpUser11, authCode=self.appText.get('code'))
+        self.appApi.Login(userName='13062200311', authCode=self.appText.get('code'))
         self.assertEqual('授权码已过期或授权码错误!', self.appText.get('resultStr'))
 
 

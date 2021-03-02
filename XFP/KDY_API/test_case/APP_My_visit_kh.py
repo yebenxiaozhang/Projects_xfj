@@ -52,6 +52,7 @@ class TestCase(unittest.TestCase):
 
         self.appText = GlobalMap()
         self.webText = GlobalMap()
+        self.flowPathText = GlobalMap()
 
     @classmethod
     def setUpClass(cls):
@@ -122,13 +123,19 @@ class TestCase(unittest.TestCase):
     def test_my_visit_02(self):
         """2、完成带看          已完成                   已完成"""
         """1- 客户创建带看计划  首页带看任务会增加"""
+        """3、回访任务的创建---无审核"""
         self.flowPath.add_visit()
         # 验证创建带看后是否有  带看任务新增
         self.appApi.GetUserAgenda()
         dome = self.appText.get('total')
         self.appApi.ClientList()
+        self.webApi.repayTaskList()
+        repay = self.appText.get('total')
         self.flowPath.accomplish_visit()
         self.flowPath.visit_status(status='已完成')
+        self.webApi.repayTaskList()
+        if self.appText.get('total') == repay:
+            print('完成带看（无审核）需要创建一个回访')
         self.appApi.GetUserAgenda()
         self.assertEqual(dome - 1, self.appText.get('total'))
         """录入带看在7天后"""
@@ -143,9 +150,15 @@ class TestCase(unittest.TestCase):
 
     def test_my_visit_03(self):
         """3、取消带看      已取消                   已取消"""
+        """创建带看后取消带看---不创建回访"""
         self.flowPath.add_visit()
+        self.webApi.repayTaskList()
+        repay = self.appText.get('total')
         self.flowPath.advance_over_visit()
         self.flowPath.visit_status(status='已取消')
+        self.webApi.repayTaskList()
+        if self.appText.get('total') != repay:
+            print('创建带看后取消带看---不创建回访')
         """取消带看后 -是否有一条跟进"""
         self.appApi.ClientFollowList()
         self.assertEqual('取消带看', self.appText.get('followContent')[-4:])
@@ -183,11 +196,15 @@ class TestCase(unittest.TestCase):
         self.appApi.Task_Visit_List(endTime=tomorrow1 + ' 23:59:59', visiteStatus=0)
         dome1 = self.appText.get('total')
         self.appApi.ClientList()
+        self.flowPathText.set_map('time', time.strftime("%Y-%m-%d %H:%M:%S"))
         self.appApi.ClientVisitAdd(projectAId=self.appApi.appText.get('houseId'),
-                                   appointmentTime=time.strftime("%Y-%m-%d %H:%M:%S"),
+                                   appointmentTime=self.flowPathText.get('time'),
                                    seeingConsultant=self.appApi.appText.get('consultantId'),
                                    appointConsultant=self.appApi.appText.get('consultantId'))
         """录入带看 审核中的 是否有新增"""
+        """创建带看后 审核失败后 不添加回访"""
+        self.webApi.repayTaskList()
+        repay = self.appText.get('total')
         self.appApi.GetUserAgenda()
         self.assertEqual(dome + 1, self.appText.get('total'))
         self.appApi.Task_Visit_List(endTime=tomorrow1 + ' 23:59:59', visiteStatus=0)
@@ -197,6 +214,9 @@ class TestCase(unittest.TestCase):
         self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
 
         self.flowPath.visit_status(status='已驳回')
+        self.webApi.repayTaskList()
+        if self.appText.get('total') != repay:
+            print('创建带看后 审核失败后 不添加回访')
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已取消')
 
@@ -210,14 +230,24 @@ class TestCase(unittest.TestCase):
         """4、审核成功-完成带看                 已完成             已完成"""
         self.webApi.Audit_management(customerVisit=True, customerVisitLevel=1)  # 修改配置审核
         self.flowPath.add_visit()
+        """创建带看后审核成功 不创建回访--完成带看则创建回访记录"""
+        self.webApi.repayTaskList()
+        repay = self.appText.get('total')
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
+        self.webApi.repayTaskList()
+        if self.appText.get('total') != repay:
+            print('创建带看 审核成功 但未完成带看 应该不创建回访')
 
         """完成带看计划  客户待办会减少"""
         self.flowPath.accomplish_visit()
         self.flowPath.visit_status(status='已完成')
         self.appApi.client_exile_sea()
         self.flowPath.visit_status(status='已完成')
+
+        self.webApi.repayTaskList()
+        if self.appText.get('total') == repay:
+            print('创建带看 审核成功 已完成带看 应该创建回访')
 
     def test_my_visit_08(self):
         """5、审核成功-提前结束带看             已取消             已取消"""
@@ -362,6 +392,7 @@ class TestCase(unittest.TestCase):
         self.appApi.GetUserData()
         self.appApi.GetUserAgenda()
         self.assertEqual(zxs_04_db + 2, self.appText.get('total'))
+        self.appApi.ClientList()
         self.flowPath.accomplish_visit()
 
 
