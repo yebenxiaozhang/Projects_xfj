@@ -95,13 +95,15 @@ class appApi:
                          )
         self.appText.set_map('msg', globals()['XfpText']['msg'])
 
-    def Login(self, userName=XfpUser, password=XfpPwd, saasCode=XfpsaasCode, authCode=None):
+    def Login(self, userName=XfpUser, password=XfpPwd, saasCode=XfpsaasCode, authCode=None, device=None):
         """登录"""
+        if device is None:
+            device = deviceId
         if authCode is None:
             self.PostRequest(url='/api/auth/login',
                              data={"userName": userName,
                                    'saasCode': saasCode,
-                                   'deviceId': deviceId,
+                                   'deviceId': device,
                                    # 'deviceId': deviceId,
                                    "password": password},
                              header=1)
@@ -131,10 +133,12 @@ class appApi:
         else:
             self.appText.set_map('data', globals()['XfpText']['data'])
 
-    def GetUserData(self):
+    def GetUserData(self, device=None):
         """获取咨询师信息"""
+        if device is None:
+            device = deviceId
         self.PostRequest(url='/api/a/consultant/info',
-                         data={'deviceId': deviceId})
+                         data={'deviceId': device})
         if self.appText.get('code') == 200:
             self.appText.set_map('consultantId', globals()['r.text']['data']['consultantId'])
             self.appText.set_map('consultantName', globals()['r.text']['data']['consultantName'])

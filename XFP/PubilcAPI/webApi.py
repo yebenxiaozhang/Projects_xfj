@@ -62,7 +62,7 @@ class webApi:
                          customerStop=False, customerStopLevel=1, customerVisit=False,
                          customerVisitLevel=1, customerDeal=False, customerDealLevel=1,
                          firstCallDaySwitch=True, firstCallDayWealth=10, notFirstCallDayWealth=5,
-                         wealthDetailSwitch=False):
+                         wealthDetailSwitch=False, authCodeSwitch=False):
         """审核管理"""
         try:
             configValue = {
@@ -138,7 +138,7 @@ class webApi:
                             "dealPercentageWealthSwitch": False
                         },
                     "authCodeConfig": {             # 授权码相关
-                        "authCodeSwitch": False,
+                        "authCodeSwitch": authCodeSwitch,
                         "authCodeOutTime": 30,      # 授权码时效
                         "authCodeOutTimeLength": 6,     # 授权码长度
                         "authCodeLoginOutTime": 30
