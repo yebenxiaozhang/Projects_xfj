@@ -1236,9 +1236,10 @@ class webApi:
         """授予财富值"""
         if Type == 1:
             Type = 'add'
+            consultantWealth = random.randint(10, 100)
         else:
             Type = 'del'
-        consultantWealth = random.randint(10, 100)
+            consultantWealth = random.randint(-100, -10)
         self.PostRequest(url='/api/b/wealth/consultantWealthChange',
                          data={
                              'type': Type,
