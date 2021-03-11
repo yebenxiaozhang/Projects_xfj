@@ -92,7 +92,12 @@ class TestCase(unittest.TestCase):
         self.assertEqual(dome - 1, self.appText.get('total'))
         self.appApi.follow_apply(keyWord=self.appText.get('cluePhone'))
         if dome1 + 1 != self.appText.get('total'):
-            raise RuntimeError("无审核的情况下 线索终止没有多加一条跟进申请")
+            print('无审核的情况下 线索终止没有多加一条跟进申请')
+
+        """线索释放公海后 在公海列表查看是否有原因"""
+        self.appApi.SeaList(keyWord=self.appText.get('cluePhone'))
+        if self.appText.get('labelName') is None:
+            raise RuntimeError("线索释放公海后 在公海列表查看 无原因")
 
     def test_follow_apply_02(self):
         """2、线索无效终止-待审核           申请中"""
@@ -142,6 +147,11 @@ class TestCase(unittest.TestCase):
         self.appApi.GetUserAgenda()
         self.assertEqual(dome - 1, self.appText.get('total'))
 
+        """线索释放公海后 在公海列表查看是否有原因"""
+        self.appApi.SeaList(keyWord=self.appText.get('cluePhone'))
+        if self.appText.get('labelName') is None:
+            raise RuntimeError("线索释放公海后 在公海列表查看 无原因")
+
     def test_follow_apply_04(self):
         """5、线索无效终止-待审核                  申请中"""
         self.flowPath.clue_non_null()
@@ -183,6 +193,11 @@ class TestCase(unittest.TestCase):
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
         self.webApi.audit()
         self.flowPath.apply_status(status='已同意')
+
+        """线索释放公海后 在公海列表查看是否有原因"""
+        self.appApi.SeaList(keyWord=self.appText.get('cluePhone'))
+        if self.appText.get('labelName') is None:
+            raise RuntimeError("线索释放公海后 在公海列表查看 无原因")
 
     def test_follow_apply_07(self):
         """10、线索终止审核中 ---不允许转客户"""

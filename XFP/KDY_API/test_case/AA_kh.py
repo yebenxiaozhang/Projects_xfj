@@ -36,6 +36,7 @@ class TestCase(unittest.TestCase):
         cls.flow = flowPath()
         cls.flowPath = cls.flow
         cls.appText = GlobalMap()
+        cls.appApi.time_()
         """线索来源"""
         cls.flowPath.get_label(labelNo='XSLY', labelName='线索来源',
                                newlabelName='百度小程序')
@@ -110,6 +111,9 @@ class TestCase(unittest.TestCase):
         cls.appText.set_map('PTSH', cls.appText.get('remark'))
         cls.appApi.GetLabelList(labelNo='XSSPYY', labelName='电话空号', saasCode='admin')
         cls.appText.set_map('DHWK', cls.appText.get('labelId'))
+        cls.flowPath.get_label(labelNo='YJLX', labelName='佣金类型',
+                               newlabelName='认购网签')
+        cls.appText.set_map('YJLX', cls.appText.get('labelId'))
         cls.appApi.get_current_month_start_and_end(date=time.strftime("%Y-%m-%d"))
 
         """审核-成交相关-财务"""

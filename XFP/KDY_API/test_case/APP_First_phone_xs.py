@@ -281,8 +281,9 @@ class TestCase(unittest.TestCase):
         self.appApi.my_clue_list(keyWord=self.appText.get('cluePhone'))
         self.appApi.CluePhoneLog()
         self.assertEqual(1, self.appText.get('total'))
-
-
+        """任务待办会显示为今日24:00"""
+        self.appApi.ClueTask()
+        self.assertEqual(self.appText.get('endTime'), time.strftime("%Y-%m-%d 23:59:59"))
 
 
 

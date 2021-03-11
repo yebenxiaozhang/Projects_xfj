@@ -131,6 +131,11 @@ class TestCase(unittest.TestCase):
         if sy_db - kh_db != self.appText.get('total'):
             raise RuntimeError("无效终止后，首页待办应该减少")
 
+        """客户释放公海后 在公海列表查看是否有原因"""
+        self.appApi.SeaList(keyWord=self.appText.get('cluePhone'))
+        if self.appText.get('labelName') is None:
+            raise RuntimeError("客户释放公海后 在公海列表查看 无原因")
+
     def test_ExileSea_03(self):
         """2、客户无效终止-待审核           申请中"""
         # self.flowPath.client_list_non_null()
@@ -152,6 +157,11 @@ class TestCase(unittest.TestCase):
 
         self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
         self.follow_later(vlue=-1)
+
+        """客户释放公海后 在公海列表查看是否有原因"""
+        self.appApi.SeaList(keyWord=self.appText.get('cluePhone'))
+        if self.appText.get('labelName') is None:
+            raise RuntimeError("客户释放公海后 在公海列表查看 无原因")
 
     def test_ExileSea_04(self):
         """4、客户无效终止-审核失败         已驳回"""
@@ -238,6 +248,11 @@ class TestCase(unittest.TestCase):
 
         self.appApi.GetUserAgenda()
         self.assertEqual(dome - 1, self.appText.get('total'))
+
+        """客户释放公海后 在公海列表查看是否有原因"""
+        self.appApi.SeaList(keyWord=self.appText.get('cluePhone'))
+        if self.appText.get('labelName') is None:
+            raise RuntimeError("客户释放公海后 在公海列表查看 无原因")
 
     def follow_front(self):
         """跟进前"""

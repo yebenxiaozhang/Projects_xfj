@@ -143,6 +143,7 @@ class appApi:
             self.appText.set_map('consultantId', globals()['r.text']['data']['consultantId'])
             self.appText.set_map('consultantName', globals()['r.text']['data']['consultantName'])
             self.appText.set_map('consultantLabels', globals()['r.text']['data']['consultantLabels'])
+            self.appText.set_map('userId', globals()['r.text']['data']['userId'])
         # else:
         #     pass
 
@@ -696,6 +697,7 @@ class appApi:
             self.appText.set_map('clueNickName', globals()['r.text']['data']['records'][0]['clueNickName'])
             self.appText.set_map('clueId', globals()['r.text']['data']['records'][0]['clueId'])
             self.appText.set_map('isTrans', globals()['r.text']['data']['records'][0]['isTrans'])
+            self.appText.set_map('labelName', globals()['r.text']['data']['records'][0]['labelName'])
 
     def clue_Assigned(self):
         """领取线索"""
@@ -1454,6 +1456,18 @@ class appApi:
                              'isOnline': isOnline,      # 1在线  0 离线
                              'consultantId': self.appText.get('consultantId')
                          })
+
+    def time_(self):
+        """时间"""
+        # 获取今天（现在时间）
+        days = random.randint(1, 7)
+        today = datetime.datetime.today()
+        # 昨天
+        yesterday = today - datetime.timedelta(days=days)
+        # 明天
+        tomorrow = today + datetime.timedelta(days=days)
+        self.appText.set_map('yesterday', yesterday.strftime("%Y-%m-%d %H:%M:%S"))
+        self.appText.set_map('tomorrow', tomorrow.strftime("%Y-%m-%d %H:%M:%S"))
 
 
 if __name__ == '__main__':

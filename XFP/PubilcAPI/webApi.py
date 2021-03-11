@@ -1166,7 +1166,7 @@ class webApi:
         self.PostRequest(url='/api/b/payment/request',
                          data={
                              'paymentDetailFormList': [{
-                                 'consultantId': self.appText.get('consultantId'),
+                                 'userId': self.appText.get('userId'),
                                  'paymentAmount': paymentAmount,
                              }],
                              'paymentTypeId': self.appText.get('YJLX'),

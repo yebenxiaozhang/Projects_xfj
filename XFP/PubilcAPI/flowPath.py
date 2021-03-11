@@ -1,5 +1,6 @@
 from PubilcAPI.webApi import *
 from datetime import date, timedelta
+from PubilcAPI.appletApi import *
 
 
 class flowPath:
