@@ -123,6 +123,7 @@ class TestCase(unittest.TestCase):
         dome1 = time.strftime("%Y-%m-%d %H:%M:%S")
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2, auditRemark=dome1 + ' 审核失败')
+        time.sleep(2)
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome1 + ' 审核失败', self.appApi.appText.get('auditRemark'))
         self.appApi.GetUserAgenda()

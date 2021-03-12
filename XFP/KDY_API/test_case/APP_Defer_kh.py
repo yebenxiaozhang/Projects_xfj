@@ -147,7 +147,6 @@ class TestCase(unittest.TestCase):
         self.flowPath.client_list_non_null()
         self.webApi.Audit_management(suspend=True, suspendLevel=1)  # 修改配置审核
         """    B-2 客户申请暂缓--审核中--跟进不变    """
-        self.follow_front()
         self.appApi.ClientList()
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
         """暂缓失败后进行查看任务待办是否有新增"""
@@ -156,7 +155,6 @@ class TestCase(unittest.TestCase):
         self.appApi.ClientList()
         self.appApi.ClientTaskPause()
         self.flowPath.apply_status(status='申请中', keyWord=self.appText.get('cluePhone'))
-        self.follow_later()
         self.appApi.ClientList()
         """3、客户申请暂缓跟进-审核失败     已驳回                 已取消"""
         dome = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -165,6 +163,10 @@ class TestCase(unittest.TestCase):
 
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + ' 审核失败', self.appApi.appText.get('auditRemark'))
+
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('审核失败', self.appText.get('followContent'))
 
         # 验证暂缓失败后是否有新增
         self.appApi.GetUserAgenda()
@@ -198,6 +200,7 @@ class TestCase(unittest.TestCase):
         self.appApi.GetUserAgenda()
         self.assertEqual(dome, self.appText.get('total'))
         self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'))
+
         """首页待办-暂缓成功后  进行流放公海"""
         self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已同意', keyWord=self.appText.get('cluePhone'), vlue=1)
@@ -216,6 +219,10 @@ class TestCase(unittest.TestCase):
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2, auditRemark=dome + ' 审核失败')
 
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('审核失败', self.appText.get('followContent'))
+
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + ' 审核失败', self.appApi.appText.get('auditRemark'))
         self.appApi.client_exile_sea()
@@ -233,6 +240,11 @@ class TestCase(unittest.TestCase):
         """8、客户申请暂缓跟进-二级审核失败        已驳回            已取消"""
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
         self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
+
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('审核失败', self.appText.get('followContent'))
+
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.appApi.client_exile_sea()
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'), vlue=1)
@@ -284,25 +296,25 @@ class TestCase(unittest.TestCase):
         if self.appText.get('total') != dome1:
             raise RuntimeError('申请暂缓后 会将首页待办（带看 | 跟进）移除')
 
-    def follow_front(self):
-        """跟进前"""
-        self.appApi.GetUserAgenda(tesk=2)
-        globals()['dome'] = self.appText.get('total')
-
-    def follow_later(self, vlue=0):
-        """跟进后"""
-        self.appApi.GetUserAgenda()
-        if vlue == 0:
-            self.assertEqual(globals()['dome'], self.appText.get('total'))
-        else:
-            self.assertNotEqual(globals()['dome'], self.appText.get('total'))
-            if vlue == -1:
-                self.assertEqual(globals()['dome'] - 1, self.appText.get('total'))
-            else:
-                self.assertEqual(globals()['dome'] + 1, self.appText.get('total'))
-
-    def client_front(self):
-        """客户前"""
-        self.flowPath.client_list_non_null()
-        self.appApi.ClientFollowList()
-        self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')
+    # def follow_front(self):
+    #     """跟进前"""
+    #     self.appApi.GetUserAgenda(tesk=2)
+    #     globals()['dome'] = self.appText.get('total')
+    #
+    # def follow_later(self, vlue=0):
+    #     """跟进后"""
+    #     self.appApi.GetUserAgenda()
+    #     if vlue == 0:
+    #         self.assertEqual(globals()['dome'], self.appText.get('total'))
+    #     else:
+    #         self.assertNotEqual(globals()['dome'], self.appText.get('total'))
+    #         if vlue == -1:
+    #             self.assertEqual(globals()['dome'] - 1, self.appText.get('total'))
+    #         else:
+    #             self.assertEqual(globals()['dome'] + 1, self.appText.get('total'))
+    #
+    # def client_front(self):
+    #     """客户前"""
+    #     self.flowPath.client_list_non_null()
+    #     self.appApi.ClientFollowList()
+    #     self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d %H:%M:%S"), followType='客户')

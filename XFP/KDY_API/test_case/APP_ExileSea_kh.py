@@ -179,6 +179,10 @@ class TestCase(unittest.TestCase):
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
         self.assertEqual(dome + ' 客户无效终止审核失败', self.appApi.appText.get('auditRemark'))
 
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('客户无效终止审核失败', self.appText.get('followContent'))
+
     def test_ExileSea_05(self):
         """5、客户无效终止-待审核                 申请中"""
         self.flowPath.client_list_non_null()
@@ -196,6 +200,10 @@ class TestCase(unittest.TestCase):
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
+
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('审核失败', self.appText.get('followContent'))
 
         """首页待办-客户释放公海-审核失败"""
         self.appApi.GetUserAgenda()
@@ -218,6 +226,10 @@ class TestCase(unittest.TestCase):
         self.webApi.audit(auditStatue=2, auditRemark=time.strftime("%Y-%m-%d %H:%M:%S") + ' 审核失败')
 
         self.flowPath.apply_status(status='已驳回', keyWord=self.appText.get('cluePhone'))
+
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('审核失败', self.appText.get('followContent'))
 
     def test_ExileSea_07(self):
         """9、客户无效终止-二级审核成功           已同意"""

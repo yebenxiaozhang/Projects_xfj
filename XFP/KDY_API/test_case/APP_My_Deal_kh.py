@@ -137,6 +137,11 @@ class TestCase(unittest.TestCase):
         """2、录入成交-审核失败        已驳回                         已驳回"""
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
+
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('成交审核不通过', self.appText.get('followContent'))
+
         self.flowPath.deal_status(status=2, keyWord=self.appText.get('dealPhone'))
 
     def test_my_deal_03(self):
@@ -148,9 +153,6 @@ class TestCase(unittest.TestCase):
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit()
         self.flowPath.deal_status(status=1, keyWord=self.appText.get('dealPhone'))
-        # self.webApi.finance_deal_auditList(keyWord=self.appText.get('dealPhone'))
-        # self.webApi.finance_deal_audit()
-        # self.flowPath.deal_status(status=1, keyWord=self.appText.get('dealPhone'))
 
     def test_my_deal_04(self):
         """1、录入成交-待审核          申请中"""
@@ -163,6 +165,10 @@ class TestCase(unittest.TestCase):
 
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
+
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('成交审核不通过', self.appText.get('followContent'))
 
         self.flowPath.deal_status(status=2, keyWord=self.appText.get('dealPhone'))
 
@@ -186,7 +192,6 @@ class TestCase(unittest.TestCase):
         """查看审核人是否一一对应"""
         self.appApi.transProgress()
         self.assertIn('总监', self.appText.get('directorAuditDesc'))
-        # self.assertIn('财务', self.appText.get('financialAuditDesc'))
         self.assertIn('经理', self.appText.get('managerAuditDesc'))
 
     def test_my_deal_06(self):
@@ -202,6 +207,10 @@ class TestCase(unittest.TestCase):
 
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
         self.webApi.audit(auditStatue=2, auditRemark=dome + ' 成交审核不通过')
+
+        """查看跟进记录  是否有审核记录"""
+        self.appApi.LookHistoryFollow()
+        self.assertIn('成交审核不通过', self.appText.get('followContent'))
 
         self.flowPath.deal_status(status=2, keyWord=self.appText.get('dealPhone'))
 
