@@ -235,6 +235,9 @@ class flowPath:
         self.appApi.ClueFollowSave(taskEndTime=time.strftime("%Y-%m-%d") + ' 22:00:00')
         time.sleep(1)
         self.appApi.ExileSea()
+        if self.appApi.appText.get('code') != 200:
+            raise RuntimeError('线索终止失败---已写跟进还是无法终止' + '线索ID：' +
+                               str(self.appApi.appText.get('clueId')))
 
     def add_new_clue(self):
         """新增一条线索"""

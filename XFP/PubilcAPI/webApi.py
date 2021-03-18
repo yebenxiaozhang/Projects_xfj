@@ -1057,6 +1057,8 @@ class webApi:
             self.appText.set_map('transYeji', globals()['r.text']['data']['records'][0]['transYeji'])
             self.appText.set_map('CJDH', globals()['r.text']['data']['records'][0]['transOrderNo'])
 
+        self.appText.set_map('web_total', globals()['r.text']['data']['total'])
+
     def TransactionSettlementStatisticalInfo(self):
         """结算详情"""
         self.PostRequest(url='/api/b/transactionSettlement/getTransactionSettlementStatisticalInfo',
@@ -1192,7 +1194,7 @@ class webApi:
                                 "requestId": self.appText.get('requestId'),
                             })
 
-    def requestList(self, paymentStatus=0, keyWord=None):
+    def requestList(self, paymentStatus=1, keyWord=None):
         """付款登记列表"""
         self.PostRequest(url='/api/b/payment/request/list',
                          data={
