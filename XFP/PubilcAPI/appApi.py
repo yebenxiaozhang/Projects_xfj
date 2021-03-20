@@ -981,9 +981,10 @@ class appApi:
                         transHouseBuilding='2', transHouseUnit='1-1',
                         transOwnerName=None, transRemark='python-签约', transReservedTellphone=None,
                         transTotalPrice='998888.56',isDeleted=None,
-                        transYeji='88.88',
+                        transYeji=None,
                         attachmentIds='13'):
-        transYeji = random.randint(20000, 100000)
+        if transYeji is None:
+            transYeji = random.randint(20000, 100000)
         transTotalPrice = random.randint(200000, 20000000)
         """成交录入"""
         if Status == 0:

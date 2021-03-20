@@ -175,17 +175,17 @@ class TestCase(unittest.TestCase):
     def test_my_deal_05(self):
         """3、录入成交-一级审核成功    审核中"""
         self.webApi.Audit_management(customerDeal=True, customerDealLevel=2)
-        # self.appApi.deal_List(transStatus=1)
+        # self.appApi.deal_List(ApplyStatus=1)
         # self.webApi.detail()
         # self.appApi.ClueInfo()
         self.appApi.add_deal(Status=1)
 
-        self.appApi.Login(userName='13062200302')
+        self.appApi.Login(userName='13062200302', authCode=1)
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'))
         self.webApi.audit(auditStatue=1)
 
         """4、录入成交-二级审核成功    已确认                         已确认"""
-        self.appApi.Login(userName='13062200303')
+        self.appApi.Login(userName='13062200303', authCode=1)
         self.webApi.auditList(phoneNum=self.appText.get('cluePhone'), auditLevel=2)
         self.webApi.audit(auditStatue=1)
 
