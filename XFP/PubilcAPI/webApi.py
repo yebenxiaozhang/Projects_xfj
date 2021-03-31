@@ -62,7 +62,8 @@ class webApi:
                          customerStop=False, customerStopLevel=1, customerVisit=False,
                          customerVisitLevel=1, customerDeal=False, customerDealLevel=1,
                          firstCallDaySwitch=True, firstCallDayWealth=10, notFirstCallDayWealth=5,
-                         wealthDetailSwitch=False, authCodeSwitch=False):
+                         wealthDetailSwitch=False, authCodeSwitch=False, dealIRepaySwitch=True,
+                         visitIRepaySwitch=True):
         """审核管理"""
         try:
             configValue = {
@@ -141,8 +142,11 @@ class webApi:
                         "authCodeSwitch": authCodeSwitch,
                         "authCodeOutTime": 30,      # 授权码时效
                         "authCodeOutTimeLength": 6,     # 授权码长度
-                        "authCodeLoginOutTime": 30
-                }
+                        "authCodeLoginOutTime": 30 },
+                    "repayConfig": {
+                        "dealIRepaySwitch": dealIRepaySwitch,
+                        "visitIRepaySwitch": visitIRepaySwitch
+                    }
 
                 }
             self.PostRequest(url='/api/b/systeminfo/updateSysConfig',
@@ -1263,11 +1267,12 @@ class webApi:
         self.appText.set_map('total', len(globals()['r.text']['data']['records']))
 
     def wealthAudit(self, auditType=True):
+        """授予财富值审核"""
         if auditType == True:
             auditRemark = None
         else:
             auditRemark = time.strftime("%Y-%m-%d %H:%M:%S")
-        """授予财富值审核"""
+
         self.PostRequest(url='/api/b/wealthAudit/wealthAudit',
                          data={
                             'auditId': self.appText.get('auditId'),

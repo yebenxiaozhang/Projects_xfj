@@ -106,6 +106,18 @@ class TestCase(unittest.TestCase):
         if self.appText.get('paidWealth') != self.appText.get('vlue'):
             print('结算----授予财富值与授予财富值列表总额不一致')
 
+        """添加财务审核后 进行授予财富值"""
+        self.webApi.Audit_management(wealthDetailSwitch=True)
+        self.webApi.awardedWealthDetail()
+        dome = self.appText.get('wealthValue')
+        self.webApi.wealthAudit()
+        self.webApi.WealthDetailList()
+        if dome != self.appText.get('wealthValue'):
+            print('结算----授予财富值与授予财富值记录单次金额不一致')
+        self.webApi.TransactionSettlementStatisticalInfo()
+        if self.appText.get('paidWealth') != self.appText.get('vlue'):
+            print('结算----授予财富值与授予财富值列表总额不一致')
+
         if ApiXfpUrl == 'http://xfp.xfj100.com':
             raise RuntimeError('正式站不跑')
         else:
